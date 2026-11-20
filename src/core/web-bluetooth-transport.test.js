@@ -55,9 +55,8 @@ describe("WebBluetoothTransport", () => {
     const registry = new TransportRegistry();
     registerWebBluetoothTransport(registry, { bluetooth: {} });
     expect(registry.has("web.bluetooth.le")).toBe(true);
-    expect(
-      registry.getDescriptor("web.bluetooth.le").transportId,
-    ).toBe("web.bluetooth.le");
+    const descriptor = registry.getDescriptor("web.bluetooth.le");
+    expect(descriptor.transportId).toBe("web.bluetooth.le");
   });
 
   it("connects, emits notification chunks, and writes bytes", async () => {
@@ -75,9 +74,8 @@ describe("WebBluetoothTransport", () => {
     );
     await transport.write(new Uint8Array([3, 4]));
     expect(chunks.map((chunk) => [...chunk])).toEqual([[1, 2]]);
-    expect(
-      fixture.characteristic.writeValueWithResponse,
-    ).toHaveBeenCalledTimes(1);
+    const write = fixture.characteristic.writeValueWithResponse;
+    expect(write).toHaveBeenCalledTimes(1);
     await transport.dispose();
     expect(fixture.device.gatt.connected).toBe(false);
   });
