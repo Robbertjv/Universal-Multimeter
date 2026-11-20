@@ -265,14 +265,18 @@ export class WebBluetoothTransport extends TransportAdapter {
           device.gatt.disconnect();
           throw signal.reason;
         }
-        if (
-          !this._writeCharacteristic.properties?.write &&
-          !this._writeCharacteristic.properties?.writeWithoutResponse
-        ) {
+        const writeSupported =
+          config.writeMode === "without-response"
+            ? this._writeCharacteristic.properties?.writeWithoutResponse
+            : this._writeCharacteristic.properties?.write;
+        if (!writeSupported) {
           throw new TransportError(
             "TRANSPORT_GATT_CHARACTERISTIC_NOT_FOUND",
-            "The configured transmit characteristic does not support writes.",
-            { characteristicUuid: config.writeCharacteristicUuid },
+            "The configured transmit characteristic does not support the selected write mode.",
+            {
+              characteristicUuid: config.writeCharacteristicUuid,
+              writeMode: config.writeMode ?? "with-response",
+            },
           );
         }
       }
@@ -292,10 +296,13 @@ export class WebBluetoothTransport extends TransportAdapter {
     }
     if (signal?.aborted) throw signal.reason;
     try {
-      if (
-        this._config.writeMode === "without-response" &&
-        typeof characteristic.writeValueWithoutResponse === "function"
-      ) {
+      if (this._config.writeMode === "without-response") {
+        if (typeof characteristic.writeValueWithoutResponse !== "function") {
+          throw new TransportError(
+            "TRANSPORT_WRITE_FAILED",
+            "The browser does not expose writeValueWithoutResponse().",
+          );
+        }
         await characteristic.writeValueWithoutResponse(bytes);
       } else if (typeof characteristic.writeValueWithResponse === "function") {
         await characteristic.writeValueWithResponse(bytes);
@@ -304,7 +311,7 @@ export class WebBluetoothTransport extends TransportAdapter {
       } else {
         throw new TransportError(
           "TRANSPORT_WRITE_FAILED",
-          "The browser does not expose a supported GATT write method.",
+          "The browser does not expose a supported GATT write-with-response method.",
         );
       }
       if (signal?.aborted) throw signal.reason;
