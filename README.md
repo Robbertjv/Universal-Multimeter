@@ -4,7 +4,7 @@ A modular, browser-based interface for reading measurements from different multi
 
 ## Project status
 
-**Application foundation in progress.** The first Vite/Web Components app shell, JavaScript quality tooling, smoke test, and CI workflow are being added. No device drivers or hardware-validated support are claimed.
+**Application foundation integrated; universal measurement model in progress.** The Vite/Web Components app shell, JavaScript quality tooling, smoke test, and CI workflow are in `main`. The shared measurement model is under review. No device drivers or hardware-validated support are claimed.
 
 ## Initial target
 

@@ -42,7 +42,7 @@ Build the shared foundations once, then develop all requested device drivers inc
 - [x] Draft transport contract in TRANSPORT_CONTRACT.md.
 - [x] Draft Device Manager and Measurement Engine contracts in DEVICE_MANAGER_AND_ENGINE.md.
 - [x] Define protocol fixture/test conventions in TEST_STRATEGY.md.
-- [ ] Create Device Manager and Measurement Engine implementation skeletons.
+- [ ] Create Device Manager and Measurement Engine implementation skeletons.\n- [x] Implement the v1 universal measurement model, validation utilities, and unit metadata (issue #4; awaiting PR review).
 - [x] Add CI for automated checks.
 
 The v1 contract documents are reviewed implementation baselines. Checked items indicate code or configuration has been added; runtime and CI validation are recorded separately.
