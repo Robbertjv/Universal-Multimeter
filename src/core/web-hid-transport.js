@@ -28,9 +28,7 @@ function validate(profile) {
   for (const key of ["vendorId", "productId"]) {
     if (
       config[key] !== undefined &&
-      (!Number.isInteger(config[key]) ||
-        config[key] < 0 ||
-        config[key] > 65535)
+      (!Number.isInteger(config[key]) || config[key] < 0 || config[key] > 65535)
     ) {
       throw new TransportError(
         "TRANSPORT_INVALID_DESCRIPTOR",
@@ -41,9 +39,7 @@ function validate(profile) {
   for (const key of ["inputReportId", "outputReportId"]) {
     if (
       config[key] !== undefined &&
-      (!Number.isInteger(config[key]) ||
-        config[key] < 0 ||
-        config[key] > 255)
+      (!Number.isInteger(config[key]) || config[key] < 0 || config[key] > 255)
     ) {
       throw new TransportError(
         "TRANSPORT_INVALID_DESCRIPTOR",
@@ -94,11 +90,7 @@ function mapError(error, operation) {
 }
 
 export class WebHIDTransport extends TransportAdapter {
-  constructor({
-    profile,
-    hid = globalThis.navigator?.hid,
-    ...options
-  } = {}) {
+  constructor({ profile, hid = globalThis.navigator?.hid, ...options } = {}) {
     super({ descriptor: WEB_HID_TRANSPORT_DESCRIPTOR, ...options });
     this._config = validate(profile ?? {});
     this._hid = hid;
