@@ -37,6 +37,12 @@ function validateBleProfile(profile) {
       "writeCharacteristicUuid must be a non-empty string when provided.",
     );
   }
+  if (config.optionalServices !== undefined && !Array.isArray(config.optionalServices)) {
+    throw new TransportError(
+      "TRANSPORT_INVALID_DESCRIPTOR",
+      "optionalServices must be an array when provided.",
+    );
+  }
   if (config.filters !== undefined && !Array.isArray(config.filters)) {
     throw new TransportError(
       "TRANSPORT_INVALID_DESCRIPTOR",
@@ -199,15 +205,24 @@ export class WebBluetoothTransport extends TransportAdapter {
     let stage = "gatt-connect";
     try {
       this._server = await device.gatt.connect();
-      if (signal?.aborted) throw signal.reason;
+      if (signal?.aborted) {
+        device.gatt.disconnect();
+        throw signal.reason;
+      }
       stage = "get-primary-service";
       this._service = await this._server.getPrimaryService(config.serviceUuid);
-      if (signal?.aborted) throw signal.reason;
+      if (signal?.aborted) {
+        device.gatt.disconnect();
+        throw signal.reason;
+      }
       stage = "get-characteristic";
       this._notifyCharacteristic = await this._service.getCharacteristic(
         config.notifyCharacteristicUuid,
       );
-      if (signal?.aborted) throw signal.reason;
+      if (signal?.aborted) {
+        device.gatt.disconnect();
+        throw signal.reason;
+      }
       if (
         !this._notifyCharacteristic.properties?.notify &&
         !this._notifyCharacteristic.properties?.indicate
@@ -233,14 +248,20 @@ export class WebBluetoothTransport extends TransportAdapter {
         this._onValueChanged,
       );
       await this._notifyCharacteristic.startNotifications();
-      if (signal?.aborted) throw signal.reason;
+      if (signal?.aborted) {
+        device.gatt.disconnect();
+        throw signal.reason;
+      }
 
       if (config.writeCharacteristicUuid) {
         stage = "get-characteristic";
         this._writeCharacteristic = await this._service.getCharacteristic(
           config.writeCharacteristicUuid,
         );
-        if (signal?.aborted) throw signal.reason;
+        if (signal?.aborted) {
+          device.gatt.disconnect();
+          throw signal.reason;
+        }
         if (
           !this._writeCharacteristic.properties?.write &&
           !this._writeCharacteristic.properties?.writeWithoutResponse
