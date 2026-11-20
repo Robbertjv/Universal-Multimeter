@@ -40,7 +40,7 @@ These labels are independent. For example, a driver can be *in progress* and *ex
 | Universal measurement model | Done | Highest | Merged via PR #13; core model, validation, constants, unit metadata, API documentation; 15 tests pass with lint, formatting, and production build. |
 | Driver contract and capability model | Done | Highest | Merged via PR #14; runtime base class, descriptor validation, stable-ID registry, capability/control gate, events, mock driver, and 15 contract tests. CI passes with 30 total tests. |
 | Transport base contract and mock | In review | Highest | Runtime, mock fixture, stable errors, operation timeouts with AbortSignal, serialized writes, bounded write queue/chunk size, and contract tests implemented; CI passed (ESLint, Prettier, 44 Vitest tests, Vite build); PR review pending. No browser adapter or hardware validation. |
-| Device Manager / Measurement Engine | Ready | Highest | v1.0 service contracts documented; runtime implementation tracked in issue #7. |
+| Device Manager / Measurement Engine | In progress | Highest | Initial DeviceProfileRegistry, TransportRegistry, DeviceManager lifecycle orchestration, MeasurementEngine cache/validation/staleness, and mock integration tests implemented on PR #16; CI/review pending. No hardware adapter or device validation. |
 | BLE transport | Ready | High | Base contract available; concrete Web Bluetooth adapter not started. |
 | Serial transport | Ready | High | Base contract available; concrete Web Serial adapter not started. |
 | WebHID transport | Ready | High | Base contract available; concrete WebHID adapter not started. |
@@ -138,3 +138,5 @@ Review clarifications:
 - 2026-11-20 — PR #14 merged: driver runtime, registry, capability/control gate, mock driver, and 15 driver contract tests integrated into main; CI passes with 30 tests total.
 - 2026-11-20 — Started issue #6 on feature/issue-6-transport-contract: transport runtime, mock transport, stable errors, and reusable transport/driver integration tests; awaiting review.
 - 2026-11-20 — Started issue #3 on feature/issue-3-app-foundation: Vite app shell, Web Component, Vitest smoke test, ESLint/Prettier, and GitHub Actions. GitHub Actions quality gate passed on PR #12; awaiting review/merge.
+
+- 2026-11-20 — Started issue #7 on `feature/issue-7-device-manager`: implemented profile/transport registries, Device Manager connect/rollback/disconnect orchestration, Measurement Engine ingestion/cache/staleness, and mock integration tests; PR #16 opened for review.
