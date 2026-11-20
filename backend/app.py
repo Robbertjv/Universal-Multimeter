@@ -12,7 +12,7 @@ from collections import deque
 from typing import Any
 
 from fastapi import FastAPI, Header, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse\nfrom fastapi.staticfiles import StaticFiles\nfrom pathlib import Path
 from paho.mqtt import client as mqtt
 
 app = FastAPI(title="Universal Multimeter Local Bridge", version="0.1.0")
@@ -165,3 +165,4 @@ async def mcp(request: Request, authorization: str | None = Header(default=None)
                 "content": [{"type": "text", "text": str(exc)}], "isError": True}}
     return {"jsonrpc": "2.0", "id": request_id, "error": {
         "code": -32601, "message": f"Method not found: {method}"}}
+\n# Serve the static web client from the same loopback origin as the local bridge.\nWEB_ROOT = Path(__file__).resolve().parent.parent\napp.mount("/", StaticFiles(directory=WEB_ROOT, html=True), name="web")\n
