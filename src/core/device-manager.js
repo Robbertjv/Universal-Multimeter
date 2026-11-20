@@ -131,13 +131,14 @@ export class DeviceManager {
   }
 
   connect(profileId, options = {}) {
-    if (this._connecting.has(profileId)) {
-      return this._connecting.get(profileId);
+    const connectionKey = `${profileId}\\u0000${options.deviceId ?? "default"}`;
+    if (this._connecting.has(connectionKey)) {
+      return this._connecting.get(connectionKey);
     }
     const promise = this._connect(profileId, options).finally(() =>
-      this._connecting.delete(profileId),
+      this._connecting.delete(connectionKey),
     );
-    this._connecting.set(profileId, promise);
+    this._connecting.set(connectionKey, promise);
     return promise;
   }
 
@@ -168,9 +169,12 @@ export class DeviceManager {
         options,
       });
       session.unsubscribers.push(
-        session.transport.on("state", (event) =>
-          this._emit("transport-state", { deviceId, ...event }),
-        ),
+        session.transport.on("state", (event) => {
+          this._emit("transport-state", { deviceId, ...event });
+          if (event.unexpected && event.state === "disconnected") {
+            void this._handleUnexpectedDisconnect(session, event);
+          }
+        }),
         session.transport.on("error", (error) => {
           this._emit("device-error", { deviceId, error });
           if (session.state === "connected") {
@@ -238,6 +242,31 @@ export class DeviceManager {
         { deviceId, cause },
       );
     }
+  }
+
+  async _handleUnexpectedDisconnect(session, event) {
+    if (session.state !== "connected") return;
+    const error = new DeviceManagerError(
+      "DEVICE_TRANSPORT_LOST",
+      "The transport disconnected unexpectedly.",
+      { deviceId: session.deviceId, event },
+    );
+    this._setState(session, "error", error);
+    this._engine.unregisterDevice(session.deviceId);
+    try {
+      await this._cleanup(session);
+    } catch (cleanupError) {
+      this._emit("device-warning", {
+        deviceId: session.deviceId,
+        warning: { code: "DEVICE_CLEANUP_FAILED", cause: cleanupError },
+      });
+    }
+    this._sessions.delete(session.deviceId);
+    this._emit("device-disconnected", {
+      deviceId: session.deviceId,
+      reason: "transport-lost",
+      error,
+    });
   }
 
   async disconnect(deviceId, reason = "user") {
