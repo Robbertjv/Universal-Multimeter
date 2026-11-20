@@ -61,7 +61,8 @@ The repository also maintains the development process and current project state:
 - [Measurement Data Model](docs/MEASUREMENT_DATA_MODEL.md) — normalized reading and device schemas.
 - [Driver Contract](docs/DRIVER_CONTRACT.md) — driver lifecycle, parser boundary, and capability rules.
 - [Transport Contract](docs/TRANSPORT_CONTRACT.md) — common transport interface and adapter requirements.
-- [Device Manager and Measurement Engine](docs/DEVICE_MANAGER_AND_ENGINE.md) — service responsibilities and lifecycle.\n- [Device Manager Runtime API](docs/DEVICE_MANAGER_API.md) — implemented registry, connection, measurement ingestion, and current limitations.
+- [Device Manager and Measurement Engine](docs/DEVICE_MANAGER_AND_ENGINE.md) — service responsibilities and lifecycle.
+- [Device Manager Runtime API](docs/DEVICE_MANAGER_API.md) — implemented registry, connection, measurement ingestion, and current limitations.
 - [Test Strategy](docs/TEST_STRATEGY.md) — unit, fixture, integration, browser, and hardware validation.
 
 These documents are maintained as the project evolves. Driver implementation may proceed with incomplete protocol knowledge; unknowns are tracked explicitly and full support is only claimed after real-hardware validation.
