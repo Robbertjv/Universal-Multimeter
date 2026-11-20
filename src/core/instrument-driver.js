@@ -278,7 +278,11 @@ export class InstrumentDriver {
         "Injected transport must expose on().",
       );
     this._transportUnsubscribers.push(
-      this._transport.on("data", (chunk) => this.onTransportData(chunk)),
+      this._transport.on("data", (chunk) => {
+        Promise.resolve()
+          .then(() => this.onTransportData(chunk))
+          .catch((error) => this.publish("error", error));
+      }),
       this._transport.on("error", (error) => this.publish("error", error)),
       this._transport.on("state", (event) =>
         this.publish("transport-state", event),
