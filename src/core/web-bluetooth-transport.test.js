@@ -69,12 +69,8 @@ describe("WebBluetoothTransport", () => {
     const chunks = [];
     transport.on("data", (chunk) => chunks.push(chunk));
     await transport.connect();
-    fixture.characteristic.value = new DataView(
-      new Uint8Array([1, 2]).buffer,
-    );
-    fixture.characteristic.dispatchEvent(
-      new Event("characteristicvaluechanged"),
-    );
+    fixture.characteristic.value = new DataView(new Uint8Array([1, 2]).buffer);
+    fixture.characteristic.dispatchEvent(new Event("characteristicvaluechanged"));
     await transport.write(new Uint8Array([3, 4]));
     expect(chunks.map((chunk) => [...chunk])).toEqual([[1, 2]]);
     expect(
