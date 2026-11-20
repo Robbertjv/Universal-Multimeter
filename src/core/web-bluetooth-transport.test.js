@@ -136,9 +136,7 @@ describe("WebBluetoothTransport", () => {
     expect(registry.getDescriptor("web.bluetooth.le")).toMatchObject(
       WEB_BLUETOOTH_TRANSPORT_DESCRIPTOR,
     );
-    const transport = registry.create("web.bluetooth.le", {
-      profile: PROFILE,
-    });
+    const transport = registry.create("web.bluetooth.le", { profile: PROFILE });
     expect(transport).toBeInstanceOf(WebBluetoothTransport);
     expect(transport.getDescriptor().transportId).toBe("web.bluetooth.le");
   });
