@@ -196,11 +196,14 @@ export class WebBluetoothTransport extends TransportAdapter {
       this._onGattDisconnected,
     );
 
+    let stage = "gatt-connect";
     try {
       this._server = await device.gatt.connect();
       if (signal?.aborted) throw signal.reason;
+      stage = "get-primary-service";
       this._service = await this._server.getPrimaryService(config.serviceUuid);
       if (signal?.aborted) throw signal.reason;
+      stage = "get-characteristic";
       this._notifyCharacteristic = await this._service.getCharacteristic(
         config.notifyCharacteristicUuid,
       );
@@ -233,6 +236,7 @@ export class WebBluetoothTransport extends TransportAdapter {
       if (signal?.aborted) throw signal.reason;
 
       if (config.writeCharacteristicUuid) {
+        stage = "get-characteristic";
         this._writeCharacteristic = await this._service.getCharacteristic(
           config.writeCharacteristicUuid,
         );
@@ -250,10 +254,7 @@ export class WebBluetoothTransport extends TransportAdapter {
       }
     } catch (cause) {
       if (cause instanceof TransportError) throw cause;
-      throw toTransportError(
-        cause,
-        cause?.operation ?? (this._service ? "get-characteristic" : "gatt-connect"),
-      );
+      throw toTransportError(cause, stage);
     }
   }
 
@@ -342,4 +343,14 @@ export class WebBluetoothTransport extends TransportAdapter {
 
 export function createWebBluetoothTransport(dependencies = {}) {
   return new WebBluetoothTransport(dependencies);
+}
+
+export function registerWebBluetoothTransport(
+  registry,
+  { bluetooth = globalThis.navigator?.bluetooth } = {},
+) {
+  registry.register(WEB_BLUETOOTH_TRANSPORT_DESCRIPTOR, ({ profile }) =>
+    createWebBluetoothTransport({ profile, bluetooth }),
+  );
+  return registry;
 }
