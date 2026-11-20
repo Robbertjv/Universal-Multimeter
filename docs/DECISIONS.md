@@ -35,3 +35,38 @@ Record decisions that materially affect architecture, compatibility, scope, or d
 - Drivers map instrument-specific readings into a common structure.
 - Device-specific fields can be preserved as metadata without contaminating common UI logic.
 - Unsupported controls and unavailable values are represented explicitly.
+
+
+## 2026-11-20 — Approve v1 architecture contracts as implementation baseline
+
+**Context:** The project needs stable common contracts to start implementation, while device protocol research and hardware validation continue incrementally.
+
+**Decision:** The reviewed architecture, measurement model, driver contract, transport contract, Device Manager/Measurement Engine contract, and test strategy are accepted as the v1.0 implementation baseline. This is a working baseline, not a claim that application code or device drivers have been implemented or hardware-validated.
+
+**Consequences:**
+- Implementation may begin against these contracts.
+- Public contract changes must be documented and tested; compatibility-affecting changes require a decision-log entry.
+- Model-specific protocol unknowns remain open in the device protocol reference and driver status register.
+- Browser-only transports and optional native/helper bridges are separate, explicit paths.
+
+## 2026-11-20 — Normalize quantity, function, and unit identifiers
+
+**Context:** Different instruments encode similar functions and units differently. The application needs stable values for charting, logging, export, and integrations.
+
+**Decision:** Use documented lowercase normalized identifiers for quantity and function, UCUM-compatible unit symbols where possible, and preserve original device codes in metadata. Use explicit unknown markers rather than guesses.
+
+**Consequences:**
+- Unit display glyphs remain a UI concern.
+- Prefix and decimal scaling must be resolved in the device decoder.
+- Dimensionless quantities can use unit `1`; unknown units remain explicitly unknown.
+
+## 2026-11-20 — Separate browser transports from OS-level bridge transports
+
+**Context:** Bluetooth Classic/SPP and conventional MQTT over TCP are not directly exposed as arbitrary sockets by normal browser APIs.
+
+**Decision:** Browser APIs and optional native/helper bridges are separate transport implementations connected through a narrow, authenticated bridge contract.
+
+**Consequences:**
+- BLE, Web Serial, WebHID, and MQTT-over-WebSocket remain browser-side paths where available.
+- Bluetooth Classic and MQTT-TCP may use a local/native helper.
+- The helper must be explicitly installed/launched, authenticated, and scoped; it is not assumed to exist.
