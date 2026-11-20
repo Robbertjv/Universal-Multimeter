@@ -88,7 +88,11 @@ function mapError(error, operation) {
 }
 
 export class WebHIDTransport extends TransportAdapter {
-  constructor({\n    profile,\n    hid = globalThis.navigator?.hid,\n    ...options\n  } = {}) {
+  constructor({
+    profile,
+    hid = globalThis.navigator?.hid,
+    ...options
+  } = {}) {
     super({ descriptor: WEB_HID_TRANSPORT_DESCRIPTOR, ...options });
     this._config = validate(profile ?? {});
     this._hid = hid;
