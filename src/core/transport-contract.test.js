@@ -117,7 +117,9 @@ describe("transport adapter contract", () => {
       new Promise((resolve) => {
         finish = resolve;
       });
-    await expect(bounded.write(new Uint8Array([1]))).rejects.toMatchObject({
+    const timedOutWrite = bounded.write(new Uint8Array([1]));
+    await vi.waitFor(() => expect(finish).toBeTypeOf("function"));
+    await expect(timedOutWrite).rejects.toMatchObject({
       code: "TRANSPORT_TIMEOUT",
     });
     await expect(bounded.write(new Uint8Array([2]))).rejects.toMatchObject({
@@ -139,6 +141,7 @@ describe("transport adapter contract", () => {
         finish = resolve;
       });
     const write = bounded.write(new Uint8Array([1]));
+    await vi.waitFor(() => expect(finish).toBeTypeOf("function"));
     const disconnect = bounded.disconnect();
     await vi.waitFor(() => expect(bounded.state).toBe("disconnecting"));
     finish();
@@ -155,7 +158,7 @@ describe("transport adapter contract", () => {
         finish = resolve;
       });
     const first = bounded.write(new Uint8Array([1]));
-    await Promise.resolve();
+    await vi.waitFor(() => expect(finish).toBeTypeOf("function"));
     await expect(bounded.write(new Uint8Array([2]))).rejects.toMatchObject({
       code: "TRANSPORT_WRITE_QUEUE_FULL",
     });
