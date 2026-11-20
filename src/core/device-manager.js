@@ -87,15 +87,20 @@ export class DeviceManager {
         session.driver.on("state", (event) => this._emit("driver-state", { deviceId, ...event })),
       );
       await session.driver.initialize();
-      await session.driver.start();
       const descriptor = { deviceId, manufacturer: profile.manufacturer, model: profile.model, driverId: profile.driverId, transportId: profile.transportId, capabilities: session.driver.getCapabilities() };
       this._engine.registerDevice(descriptor);
+      await session.driver.start();
       session.connectedAt = this._clock().toISOString();
       this._setState(session, "connected");
       this._emit("device-connected", { device: this._publicSession(session) });
       return this._publicSession(session);
     } catch (cause) {
-      await this._cleanup(session);
+      try {
+        await this._cleanup(session);
+      } catch (cleanupError) {
+        this._emit("device-warning", { deviceId, warning: { code: "DEVICE_CLEANUP_FAILED", cause: cleanupError } });
+      }
+      this._engine.unregisterDevice(deviceId);
       this._setState(session, "error", cause);
       this._sessions.delete(deviceId);
       this._emit("device-error", { deviceId, error: cause });
