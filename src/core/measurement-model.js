@@ -19,6 +19,9 @@ function cloneMetadata(metadata) {
  * MeasurementValidationError with machine-readable diagnostics on .diagnostics.
  */
 export function createMeasurement(input) {
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    assertValidMeasurement(input);
+  }
   const source = structuredClone(input);
   const metadata = cloneMetadata(source.metadata);
 
