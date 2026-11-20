@@ -216,9 +216,7 @@ export class DeviceManager {
       await session.driver.start();
       session.connectedAt = this._clock().toISOString();
       this._setState(session, "connected");
-      this._emit("device-connected", {
-        device: this._publicSession(session),
-      });
+      this._emit("device-connected", { device: this._publicSession(session) });
       return this._publicSession(session);
     } catch (cause) {
       try {
@@ -255,11 +253,7 @@ export class DeviceManager {
         failure = error;
       }
       this._engine.unregisterDevice(deviceId);
-      this._setState(
-        session,
-        failure ? "error" : "disconnected",
-        failure,
-      );
+      this._setState(session, failure ? "error" : "disconnected", failure);
       this._sessions.delete(deviceId);
       this._emit("device-disconnected", { deviceId, reason, error: failure });
       if (failure) {
@@ -305,11 +299,7 @@ export class DeviceManager {
         { deviceId },
       );
     }
-    return session.driver.executeControl(
-      controlId,
-      parameters,
-      authorization,
-    );
+    return session.driver.executeControl(controlId, parameters, authorization);
   }
 
   async _cleanup(session) {
