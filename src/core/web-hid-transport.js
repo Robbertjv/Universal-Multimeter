@@ -28,7 +28,9 @@ function validate(profile) {
   for (const key of ["vendorId", "productId"]) {
     if (
       config[key] !== undefined &&
-      (!Number.isInteger(config[key]) || config[key] < 0 || config[key] > 65535)
+      (!Number.isInteger(config[key]) ||
+        config[key] < 0 ||
+        config[key] > 65535)
     ) {
       throw new TransportError(
         "TRANSPORT_INVALID_DESCRIPTOR",
@@ -39,7 +41,9 @@ function validate(profile) {
   for (const key of ["inputReportId", "outputReportId"]) {
     if (
       config[key] !== undefined &&
-      (!Number.isInteger(config[key]) || config[key] < 0 || config[key] > 255)
+      (!Number.isInteger(config[key]) ||
+        config[key] < 0 ||
+        config[key] > 255)
     ) {
       throw new TransportError(
         "TRANSPORT_INVALID_DESCRIPTOR",
@@ -81,7 +85,9 @@ function mapError(error, operation) {
   }
 
   return new TransportError(
-    operation === "send" ? "TRANSPORT_WRITE_FAILED" : "TRANSPORT_CONNECT_FAILED",
+    operation === "send"
+      ? "TRANSPORT_WRITE_FAILED"
+      : "TRANSPORT_CONNECT_FAILED",
     "WebHID operation failed: " + operation,
     { cause: error, operation },
   );
