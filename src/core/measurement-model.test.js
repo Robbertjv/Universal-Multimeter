@@ -108,7 +108,7 @@ describe("measurement model", () => {
     expect(primary.channelId).not.toBe(secondary.channelId);
   });
 
-  it("reports diagnostics for malformed timestamps and ranges", () => {
+  it("rejects ranges expressed in a different unit", () => {\n    const result = inspectMeasurement({\n      ...validReading,\n      range: { min: 0, max: 60, unit: "mV" },\n    });\n    expect(result.valid).toBe(false);\n    expect(result.errors.map((error) => error.code)).toContain(\n      "RANGE_UNIT_MISMATCH",\n    );\n  });\n\n  it("reports diagnostics for malformed timestamps and ranges", () => {
     const result = inspectMeasurement({
       ...validReading,
       receivedAt: "not-a-date",
