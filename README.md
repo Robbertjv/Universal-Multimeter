@@ -34,7 +34,22 @@ The application is intended to use a modular architecture consisting of:
 
 See [Project Specification](docs/PROJECT_SPECIFICATION.md) for the full documented scope and architecture.
 
-## Additional requested instruments\n\nThe future device roadmap also includes the Fluke 187, Voltcraft VC8x0 series, Voltcraft GDM-704, UNI-T UT61 series, UNI-T UT71 series, and UNI-T UT612 LCR meter. Their interfaces and protocol maturity vary by exact model; none is claimed as implemented. See the [Project Specification](docs/PROJECT_SPECIFICATION.md#13-additional-instruments-requested-for-future-implementation) for the preliminary protocol research and verification requirements.\n\n## Planned technologies
+## Additional requested instruments
+
+The planned device roadmap extends beyond the initial EEVblog 121GW support and includes:
+
+- **Fluke 187 DMM** — optical infrared serial interface.
+- **Voltcraft VC8x0 series DMMs** — interface and protocol vary by exact model.
+- **Voltcraft GDM-704** — PC interface; protocol details require verification.
+- **UNI-T UT61 series DMMs** — USB and/or RS232, depending on model.
+- **UNI-T UT71 series DMMs** — USB/serial interface.
+- **UNI-T UT612 LCR meter** — USB/serial interface for LCR measurements.
+
+These are requested future targets, not currently implemented or verified as supported. Protocol details, cable variants, and model-specific differences must be confirmed before driver development.
+
+See the [Project Specification](docs/PROJECT_SPECIFICATION.md#13-additional-instruments-requested-for-future-implementation) for the preliminary protocol research, references, and outstanding verification tasks.
+
+## Planned technologies
 
 - HTML, CSS, and JavaScript
 - Web Components
