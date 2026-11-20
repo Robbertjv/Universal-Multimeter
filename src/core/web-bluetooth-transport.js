@@ -37,7 +37,10 @@ function validateBleProfile(profile) {
       "writeCharacteristicUuid must be a non-empty string when provided.",
     );
   }
-  if (config.optionalServices !== undefined && !Array.isArray(config.optionalServices)) {
+  if (
+    config.optionalServices !== undefined &&
+    !Array.isArray(config.optionalServices)
+  ) {
     throw new TransportError(
       "TRANSPORT_INVALID_DESCRIPTOR",
       "optionalServices must be an array when provided.",
