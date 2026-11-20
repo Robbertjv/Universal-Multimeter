@@ -36,16 +36,16 @@ Build the shared foundations once, then develop all requested device drivers inc
 **Priority: highest**
 
 - [x] Draft module boundaries and public interfaces in ARCHITECTURE.md.
-- [ ] Establish application entry point, build/dev workflow, linting, and automated test runner.
+- [x] Establish application entry point, Vite build/dev workflow, linting, and Vitest runner.
 - [x] Draft universal measurement data model in MEASUREMENT_DATA_MODEL.md.
 - [x] Draft driver contract and capability model in DRIVER_CONTRACT.md.
 - [x] Draft transport contract in TRANSPORT_CONTRACT.md.
 - [x] Draft Device Manager and Measurement Engine contracts in DEVICE_MANAGER_AND_ENGINE.md.
 - [x] Define protocol fixture/test conventions in TEST_STRATEGY.md.
 - [ ] Create Device Manager and Measurement Engine implementation skeletons.
-- [ ] Add CI for automated checks.
+- [x] Add CI for automated checks.
 
-The contract documents are proposed v1 baselines and require implementation review; checked items indicate documentation exists, not that runtime code exists.
+The v1 contract documents are reviewed implementation baselines. Checked items indicate code or configuration has been added; runtime and CI validation are recorded separately.
 
 **Exit criteria:** a minimal application can load, instantiate a mock device/transport, normalize a reading, and test it without real hardware.
 

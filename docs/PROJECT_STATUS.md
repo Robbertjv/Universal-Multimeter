@@ -1,8 +1,8 @@
 # Project Status
 
 **Last reviewed:** 2026-11-20  
-**Overall phase:** Architecture v1.0 baseline reviewed; ready to begin implementation  
-**Application implementation:** Not started  
+**Overall phase:** Phase 1 — application foundation in progress  
+**Application implementation:** Foundation skeleton in progress  
 **Overall health:** On track for foundational work; protocol and hardware validation remain open across several devices.
 
 This page is the current project dashboard. Update it when meaningful work is completed, priorities change, or a dependency becomes blocked.
@@ -36,6 +36,7 @@ These labels are independent. For example, a driver can be *in progress* and *ex
 | Project specification and scope | Done | High | Initial scope and architecture documented. |
 | Device protocol research | In progress | High | Consolidated reference exists; several models need captures and clarification. |
 | Workflow and roadmap | Done | High | Defined in repository. |
+| Application skeleton and tooling | In progress | Highest | Vite entry point, Web Component shell, Vitest smoke test, ESLint, Prettier, and CI added; GitHub Actions lint, format, test, and production build checks pass on PR #12. |
 | Universal measurement model | Done | Highest | Reviewed v1.0 implementation baseline documented in MEASUREMENT_DATA_MODEL.md; code not yet implemented. |
 | Driver contract and capability model | Done | Highest | Reviewed v1.0 implementation baseline documented in DRIVER_CONTRACT.md; code not yet implemented. |
 | Device Manager / Measurement Engine | Done | Highest | Reviewed v1.0 service contracts documented; implementation not started. |
@@ -79,7 +80,7 @@ No application drivers have been implemented or hardware-validated yet. The entr
 - [Device Manager and Measurement Engine](DEVICE_MANAGER_AND_ENGINE.md)
 - [Test Strategy](TEST_STRATEGY.md)
 
-These are proposed v1 technical contracts, ready for implementation review. They are not implemented code.
+These v1 technical contracts are the reviewed implementation baseline. Runtime implementation is tracked separately.
 
 ## Current priorities
 
@@ -98,7 +99,7 @@ The initial implementation work packages are tracked as issues:
 | Issue | Work package | Status |
 |---|---|---|
 | [#2](https://github.com/Robbertjv/Universal-Multimeter/issues/2) | Review and ratify v1 architecture/data/driver/transport contracts | Closed — completed |
-| [#3](https://github.com/Robbertjv/Universal-Multimeter/issues/3) | Application skeleton, JavaScript tooling, CI | Open |
+| [#3](https://github.com/Robbertjv/Universal-Multimeter/issues/3) | Application skeleton, JavaScript tooling, CI | In review — PR pending |
 | [#4](https://github.com/Robbertjv/Universal-Multimeter/issues/4) | Universal measurement model and validation | Open |
 | [#5](https://github.com/Robbertjv/Universal-Multimeter/issues/5) | Driver base contract, registry, capabilities | Open |
 | [#6](https://github.com/Robbertjv/Universal-Multimeter/issues/6) | Transport base contract and mock transport | Open |
@@ -132,4 +133,5 @@ Review clarifications:
 
 ## Update log
 
-- 2026-11-20 — Added repository workflow, implementation roadmap, and initial project/driver status register. No application code or hardware support is claimed.
+- 2026-11-20 — Added repository workflow, implementation roadmap, and initial project/driver status register.
+- 2026-11-20 — Started issue #3 on feature/issue-3-app-foundation: Vite app shell, Web Component, Vitest smoke test, ESLint/Prettier, and GitHub Actions. GitHub Actions quality gate passed on PR #12; awaiting review/merge.

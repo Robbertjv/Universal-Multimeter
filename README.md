@@ -4,7 +4,7 @@ A modular, browser-based interface for reading measurements from different multi
 
 ## Project status
 
-**Architecture v1.0 baseline reviewed; implementation not started.** The repository contains the project specification, device protocol research, workflow, roadmap, status register, and reviewed v1.0 technical contracts. No application code or hardware-validated support is claimed.
+**Application foundation in progress.** The first Vite/Web Components app shell, JavaScript quality tooling, smoke test, and CI workflow are being added. No device drivers or hardware-validated support are claimed.
 
 ## Initial target
 
@@ -87,6 +87,17 @@ The transport roadmap includes Bluetooth LE, Bluetooth Classic, USB Serial, MQTT
 ├── README.md
 ├── LICENSE
 ├── .gitignore
+├── package.json
+├── index.html
+├── vite.config.js
+├── eslint.config.js
+├── src/
+│   ├── main.js
+│   ├── styles.css
+│   └── components/
+│       ├── universal-multimeter-app.js
+│       └── universal-multimeter-app.test.js
+├── .github/workflows/ci.yml
 └── docs/
     ├── PROJECT_SPECIFICATION.md
     ├── DEVICE_PROTOCOLS.md
@@ -102,9 +113,22 @@ The transport roadmap includes Bluetooth LE, Bluetooth Classic, USB Serial, MQTT
     └── TEST_STRATEGY.md
 ```
 
-## Development approach
+## Development setup
 
-The project will proceed from the documented architecture and specification. Application development is intentionally deferred until the repository documentation is in place and reviewed.
+Requirements: Node.js 22 or newer and npm.
+
+```bash
+npm install
+npm run dev
+```
+
+Open the local URL printed by Vite. Run the complete quality gate before submitting changes:
+
+```bash
+npm run check
+```
+
+Individual commands: `npm run lint`, `npm run format:check`, `npm test`, and `npm run build`. GitHub Actions runs the same quality gate for pushes and pull requests.
 
 ## License
 
