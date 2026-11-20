@@ -41,7 +41,9 @@ function report(hid, device, reportId, bytes) {
 }
 
 describe("WebHIDTransport", () => {
-  it("registers, preserves report ID/boundary and sends configured report", async () => {
+  it(
+    "registers, preserves report ID/boundary and sends configured report",
+    async () => {
     const f = fixture();
     const registry = new TransportRegistry();
     registerWebHIDTransport(registry, { hid: f.hid });
