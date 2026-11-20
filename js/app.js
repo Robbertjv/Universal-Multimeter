@@ -41,7 +41,7 @@ function render(reading){
  state.history.push({x:reading.receivedAt,y:reading.main.baseValue,unit:reading.main.baseUnit});
  const cutoff=Date.now()-3600000;state.history=state.history.filter(p=>p.x>=cutoff).slice(-5000);
  updateChart();updateStats();
- if(state.logging&&reading.main.baseValue!=null&&!reading.main.overload&&!reading.main.text.trim()==="")addLog(reading);
+ if(state.logging&&reading.main.baseValue!=null&&!reading.main.overload&&reading.main.text.trim()!=="")addLog(reading);
  publishMqtt(reading);
 }
 function updateStats(){
@@ -87,7 +87,7 @@ async function connectBle(){
  if(!navigator.bluetooth){log("Web Bluetooth is niet beschikbaar in deze browser. Gebruik Chrome via HTTPS of localhost.","error");return;}
  try{
   log("Zoeken naar EEVblog 121GW…");
-  const device=await navigator.bluetooth.requestDevice({filters:[{namePrefix:"121GW"},{namePrefix:"Bluegiga"}],optionalServices:["generic_access","device_information","battery_service"]});
+  const device=await navigator.bluetooth.requestDevice({filters:[{namePrefix:"121GW"},{namePrefix:"Bluegiga"}],optionalServices:["generic_access","device_information","battery_service","e7add780-b042-4876-aae1-112855353cc0"]});
   state.device=device;device.addEventListener("gattserverdisconnected",onDisconnected);
   state.server=await device.gatt.connect();
   const services=await state.server.getPrimaryServices();
