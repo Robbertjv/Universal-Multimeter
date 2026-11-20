@@ -22,7 +22,5 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install --no-audit --no-fund --legacy-peer-deps --package-lock=false
-      - name: Format core files and print patch for review
-        run: npx prettier --write src/core/*.js && git diff -- src/core
       - name: Run quality checks
         run: npm run check
