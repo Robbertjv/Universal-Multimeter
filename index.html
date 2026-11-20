@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#171717">
+  <meta name="description" content="Universal Multimeter Web Interface voor de EEVblog 121GW.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./css/styles.css">
+  <title>Universal Multimeter — 121GW</title>
+</head>
+<body>
+<main class="app-shell">
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark">UM</div>
+      <div>
+        <div class="brand-title">UNIVERSAL <span>MULTIMETER</span></div>
+        <div class="brand-subtitle">121GW WEB INTERFACE</div>
+      </div>
+      <span id="connection-status" class="status-pill offline"><i></i> OFFLINE</span>
+    </div>
+    <div class="header-actions">
+      <span id="device-name" class="device-info">Geen meter verbonden</span>
+      <button id="connect-btn" class="btn btn-connect">CONNECT BLE</button>
+      <button id="disconnect-btn" class="btn btn-secondary" disabled>DISCONNECT</button>
+    </div>
+  </header>
+
+  <section class="notice" id="browser-notice">
+    Zet Bluetooth op de 121GW aan door de <b>1ms PEAK</b>-knop ingedrukt te houden tot BT op het display verschijnt.
+    Gebruik Chrome via HTTPS of localhost.
+  </section>
+
+  <section class="dashboard-grid">
+    <article class="card meter-card">
+      <div class="card-topline">
+        <div>
+          <div class="eyebrow">LIVE MEASUREMENT</div>
+          <h1 id="mode-name">Wachten op meting</h1>
+        </div>
+        <div class="meter-icons" id="meter-icons">
+          <span data-icon="ac">AC</span><span data-icon="dc">DC</span><span data-icon="auto">AUTO</span>
+          <span data-icon="rel">REL</span><span data-icon="hold">HOLD</span><span data-icon="minmax">MIN/MAX</span>
+          <span data-icon="peak">1ms</span><span data-icon="lp">1kHz</span>
+        </div>
+      </div>
+
+      <div class="lcd">
+        <div class="lcd-top">
+          <span id="main-prefix">121GW</span>
+          <span class="lcd-top-right">
+            <span id="battery-indicator">BAT --</span>
+            <span id="bt-indicator">BT</span>
+            <span id="apo-indicator">APO</span>
+          </span>
+        </div>
+        <div class="reading-line">
+          <span id="main-reading" class="main-reading">－－－－－</span>
+          <span id="main-unit" class="main-unit"></span>
+        </div>
+        <div class="lcd-subline">
+          <span id="sub-label">SUB</span>
+          <span id="sub-reading">—</span>
+          <span id="sub-unit"></span>
+        </div>
+        <div class="bar-area">
+          <span id="bar-minus">−</span>
+          <div id="bargraph" class="bargraph" aria-label="Analoge bargraph">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <span id="bar-scale">5</span>
+        </div>
+        <div class="lcd-footer">
+          <span id="serial-number">S/N —</span>
+          <span id="last-update">Geen data</span>
+          <span id="battery-voltage">— V</span>
+        </div>
+      </div>
+
+      <div class="meter-controls">
+        <button class="control-btn" data-key="1">RANGE</button>
+        <button class="control-btn" data-key="2">HOLD</button>
+        <button class="control-btn" data-key="3">REL</button>
+        <button class="control-btn" data-key="4">1ms PEAK</button>
+        <button class="control-btn" data-key="5">MODE</button>
+        <button class="control-btn" data-key="6">MIN/MAX</button>
+        <button class="control-btn" data-key="7">MEM</button>
+        <button class="control-btn" data-key="8">SETUP</button>
+      </div>
+      <div class="control-hint">Knoppen worden via Bluetooth naar de meter gestuurd. De draaischakelaar bedien je op de meter zelf.</div>
+    </article>
+
+    <article class="card graph-card">
+      <div class="card-heading">
+        <div><div class="eyebrow">MEASUREMENT HISTORY</div><h2>Live trend</h2></div>
+        <div class="graph-actions">
+          <select id="graph-window" aria-label="Grafiekvenster">
+            <option value="60">60 sec</option><option value="300">5 min</option><option value="900">15 min</option><option value="3600">1 uur</option>
+          </select>
+          <button id="clear-graph-btn" class="btn btn-small">CLEAR</button>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="measurement-chart"></canvas></div>
+      <div class="stats-row">
+        <div><span>MIN</span><b id="stat-min">—</b></div>
+        <div><span>MAX</span><b id="stat-max">—</b></div>
+        <div><span>AVG</span><b id="stat-avg">—</b></div>
+        <div><span>Δ P-P</span><b id="stat-pp">—</b></div>
+      </div>
+    </article>
+  </section>
+
+  <section class="lower-grid">
+    <article class="card">
+      <div class="card-heading"><div><div class="eyebrow">DATA LOGGER</div><h2>Logging & export</h2></div><span id="logging-state" class="small-state">STOPPED</span></div>
+      <div class="button-row">
+        <button id="logging-toggle" class="btn btn-green" disabled>START LOGGING</button>
+        <button id="export-csv" class="btn btn-secondary">EXPORT CSV</button>
+        <button id="clear-log" class="btn btn-danger">CLEAR LOG</button>
+      </div>
+      <div class="log-meta"><span id="log-count">0 records</span><span id="log-duration">00:00:00</span></div>
+      <div class="table-wrap">
+        <table><thead><tr><th>TIME</th><th>MODE</th><th>VALUE</th><th>UNIT</th></tr></thead><tbody id="log-table"><tr><td colspan="4" class="empty">Nog geen meetgegevens</td></tr></tbody></table>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-heading"><div><div class="eyebrow">CONNECTIVITY</div><h2>MQTT bridge</h2></div><span id="mqtt-state" class="small-state">DISCONNECTED</span></div>
+      <div class="field-grid">
+        <label>Transport<select id="mqtt-transport"><option value="websocket">MQTT over WebSocket</option><option value="tcp">MQTT TCP via lokale bridge</option></select></label>
+        <label>Broker host<input id="mqtt-host" type="text" placeholder="broker.example.com"></label>
+        <label>Port<input id="mqtt-port" type="number" value="9001"></label>
+        <label>Topic<input id="mqtt-topic" type="text" value="universal-multimeter/121gw/measurement"></label>
+        <label>Username<input id="mqtt-user" type="text" autocomplete="username"></label>
+        <label>Password<input id="mqtt-password" type="password" autocomplete="current-password"></label>
+      </div>
+      <div class="button-row">
+        <button id="mqtt-connect" class="btn btn-connect">CONNECT MQTT</button>
+        <button id="mqtt-disconnect" class="btn btn-secondary" disabled>DISCONNECT</button>
+      </div>
+      <p class="help-text">WebSocket gebruikt WS/WSS vanuit de browser. TCP gebruikt de optionele lokale Python-bridge. Credentials worden niet in de browser opgeslagen.</p>
+    </article>
+  </section>
+
+  <section class="lower-grid">
+    <article class="card">
+      <div class="card-heading"><div><div class="eyebrow">DEVICE MANAGER</div><h2>Connection details</h2></div></div>
+      <dl class="detail-list">
+        <div><dt>Instrument</dt><dd>EEVblog 121GW</dd></div>
+        <div><dt>Interface</dt><dd>Bluetooth Low Energy</dd></div>
+        <div><dt>GATT characteristic</dt><dd class="mono">E7ADD780…353CC1</dd></div>
+        <div><dt>Packets received</dt><dd id="packet-count">0</dd></div>
+        <div><dt>Invalid frames</dt><dd id="invalid-count">0</dd></div>
+        <div><dt>Last packet</dt><dd id="raw-packet" class="mono">—</dd></div>
+      </dl>
+    </article>
+    <article class="card">
+      <div class="card-heading"><div><div class="eyebrow">EVENT CONSOLE</div><h2>System log</h2></div><button id="clear-console" class="btn btn-small">CLEAR</button></div>
+      <div id="console" class="console" role="log" aria-live="polite"></div>
+    </article>
+  </section>
+
+  <footer class="app-footer">
+    <span>UNIVERSAL MULTIMETER WEB INTERFACE</span><span>EEVBLOG 121GW DRIVER · PROTOCOL V2</span>
+  </footer>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script type="module" src="./js/app.js"></script>
+</body>
+</html>
