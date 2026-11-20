@@ -156,7 +156,9 @@ describe("WebBluetoothTransport", () => {
     await transport.dispose();
   });
 
-  it("delivers copied notification chunks without frame assumptions", async () => {
+  it(
+    "delivers copied notification chunks without frame assumptions",
+    async () => {
     const { transport, notify } = setup();
     const chunks = [];
     transport.on("data", (chunk) => chunks.push(chunk));
@@ -169,7 +171,8 @@ describe("WebBluetoothTransport", () => {
     ]);
     expect(chunks[0]).not.toBe(notify.value);
     await transport.dispose();
-  });
+    },
+  );
 
   it("writes bytes through the configured GATT characteristic", async () => {
     const { transport, write } = setup();
@@ -206,7 +209,9 @@ describe("WebBluetoothTransport", () => {
     expect(device.gatt.connected).toBe(false);
   });
 
-  it("maps user cancellation and permission denial to stable errors", async () => {
+  it(
+    "maps user cancellation and permission denial to stable errors",
+    async () => {
     const cancelled = setup();
     const cancelError = new Error("cancelled");
     cancelError.name = "NotFoundError";
@@ -222,7 +227,8 @@ describe("WebBluetoothTransport", () => {
     await expect(denied.transport.connect()).rejects.toMatchObject({
       code: "TRANSPORT_PERMISSION_DENIED",
     });
-  });
+    },
+  );
 
   it("reports unavailable browser APIs and missing GATT services", async () => {
     const unavailable = new WebBluetoothTransport({
@@ -246,7 +252,9 @@ describe("WebBluetoothTransport", () => {
     });
   });
 
-  it("maps a missing configured characteristic to a stable GATT error", async () => {
+  it(
+    "maps a missing configured characteristic to a stable GATT error",
+    async () => {
     const { bluetooth } = setup();
     const profile = {
       ...PROFILE,
@@ -260,9 +268,12 @@ describe("WebBluetoothTransport", () => {
       code: "TRANSPORT_GATT_CHARACTERISTIC_NOT_FOUND",
     });
     await transport.dispose();
-  });
+    },
+  );
 
-  it("cleans up notification listeners and reports unexpected disconnect", async () => {
+  it(
+    "cleans up notification listeners and reports unexpected disconnect",
+    async () => {
     const { transport, device, notify } = setup();
     const states = [];
     transport.on("state", (event) => states.push(event));
@@ -276,7 +287,8 @@ describe("WebBluetoothTransport", () => {
     notify.emit(new Uint8Array([1]));
     expect(chunks).toHaveLength(0);
     await transport.dispose();
-  });
+    },
+  );
 
   it("rejects incomplete BLE profile configuration", () => {
     expect(
