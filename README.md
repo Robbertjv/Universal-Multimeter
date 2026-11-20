@@ -4,7 +4,7 @@ A modular, browser-based interface for reading measurements from different multi
 
 ## Project status
 
-**Architecture contracts documented; implementation not started.** The repository now contains the project specification, device protocol research, workflow, roadmap, status register, and proposed v1 technical contracts. No application code or hardware-validated support is claimed.
+**Architecture v1.0 baseline reviewed; implementation not started.** The repository contains the project specification, device protocol research, workflow, roadmap, status register, and reviewed v1.0 technical contracts. No application code or hardware-validated support is claimed.
 
 ## Initial target
 
