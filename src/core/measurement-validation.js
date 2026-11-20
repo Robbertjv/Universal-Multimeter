@@ -29,7 +29,7 @@ function isNonEmptyString(value) {
 function isIsoTimestamp(value) {
   if (!isNonEmptyString(value)) return false;
   const date = new Date(value);
-  return !Number.isNaN(date.valueOf()) && /^\\d{4}-\\d{2}-\\d{2}T/.test(value);
+  return !Number.isNaN(date.valueOf()) && /^\d{4}-\d{2}-\d{2}T/.test(value);
 }
 
 function isFiniteNumber(value) {
