@@ -4,7 +4,7 @@ A modular, browser-based interface for reading measurements from different multi
 
 ## Project status
 
-**Architecture and specification phase.** No application code has been written yet. The initial goal is to establish the repository structure and document the agreed architecture before implementation begins.
+**Architecture contracts documented; implementation not started.** The repository now contains the project specification, device protocol research, workflow, roadmap, status register, and proposed v1 technical contracts. No application code or hardware-validated support is claimed.
 
 ## Initial target
 
@@ -57,6 +57,12 @@ The repository also maintains the development process and current project state:
 - [Roadmap](docs/ROADMAP.md) — implementation phases, dependencies, and priorities.
 - [Project Status](docs/PROJECT_STATUS.md) — current work packages and per-driver maturity.
 - [Architecture Decisions](docs/DECISIONS.md) — recorded decisions and their rationale.
+- [System Architecture](docs/ARCHITECTURE.md) — components, boundaries, data flow, errors, and security.
+- [Measurement Data Model](docs/MEASUREMENT_DATA_MODEL.md) — normalized reading and device schemas.
+- [Driver Contract](docs/DRIVER_CONTRACT.md) — driver lifecycle, parser boundary, and capability rules.
+- [Transport Contract](docs/TRANSPORT_CONTRACT.md) — common transport interface and adapter requirements.
+- [Device Manager and Measurement Engine](docs/DEVICE_MANAGER_AND_ENGINE.md) — service responsibilities and lifecycle.
+- [Test Strategy](docs/TEST_STRATEGY.md) — unit, fixture, integration, browser, and hardware validation.
 
 These documents are maintained as the project evolves. Driver implementation may proceed with incomplete protocol knowledge; unknowns are tracked explicitly and full support is only claimed after real-hardware validation.
 
@@ -83,7 +89,17 @@ The transport roadmap includes Bluetooth LE, Bluetooth Classic, USB Serial, MQTT
 ├── .gitignore
 └── docs/
     ├── PROJECT_SPECIFICATION.md
-    └── DEVICE_PROTOCOLS.md
+    ├── DEVICE_PROTOCOLS.md
+    ├── DEVELOPMENT_WORKFLOW.md
+    ├── ROADMAP.md
+    ├── PROJECT_STATUS.md
+    ├── DECISIONS.md
+    ├── ARCHITECTURE.md
+    ├── MEASUREMENT_DATA_MODEL.md
+    ├── DRIVER_CONTRACT.md
+    ├── TRANSPORT_CONTRACT.md
+    ├── DEVICE_MANAGER_AND_ENGINE.md
+    └── TEST_STRATEGY.md
 ```
 
 ## Development approach
