@@ -10,9 +10,9 @@ This document records the agreed project scope and architecture. It is a specifi
 
 ## 2. Project status
 
-**Current status: architecture and specification only.**
+**Current status: documentation baseline complete; application implementation not started.**
 
-No application code has been written. The initial repository milestone is to establish and maintain the project documentation. Implementation is deliberately deferred until this documentation milestone is complete.
+The project specification, protocol research, workflow, roadmap, status register, and v1.0 technical contracts are in the repository. Application implementation may now begin against the reviewed contracts. No device support is claimed until implemented and validated.
 
 ## 3. Target platforms and browser
 
@@ -169,7 +169,7 @@ The initial repository milestone consists of:
 3. `.gitignore`
 4. `LICENSE` (MIT)
 
-These files establish the project documentation and repository baseline. No application source code is part of this milestone.
+These files established the initial repository baseline. The documentation set has since been expanded with workflow, roadmap, protocol research, architecture contracts, and test strategy. No application source code is part of this documentation milestone.
 
 ## 12. Items intentionally not defined yet
 
