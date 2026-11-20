@@ -73,13 +73,7 @@ export class TransportAdapter {
 
   async _withTimeout(operation, timeoutMs, code, message) {
     const duration = timeoutMs ?? this._timeoutMs;
-    if (duration === 0) {
-      try {
-        return await operation();
-      } catch (cause) {
-        throw cause;
-      }
-    }
+    if (duration === 0) return operation();
 
     let timer;
     try {
