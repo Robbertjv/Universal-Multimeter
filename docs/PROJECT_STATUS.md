@@ -145,4 +145,4 @@ Review clarifications:
 
 - 2026-11-20 — Started issue #8 on `feature/issue-8-web-bluetooth`: profile-driven Web Bluetooth LE transport, GATT notification/write handling, permission/error mapping, disconnect cleanup, registry integration, and mock tests. Browser/platform and physical 121GW validation remain outstanding.
 
-- 2026-11-20 — Started issue #9 on `feature/issue-9-serial-hid-adapters`: profile-driven Web Serial and WebHID adapters, registry helpers, stable unavailable-API errors, HID report-ID-preserving chunks, mock tests, and runtime documentation. CP2110 mapping and real browser/OS/hardware validation remain outstanding; PR #18 opened for review.
+- 2026-11-20 — Started issue #9 on `feature/issue-9-serial-hid-adapters`: profile-driven Web Serial and WebHID adapters, registry helpers, stable unavailable-API errors, HID report-ID-preserving chunks, mock tests, and runtime documentation. CP2110 mapping and real browser/OS/hardware validation remain outstanding; PR #18 opened for review. CI passed (66 tests, lint, formatting, and production build).
