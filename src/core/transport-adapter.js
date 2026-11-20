@@ -41,7 +41,7 @@ export class TransportAdapter {
     this._maxQueuedWrites = maxQueuedWrites;
     this._timeoutMs = timeoutMs;
     this._queuedWrites = 0;
-    this._writeQueue = Promise.resolve();
+    this._writeExecutionQueue = Promise.resolve();
     this._lifecycleQueue = Promise.resolve();
     this._disposed = false;
     this._connectPromise = null;
@@ -205,10 +205,7 @@ export class TransportAdapter {
   write(data, options = {}) {
     if (this._disposed) {
       return Promise.reject(
-        new TransportError(
-          "TRANSPORT_DISPOSED",
-          "Transport has been disposed.",
-        ),
+        new TransportError("TRANSPORT_DISPOSED", "Transport has been disposed."),
       );
     }
     if (this._state !== "connected") {
@@ -252,24 +249,38 @@ export class TransportAdapter {
     }
 
     this._queuedWrites += 1;
-    const operation = this._writeQueue.then(async () => {
-      if (this._state !== "connected") {
-        throw new TransportError(
-          "TRANSPORT_NOT_CONNECTED",
-          "Transport disconnected before write.",
-        );
-      }
-      await this._withTimeout(
-        (signal) => this.onWrite(bytes, { signal }),
-        options.timeoutMs,
-        "TRANSPORT_WRITE_FAILED",
-        "Transport write timed out.",
-      );
-    });
-    this._writeQueue = operation.catch(() => {});
-
-    return operation.finally(() => {
+    let started = false;
+    let released = false;
+    const releaseSlot = () => {
+      if (released) return;
+      released = true;
       this._queuedWrites -= 1;
+    };
+
+    const result = this._withTimeout(
+      (signal) => {
+        started = true;
+        const execution = this._writeExecutionQueue.then(async () => {
+          if (this._state !== "connected") {
+            throw new TransportError(
+              "TRANSPORT_NOT_CONNECTED",
+              "Transport disconnected before write.",
+            );
+          }
+          await this.onWrite(bytes, { signal });
+        });
+        this._writeExecutionQueue = execution.catch(() => {});
+        execution.finally(releaseSlot).catch(() => {});
+        return execution;
+      },
+      options.timeoutMs,
+      "TRANSPORT_WRITE_FAILED",
+      "Transport write timed out.",
+    );
+
+    return result.catch((error) => {
+      if (!started) releaseSlot();
+      throw error;
     });
   }
 
