@@ -1,7 +1,7 @@
 # Project Status
 
 **Last reviewed:** 2026-11-20  
-**Overall phase:** Phase 1 — application foundation integrated; measurement model in review  
+**Overall phase:** Phase 1 — application foundation and universal measurement model integrated  
 **Application implementation:** Foundation merged; core measurement model implemented  
 **Overall health:** On track for foundational work; protocol and hardware validation remain open across several devices.
 
@@ -36,10 +36,10 @@ These labels are independent. For example, a driver can be *in progress* and *ex
 | Project specification and scope | Done | High | Initial scope and architecture documented. |
 | Device protocol research | In progress | High | Consolidated reference exists; several models need captures and clarification. |
 | Workflow and roadmap | Done | High | Defined in repository. |
-| Application skeleton and tooling | In progress | Highest | Vite entry point, Web Component shell, Vitest smoke test, ESLint, Prettier, and CI added; GitHub Actions lint, format, test, and production build checks pass on PR #12. |
-| Universal measurement model | In review | Highest | Core model, validation, constants, unit metadata, 11 measurement-model tests, 3 unit-registry tests, and API documentation implemented; PR #13 CI passes (lint, formatting, 15 total tests, production build). |
-| Driver contract and capability model | Done | Highest | Reviewed v1.0 implementation baseline documented in DRIVER_CONTRACT.md; code not yet implemented. |
-| Device Manager / Measurement Engine | Done | Highest | Reviewed v1.0 service contracts documented; implementation not started. |
+| Application skeleton and tooling | Done | Highest | Vite entry point, Web Component shell, Vitest smoke test, ESLint, Prettier, and CI added; GitHub Actions lint, format, test, and production build checks pass on PR #12. |
+| Universal measurement model | Done | Highest | Merged via PR #13; core model, validation, constants, unit metadata, API documentation; 15 tests pass with lint, formatting, and production build. |
+| Driver contract and capability model | Ready | Highest | v1.0 contract documented; runtime registry and base driver implementation tracked in issue #5. |
+| Device Manager / Measurement Engine | Ready | Highest | v1.0 service contracts documented; runtime implementation tracked in issue #7. |
 | BLE transport | Ready | High | Contract documented; implementation not started. |
 | Serial transport | Ready | High | Contract documented; implementation not started. |
 | WebHID transport | Ready | High | Contract documented; implementation not started. |
@@ -99,8 +99,8 @@ The initial implementation work packages are tracked as issues:
 | Issue | Work package | Status |
 |---|---|---|
 | [#2](https://github.com/Robbertjv/Universal-Multimeter/issues/2) | Review and ratify v1 architecture/data/driver/transport contracts | Closed — completed |
-| [#3](https://github.com/Robbertjv/Universal-Multimeter/issues/3) | Application skeleton, JavaScript tooling, CI | In review — PR pending |
-| [#4](https://github.com/Robbertjv/Universal-Multimeter/issues/4) | Universal measurement model and validation | In review — PR pending |
+| [#3](https://github.com/Robbertjv/Universal-Multimeter/issues/3) | Application skeleton, JavaScript tooling, CI | Closed — PR #12 merged |
+| [#4](https://github.com/Robbertjv/Universal-Multimeter/issues/4) | Universal measurement model and validation | Closed — PR #13 merged |
 | [#5](https://github.com/Robbertjv/Universal-Multimeter/issues/5) | Driver base contract, registry, capabilities | Open |
 | [#6](https://github.com/Robbertjv/Universal-Multimeter/issues/6) | Transport base contract and mock transport | Open |
 | [#7](https://github.com/Robbertjv/Universal-Multimeter/issues/7) | Device Manager and Measurement Engine | Open |
@@ -133,5 +133,5 @@ Review clarifications:
 
 ## Update log
 
-- 2026-11-20 — Added repository workflow, implementation roadmap, and initial project/driver status register.
+- 2026-11-20 — Added repository workflow, implementation roadmap, and initial project/driver status register.\n- 2026-11-20 — PR #12 merged: application foundation and CI integrated into main.\n- 2026-11-20 — PR #13 merged: universal measurement model, validation, unit registry, API documentation, and 15 passing tests integrated into main.
 - 2026-11-20 — Started issue #3 on feature/issue-3-app-foundation: Vite app shell, Web Component, Vitest smoke test, ESLint/Prettier, and GitHub Actions. GitHub Actions quality gate passed on PR #12; awaiting review/merge.
