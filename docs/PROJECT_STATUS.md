@@ -1,7 +1,7 @@
 # Project Status
 
 **Last reviewed:** 2026-11-20  
-**Overall phase:** Project control and architecture preparation  
+**Overall phase:** Architecture contracts defined; implementation backlog being established  
 **Application implementation:** Not started  
 **Overall health:** On track for foundational work; protocol and hardware validation remain open across several devices.
 
@@ -36,12 +36,12 @@ These labels are independent. For example, a driver can be *in progress* and *ex
 | Project specification and scope | Done | High | Initial scope and architecture documented. |
 | Device protocol research | In progress | High | Consolidated reference exists; several models need captures and clarification. |
 | Workflow and roadmap | Done | High | Defined in repository. |
-| Universal measurement model | Ready | Highest | First architecture work package. |
-| Driver contract and capability model | Ready | Highest | Required before device-specific integration. |
-| Device Manager / Measurement Engine | Ready | Highest | Build against mock transport/device first. |
-| BLE transport | Ready | High | First needed for EEVblog 121GW. |
-| Serial transport | Ready | High | Needed for Fluke, Voltcraft, and UNI-T serial paths. |
-| WebHID transport | Ready | High | Needed for HID devices/bridges including UT612 path. |
+| Universal measurement model | In review | Highest | Proposed v1 contract documented in MEASUREMENT_DATA_MODEL.md. |
+| Driver contract and capability model | In review | Highest | Proposed v1 contract documented in DRIVER_CONTRACT.md. |
+| Device Manager / Measurement Engine | In review | Highest | Service contracts documented; implementation not started. |
+| BLE transport | Ready | High | Contract documented; implementation not started. |
+| Serial transport | Ready | High | Contract documented; implementation not started. |
+| WebHID transport | Ready | High | Contract documented; implementation not started. |
 | MQTT / WebSocket / REST | Backlog | Medium | Planned integrations. |
 | Dashboard / charting | Backlog | High | Depends on universal measurement model. |
 | Logging / IndexedDB / CSV | Backlog | High | Depends on stable measurement model. |
@@ -70,14 +70,26 @@ No application drivers have been implemented or hardware-validated yet. The entr
 | UNI-T UT71 series | Ready | Scaffold planned | Implement 11-byte parser; test 7O1/8N1 discrepancy on hardware. |
 | UNI-T UT612 | Ready | Research needed | Implement known frame parser; add WebHID/CP2110 transport path. |
 
+## Architecture documents
+
+- [System Architecture](ARCHITECTURE.md)
+- [Universal Measurement Data Model](MEASUREMENT_DATA_MODEL.md)
+- [Device Driver Contract](DRIVER_CONTRACT.md)
+- [Transport Adapter Contract](TRANSPORT_CONTRACT.md)
+- [Device Manager and Measurement Engine](DEVICE_MANAGER_AND_ENGINE.md)
+- [Test Strategy](TEST_STRATEGY.md)
+
+These are proposed v1 technical contracts, ready for implementation review. They are not implemented code.
+
 ## Current priorities
 
-1. Define the universal measurement model and driver/transport contracts.
-2. Create application skeleton, test tooling, and mock device path.
-3. Build BLE, Serial, and WebHID transport foundations.
-4. Begin the first driver wave while transport work proceeds where practical.
-5. Capture real device data and convert tentative protocol assumptions into verified behavior.
-6. Add dashboard, charting, logging, and export after the measurement contract is stable.
+1. Review/ratify the proposed v1 architecture and data/driver/transport contracts.
+2. Create the application skeleton, test tooling, CI, and mock device path.
+3. Implement Device Manager and Measurement Engine against mocks.
+4. Build BLE, Serial, and WebHID transport foundations.
+5. Begin all requested drivers incrementally; research unknown protocol fields in parallel.
+6. Capture real device data and convert tentative protocol assumptions into verified behavior.
+7. Add dashboard, charting, logging, and export against the stable measurement contract.
 
 ## Known project-wide risks
 
