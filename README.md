@@ -49,6 +49,17 @@ These are requested future targets, not currently implemented or verified as sup
 
 See [Device Communication Protocol Reference](docs/DEVICE_PROTOCOLS.md) for consolidated protocol research, transport settings, frame layouts, source references, and validation requirements. The [Project Specification](docs/PROJECT_SPECIFICATION.md) describes the overall architecture and roadmap.
 
+## Project management
+
+The repository also maintains the development process and current project state:
+
+- [Development Workflow](docs/DEVELOPMENT_WORKFLOW.md) — lifecycle, driver workflow, testing, and contribution conventions.
+- [Roadmap](docs/ROADMAP.md) — implementation phases, dependencies, and priorities.
+- [Project Status](docs/PROJECT_STATUS.md) — current work packages and per-driver maturity.
+- [Architecture Decisions](docs/DECISIONS.md) — recorded decisions and their rationale.
+
+These documents are maintained as the project evolves. Driver implementation may proceed with incomplete protocol knowledge; unknowns are tracked explicitly and full support is only claimed after real-hardware validation.
+
 ## Planned technologies
 
 - HTML, CSS, and JavaScript
