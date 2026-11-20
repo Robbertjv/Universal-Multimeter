@@ -1,5 +1,7 @@
 # Transport Runtime API
 
+See [WEB_BLUETOOTH_API.md](WEB_BLUETOOTH_API.md) for the concrete Web Bluetooth LE adapter, profile configuration, permission behavior, and current validation limits.
+
 The transport-independent runtime lives in `src/core`.
 
 ## Lifecycle and errors
