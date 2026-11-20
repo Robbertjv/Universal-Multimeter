@@ -81,16 +81,22 @@ export class TransportAdapter {
         Promise.resolve().then(operation),
         new Promise((_, reject) => {
           timer = setTimeout(
-            () => reject(new TransportError("TRANSPORT_TIMEOUT", message, {
-              operation: code,
-              timeoutMs: duration,
-            })),
+            () =>
+              reject(
+                new TransportError("TRANSPORT_TIMEOUT", message, {
+                  operation: code,
+                  timeoutMs: duration,
+                }),
+              ),
             duration,
           );
         }),
       ]);
     } catch (cause) {
-      if (cause instanceof TransportError && cause.code === "TRANSPORT_TIMEOUT") {
+      if (
+        cause instanceof TransportError &&
+        cause.code === "TRANSPORT_TIMEOUT"
+      ) {
         throw cause;
       }
       throw this._wrap(code, message, cause);
@@ -111,7 +117,10 @@ export class TransportAdapter {
   connect(options = {}) {
     if (this._disposed) {
       return Promise.reject(
-        new TransportError("TRANSPORT_DISPOSED", "Transport has been disposed."),
+        new TransportError(
+          "TRANSPORT_DISPOSED",
+          "Transport has been disposed.",
+        ),
       );
     }
     if (this._connectPromise) return this._connectPromise;
@@ -196,7 +205,10 @@ export class TransportAdapter {
   write(data, options = {}) {
     if (this._disposed) {
       return Promise.reject(
-        new TransportError("TRANSPORT_DISPOSED", "Transport has been disposed."),
+        new TransportError(
+          "TRANSPORT_DISPOSED",
+          "Transport has been disposed.",
+        ),
       );
     }
     if (this._state !== "connected") {
@@ -281,7 +293,10 @@ export class TransportAdapter {
         new TransportError(
           "TRANSPORT_READ_FAILED",
           "Receive chunk exceeds the configured maximum chunk size.",
-          { byteLength: bytes.byteLength, maxBufferedBytes: this._maxBufferedBytes },
+          {
+            byteLength: bytes.byteLength,
+            maxBufferedBytes: this._maxBufferedBytes,
+          },
         ),
       );
       return false;

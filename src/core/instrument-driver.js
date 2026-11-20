@@ -272,11 +272,24 @@ export class InstrumentDriver {
 
   _attachTransport() {
     if (!this._transport || this._transportUnsubscribers.length) return;
-    if (typeof this._transport.on !== "function") throw new DriverError("DRIVER_TRANSPORT_INVALID", "Injected transport must expose on().");
-    this._transportUnsubscribers.push(this._transport.on("data", (chunk) => this.onTransportData(chunk)), this._transport.on("error", (error) => this.publish("error", error)), this._transport.on("state", (event) => this.publish("transport-state", event)));
+    if (typeof this._transport.on !== "function")
+      throw new DriverError(
+        "DRIVER_TRANSPORT_INVALID",
+        "Injected transport must expose on().",
+      );
+    this._transportUnsubscribers.push(
+      this._transport.on("data", (chunk) => this.onTransportData(chunk)),
+      this._transport.on("error", (error) => this.publish("error", error)),
+      this._transport.on("state", (event) =>
+        this.publish("transport-state", event),
+      ),
+    );
   }
 
-  _detachTransport() { for (const unsubscribe of this._transportUnsubscribers.splice(0)) unsubscribe(); }
+  _detachTransport() {
+    for (const unsubscribe of this._transportUnsubscribers.splice(0))
+      unsubscribe();
+  }
 
   publish(eventName, payload) {
     this._events.emit(eventName, payload);

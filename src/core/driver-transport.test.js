@@ -7,7 +7,9 @@ describe("driver and injected transport boundary", () => {
     const transport = new MockTransport();
     const driver = createMockDriver({ transport });
     const chunks = [];
-    vi.spyOn(driver, "onTransportData").mockImplementation((chunk) => chunks.push(chunk));
+    vi.spyOn(driver, "onTransportData").mockImplementation((chunk) =>
+      chunks.push(chunk),
+    );
 
     await driver.initialize();
     await driver.start();
