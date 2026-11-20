@@ -1,6 +1,6 @@
 # Device Driver Contract
 
-**Status:** Proposed v1 contract.
+**Status:** Reviewed v1.0 implementation baseline (2026-11-20).
 
 A driver represents one instrument model or an evidenced-compatible model family. It owns device-specific protocol interpretation and command encoding. It does not own browser transport APIs, UI, charts, storage, or logging.
 
@@ -49,7 +49,7 @@ class InstrumentDriver {
   async initialize() {}
   async start() {}
   async stop() {}
-  async executeControl(controlId, parameters = {}) {}
+  async executeControl(controlId, parameters = {}, context = {}) {}
   on(eventName, listener) {}
   off(eventName, listener) {}
 }
@@ -60,7 +60,7 @@ Semantics:
 - `initialize()` resets parser state and performs only safe, documented initialization.
 - `start()` begins consuming the already-connected transport stream.
 - `stop()` stops subscriptions/timers and is safe to call more than once.
-- `executeControl()` validates capability and parameters; unsupported/unknown controls reject with a stable error.
+- `executeControl()` validates capability and parameters; unsupported/unknown controls reject with a stable error. The context carries caller/action origin and the authorization decision from the application service; the driver must not bypass authorization.
 - Driver events include `measurement`, `capabilities`, `warning`, `error`, and optional `raw-frame`.
 - Driver must not close a shared transport unless ownership is explicitly assigned by Device Manager.
 
