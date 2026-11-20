@@ -41,34 +41,31 @@ function report(hid, device, reportId, bytes) {
 }
 
 describe("WebHIDTransport", () => {
-  it(
-    "registers, preserves report ID/boundary and sends configured report",
-    async () => {
-      const f = fixture();
-      const registry = new TransportRegistry();
-      registerWebHIDTransport(registry, { hid: f.hid });
-      const transport = registry.create("web.hid", { profile });
-      const chunks = [];
-      transport.on("data", (bytes) => chunks.push([...bytes]));
-      await transport.connect();
+  it("registers, preserves report ID/boundary and sends configured report", async () => {
+    const f = fixture();
+    const registry = new TransportRegistry();
+    registerWebHIDTransport(registry, { hid: f.hid });
+    const transport = registry.create("web.hid", { profile });
+    const chunks = [];
+    transport.on("data", (bytes) => chunks.push([...bytes]));
+    await transport.connect();
 
-      expect(f.hid.requestDevice).toHaveBeenCalledWith({
-        filters: [{ vendorId: 0x10c4, productId: 0xea80 }],
-      });
-      report(f.hid, f.device, 1, [0xaa, 0xbb]);
-      report(f.hid, f.device, 3, [0xcc]);
-      expect(chunks).toEqual([[1, 0xaa, 0xbb]]);
+    expect(f.hid.requestDevice).toHaveBeenCalledWith({
+      filters: [{ vendorId: 0x10c4, productId: 0xea80 }],
+    });
+    report(f.hid, f.device, 1, [0xaa, 0xbb]);
+    report(f.hid, f.device, 3, [0xcc]);
+    expect(chunks).toEqual([[1, 0xaa, 0xbb]]);
 
-      await transport.write(new Uint8Array([2, 0x44, 0x55]));
-      expect(f.device.sendReport).toHaveBeenCalledWith(
-        2,
-        new Uint8Array([0x44, 0x55]),
-      );
-      await transport.disconnect();
-      expect(f.device.close).toHaveBeenCalledTimes(1);
-      await transport.dispose();
-    },
-  );
+    await transport.write(new Uint8Array([2, 0x44, 0x55]));
+    expect(f.device.sendReport).toHaveBeenCalledWith(
+      2,
+      new Uint8Array([0x44, 0x55]),
+    );
+    await transport.disconnect();
+    expect(f.device.close).toHaveBeenCalledTimes(1);
+    await transport.dispose();
+  });
 
   it("maps unavailable, permission denial and cancelled chooser", async () => {
     const unavailable = new WebHIDTransport({ profile, hid: null });
@@ -110,9 +107,9 @@ describe("WebHIDTransport", () => {
     const f = fixture();
     const transport = new WebHIDTransport({ profile, hid: f.hid });
     await transport.connect();
-    await expect(
-      transport.write(new Uint8Array([1, 2])),
-    ).rejects.toMatchObject({ code: "TRANSPORT_WRITE_FAILED" });
+    await expect(transport.write(new Uint8Array([1, 2]))).rejects.toMatchObject(
+      { code: "TRANSPORT_WRITE_FAILED" },
+    );
     await transport.dispose();
   });
 });
