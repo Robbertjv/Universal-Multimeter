@@ -91,6 +91,25 @@ These are proposed v1 technical contracts, ready for implementation review. They
 6. Capture real device data and convert tentative protocol assumptions into verified behavior.
 7. Add dashboard, charting, logging, and export against the stable measurement contract.
 
+## GitHub implementation backlog
+
+The initial implementation work packages are tracked as issues:
+
+| Issue | Work package | Status |
+|---|---|---|
+| [#2](https://github.com/Robbertjv/Universal-Multimeter/issues/2) | Review and ratify v1 architecture/data/driver/transport contracts | Open |
+| [#3](https://github.com/Robbertjv/Universal-Multimeter/issues/3) | Application skeleton, JavaScript tooling, CI | Open |
+| [#4](https://github.com/Robbertjv/Universal-Multimeter/issues/4) | Universal measurement model and validation | Open |
+| [#5](https://github.com/Robbertjv/Universal-Multimeter/issues/5) | Driver base contract, registry, capabilities | Open |
+| [#6](https://github.com/Robbertjv/Universal-Multimeter/issues/6) | Transport base contract and mock transport | Open |
+| [#7](https://github.com/Robbertjv/Universal-Multimeter/issues/7) | Device Manager and Measurement Engine | Open |
+| [#8](https://github.com/Robbertjv/Universal-Multimeter/issues/8) | Web Bluetooth LE adapter | Open |
+| [#9](https://github.com/Robbertjv/Universal-Multimeter/issues/9) | Web Serial and WebHID adapters | Open |
+| [#10](https://github.com/Robbertjv/Universal-Multimeter/issues/10) | First driver wave: 121GW, Fluke 187, UT61E, UT71 | Open |
+| [#11](https://github.com/Robbertjv/Universal-Multimeter/issues/11) | Remaining driver skeletons and protocol research | Open |
+
+GitHub Issues are the execution-level task tracker. This document remains the project-level summary; update it when issue status or priorities materially change.
+
 ## Known project-wide risks
 
 - Protocol descriptions are not equivalent to validation on the project's own hardware.
