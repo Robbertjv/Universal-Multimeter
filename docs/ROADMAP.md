@@ -14,7 +14,7 @@ Build the shared foundations once, then develop all requested device drivers inc
 - [x] Add consolidated device protocol research.
 - [x] Define this workflow, roadmap, and status tracking.
 - [ ] Review and resolve inconsistencies between specification, protocol notes, and implementation decisions.
-- [ ] Create GitHub issues for the first implementation work packages.
+- [x] Create GitHub issues for the first implementation work packages.
 
 **Exit criteria:** scope, workflow, driver inventory, and status vocabulary are documented.
 
@@ -22,14 +22,17 @@ Build the shared foundations once, then develop all requested device drivers inc
 
 **Priority: highest**
 
-- [ ] Define module boundaries and public interfaces.
+- [x] Draft module boundaries and public interfaces in ARCHITECTURE.md.
 - [ ] Establish application entry point, build/dev workflow, linting, and automated test runner.
-- [ ] Define universal measurement data model (value, unit, quantity, function, range, timestamp, quality, source, raw data, channel).
-- [ ] Define driver contract and capability model.
-- [ ] Define transport contract: connect, disconnect, read/subscribe, write where supported, events, timeout, and error reporting.
-- [ ] Create Device Manager and Measurement Engine skeletons.
-- [ ] Add protocol fixture/test conventions.
+- [x] Draft universal measurement data model in MEASUREMENT_DATA_MODEL.md.
+- [x] Draft driver contract and capability model in DRIVER_CONTRACT.md.
+- [x] Draft transport contract in TRANSPORT_CONTRACT.md.
+- [x] Draft Device Manager and Measurement Engine contracts in DEVICE_MANAGER_AND_ENGINE.md.
+- [x] Define protocol fixture/test conventions in TEST_STRATEGY.md.
+- [ ] Create Device Manager and Measurement Engine implementation skeletons.
 - [ ] Add CI for automated checks.
+
+The contract documents are proposed v1 baselines and require implementation review; checked items indicate documentation exists, not that runtime code exists.
 
 **Exit criteria:** a minimal application can load, instantiate a mock device/transport, normalize a reading, and test it without real hardware.
 
