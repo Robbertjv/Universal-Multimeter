@@ -27,7 +27,14 @@ describe("measurement model", () => {
     expect(Object.isFrozen(record)).toBe(true);
   });
 
-  it("rejects missing required fields instead of silently treating them as unknown", () => {\n    const missingFunction = { ...validReading };\n    delete missingFunction.function;\n    expect(inspectMeasurement(missingFunction).valid).toBe(false);\n    expect(() => createMeasurement(missingFunction)).toThrow();\n  });\n\n  it("requires a finite number for valid readings", () => {
+  it("rejects missing required fields instead of silently treating them as unknown", () => {
+    const missingFunction = { ...validReading };
+    delete missingFunction.function;
+    expect(inspectMeasurement(missingFunction).valid).toBe(false);
+    expect(() => createMeasurement(missingFunction)).toThrow();
+  });
+
+  it("requires a finite number for valid readings", () => {
     expect(inspectMeasurement({ ...validReading, value: Number.NaN }).valid).toBe(false);
     expect(inspectMeasurement({ ...validReading, value: Infinity }).valid).toBe(false);
     expect(createMeasurement({ ...validReading, value: 0 }).value).toBe(0);
