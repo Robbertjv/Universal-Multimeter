@@ -42,7 +42,7 @@ Build the shared foundations once, then develop all requested device drivers inc
 - [x] Draft transport contract in TRANSPORT_CONTRACT.md.
 - [x] Draft Device Manager and Measurement Engine contracts in DEVICE_MANAGER_AND_ENGINE.md.
 - [x] Define protocol fixture/test conventions in TEST_STRATEGY.md.
-- [ ] Create Device Manager and Measurement Engine implementation skeletons.
+- [x] Implement Device Manager and Measurement Engine runtime against mock transport/driver (issue #7; PR #16 review pending).
 - [x] Implement transport-independent base adapter, mock transport, stable errors, timeout/AbortSignal behavior, serialized writes, bounded queues/chunks, and contract tests (issue #6; PR review pending).\n- [x] Implement the v1 universal measurement model, validation utilities, and unit metadata (issue #4; awaiting PR review).
 - [x] Add CI for automated checks.
 
