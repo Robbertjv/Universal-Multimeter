@@ -39,7 +39,7 @@ These labels are independent. For example, a driver can be *in progress* and *ex
 | Application skeleton and tooling | Done | Highest | Vite entry point, Web Component shell, Vitest smoke test, ESLint, Prettier, and CI added; GitHub Actions lint, format, test, and production build checks pass on PR #12. |
 | Universal measurement model | Done | Highest | Merged via PR #13; core model, validation, constants, unit metadata, API documentation; 15 tests pass with lint, formatting, and production build. |
 | Driver contract and capability model | Done | Highest | Merged via PR #14; runtime base class, descriptor validation, stable-ID registry, capability/control gate, events, mock driver, and 15 contract tests. CI passes with 30 total tests. |
-| Transport base contract and mock | In review | Highest | Runtime, mock fixture, stable errors, bounded writes/chunks, and contract tests implemented on feature branch; no browser adapter/hardware validation. |
+| Transport base contract and mock | In review | Highest | Runtime, mock fixture, stable errors, operation timeouts with AbortSignal, serialized writes, bounded write queue/chunk size, and contract tests implemented; CI/review pending. No browser adapter or hardware validation. |
 | Device Manager / Measurement Engine | Ready | Highest | v1.0 service contracts documented; runtime implementation tracked in issue #7. |
 | BLE transport | Ready | High | Base contract available; concrete Web Bluetooth adapter not started. |
 | Serial transport | Ready | High | Base contract available; concrete Web Serial adapter not started. |
