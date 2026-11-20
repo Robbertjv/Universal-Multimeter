@@ -156,7 +156,7 @@ describe("WebBluetoothTransport", () => {
     await transport.dispose();
   });
 
-  it("delivers copied notification chunks without frame assumptions", async () => {
+  it("delivers notification chunks unchanged", async () => {
     const { transport, notify } = setup();
     const chunks = [];
     transport.on("data", (chunk) => chunks.push(chunk));
@@ -206,7 +206,7 @@ describe("WebBluetoothTransport", () => {
     expect(device.gatt.connected).toBe(false);
   });
 
-  it("maps user cancellation and permission denial to stable errors", async () => {
+  it("maps cancellation and permission denial", async () => {
     const cancelled = setup();
     const cancelError = new Error("cancelled");
     cancelError.name = "NotFoundError";
@@ -246,7 +246,7 @@ describe("WebBluetoothTransport", () => {
     });
   });
 
-  it("maps a missing configured characteristic to a stable GATT error", async () => {
+  it("reports missing GATT characteristics", async () => {
     const { bluetooth } = setup();
     const profile = {
       ...PROFILE,
@@ -262,7 +262,7 @@ describe("WebBluetoothTransport", () => {
     await transport.dispose();
   });
 
-  it("cleans up notification listeners and reports unexpected disconnect", async () => {
+  it("cleans up unexpected disconnects", async () => {
     const { transport, device, notify } = setup();
     const states = [];
     transport.on("state", (event) => states.push(event));
