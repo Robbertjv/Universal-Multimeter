@@ -88,7 +88,7 @@ async function connectBle(){
  if(!navigator.bluetooth){log("Web Bluetooth is niet beschikbaar in deze browser. Gebruik Chrome via HTTPS of localhost.","error");return;}
  try{
   log("Zoeken naar EEVblog 121GW…");
-  const device=await navigator.bluetooth.requestDevice({filters:[{namePrefix:"121GW"},{namePrefix:"Bluegiga"}],optionalServices:["generic_access","device_information","battery_service","e7add780-b042-4876-aae1-112855353cc0"]});
+  const device=await navigator.bluetooth.requestDevice({filters:[{namePrefix:"121GW"},{namePrefix:"Bluegiga"}],optionalServices:["generic_access","device_information","battery_service","0bd51666-e7cb-469b-8e4d-2742f1ba77cc"]});
   state.device=device;device.addEventListener("gattserverdisconnected",onDisconnected);
   state.server=await device.gatt.connect();
   const services=await state.server.getPrimaryServices();
