@@ -18,6 +18,19 @@ Build the shared foundations once, then develop all requested device drivers inc
 
 **Exit criteria:** scope, workflow, driver inventory, and status vocabulary are documented.
 
+## Initial execution issues
+
+- [#2 Review and ratify architecture contracts](https://github.com/Robbertjv/Universal-Multimeter/issues/2)
+- [#3 Application skeleton and CI](https://github.com/Robbertjv/Universal-Multimeter/issues/3)
+- [#4 Measurement model](https://github.com/Robbertjv/Universal-Multimeter/issues/4)
+- [#5 Driver contract and registry](https://github.com/Robbertjv/Universal-Multimeter/issues/5)
+- [#6 Transport base and mock](https://github.com/Robbertjv/Universal-Multimeter/issues/6)
+- [#7 Device Manager and Measurement Engine](https://github.com/Robbertjv/Universal-Multimeter/issues/7)
+- [#8 Web Bluetooth LE](https://github.com/Robbertjv/Universal-Multimeter/issues/8)
+- [#9 Web Serial and WebHID](https://github.com/Robbertjv/Universal-Multimeter/issues/9)
+- [#10 First driver wave](https://github.com/Robbertjv/Universal-Multimeter/issues/10)
+- [#11 Remaining driver skeletons and protocol research](https://github.com/Robbertjv/Universal-Multimeter/issues/11)
+
 ## Phase 1 — Architecture and application skeleton
 
 **Priority: highest**
