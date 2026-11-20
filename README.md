@@ -30,6 +30,7 @@ The application is intended to use a modular architecture consisting of:
 - **Universal measurement data model** — provides a consistent representation of readings across devices.
 - **Graph engine** — presents live and recorded measurements.
 - **Logging and data storage** — records measurements and supports export.
+- **MCP integration** — planned Model Context Protocol interface so an AI client can connect to a running meter/web frontend instance and access its measurement context through defined, permission-controlled capabilities.
 
 See [Project Specification](docs/PROJECT_SPECIFICATION.md) for the full documented scope and architecture.
 
@@ -45,7 +46,7 @@ See [Project Specification](docs/PROJECT_SPECIFICATION.md) for the full document
 - Progressive Web App (PWA) capabilities
 - Optional Python FastAPI component
 
-The transport roadmap includes Bluetooth LE, Bluetooth Classic, USB Serial, MQTT, WebSocket, and potentially a REST API. These are planned interfaces, not claims of current implementation.
+The transport roadmap includes Bluetooth LE, Bluetooth Classic, USB Serial, MQTT over its standard TCP transport as well as MQTT over WebSockets (including secure WSS where supported), and potentially a REST API. WebSocket is also a planned communication option. An MCP (Model Context Protocol) integration is planned to make a running meter/web frontend instance available to an AI client. These are planned capabilities, not claims of current implementation.
 
 ## Repository layout
 
