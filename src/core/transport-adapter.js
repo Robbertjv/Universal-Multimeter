@@ -73,23 +73,22 @@ export class TransportAdapter {
 
   async _withTimeout(operation, timeoutMs, code, message) {
     const duration = timeoutMs ?? this._timeoutMs;
-    if (duration === 0) return operation();
-
+    const controller = new AbortController();
     let timer;
+
     try {
+      if (duration === 0) return await operation(controller.signal);
       return await Promise.race([
-        Promise.resolve().then(operation),
+        Promise.resolve().then(() => operation(controller.signal)),
         new Promise((_, reject) => {
-          timer = setTimeout(
-            () =>
-              reject(
-                new TransportError("TRANSPORT_TIMEOUT", message, {
-                  operation: code,
-                  timeoutMs: duration,
-                }),
-              ),
-            duration,
-          );
+          timer = setTimeout(() => {
+            const error = new TransportError("TRANSPORT_TIMEOUT", message, {
+              operation: code,
+              timeoutMs: duration,
+            });
+            controller.abort(error);
+            reject(error);
+          }, duration);
         }),
       ]);
     } catch (cause) {
