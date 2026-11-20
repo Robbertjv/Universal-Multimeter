@@ -37,7 +37,7 @@ These labels are independent. For example, a driver can be *in progress* and *ex
 | Device protocol research | In progress | High | Consolidated reference exists; several models need captures and clarification. |
 | Workflow and roadmap | Done | High | Defined in repository. |
 | Application skeleton and tooling | In progress | Highest | Vite entry point, Web Component shell, Vitest smoke test, ESLint, Prettier, and CI added; GitHub Actions lint, format, test, and production build checks pass on PR #12. |
-| Universal measurement model | In review | Highest | Core model, validation, constants, unit metadata, tests, and API documentation implemented on feature branch for issue #4. |
+| Universal measurement model | In review | Highest | Core model, validation, constants, unit metadata, 10 model tests, and API documentation implemented; PR #13 CI passes (lint, formatting, 11 total tests, production build). |
 | Driver contract and capability model | Done | Highest | Reviewed v1.0 implementation baseline documented in DRIVER_CONTRACT.md; code not yet implemented. |
 | Device Manager / Measurement Engine | Done | Highest | Reviewed v1.0 service contracts documented; implementation not started. |
 | BLE transport | Ready | High | Contract documented; implementation not started. |
