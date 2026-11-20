@@ -38,7 +38,7 @@ These labels are independent. For example, a driver can be *in progress* and *ex
 | Workflow and roadmap | Done | High | Defined in repository. |
 | Application skeleton and tooling | Done | Highest | Vite entry point, Web Component shell, Vitest smoke test, ESLint, Prettier, and CI added; GitHub Actions lint, format, test, and production build checks pass on PR #12. |
 | Universal measurement model | Done | Highest | Merged via PR #13; core model, validation, constants, unit metadata, API documentation; 15 tests pass with lint, formatting, and production build. |
-| Driver contract and capability model | Ready | Highest | v1.0 contract documented; runtime registry and base driver implementation tracked in issue #5. |
+| Driver contract and capability model | In review | Highest | Runtime base class, validated descriptors, stable-ID registry, capability/control gating, events, mock driver, and 15 contract tests implemented in PR #14; CI passes with 30 total tests. |
 | Device Manager / Measurement Engine | Ready | Highest | v1.0 service contracts documented; runtime implementation tracked in issue #7. |
 | BLE transport | Ready | High | Contract documented; implementation not started. |
 | Serial transport | Ready | High | Contract documented; implementation not started. |
@@ -134,4 +134,5 @@ Review clarifications:
 ## Update log
 
 - 2026-11-20 — Added repository workflow, implementation roadmap, and initial project/driver status register.\n- 2026-11-20 — PR #12 merged: application foundation and CI integrated into main.\n- 2026-11-20 — PR #13 merged: universal measurement model, validation, unit registry, API documentation, and 15 passing tests integrated into main.
+- 2026-11-20 — PR #14 opened for issue #5: driver runtime, registry, capability/control gate, mock driver, and 15 driver contract tests; CI passes with 30 tests total.
 - 2026-11-20 — Started issue #3 on feature/issue-3-app-foundation: Vite app shell, Web Component, Vitest smoke test, ESLint/Prettier, and GitHub Actions. GitHub Actions quality gate passed on PR #12; awaiting review/merge.
