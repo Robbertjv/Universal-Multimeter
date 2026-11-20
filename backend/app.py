@@ -1,21 +1,22 @@
-"""Local MQTT TCP bridge and read-only MCP endpoint for the 121GW web UI.
-
-Run with: uvicorn backend.app:app --host 127.0.0.1 --port 8765
-The server deliberately binds to loopback. Configure MCP_TOKEN before exposing MCP.
-"""
+"""Loopback-only MQTT TCP bridge and read-only MCP endpoint for the 121GW web UI."""
 from __future__ import annotations
+
 import json
 import os
 import secrets
 import time
 from collections import deque
+from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, Header, HTTPException, Request
-from fastapi.responses import JSONResponse\nfrom fastapi.staticfiles import StaticFiles\nfrom pathlib import Path
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from paho.mqtt import client as mqtt
 
 app = FastAPI(title="Universal Multimeter Local Bridge", version="0.1.0")
+WEB_ROOT = Path(__file__).resolve().parent.parent
 latest: dict[str, Any] | None = None
 history: deque[dict[str, Any]] = deque(maxlen=10000)
 mqtt_client: mqtt.Client | None = None
@@ -33,16 +34,25 @@ def require_local(request: Request) -> None:
 def require_token(authorization: str | None) -> None:
     if not MCP_TOKEN:
         raise HTTPException(503, "Set MCP_TOKEN in the environment before enabling MCP")
-    expected = "Bearer " + MCP_TOKEN
-    if not authorization or not secrets.compare_digest(authorization, expected):
+    if not authorization or not secrets.compare_digest(authorization, "Bearer " + MCP_TOKEN):
         raise HTTPException(401, "Invalid bearer token")
+
+
+def meter_is_fresh() -> bool:
+    if not latest or not latest.get("timestamp"):
+        return False
+    try:
+        stamp = datetime.fromisoformat(str(latest["timestamp"]).replace("Z", "+00:00")).timestamp()
+        return time.time() - stamp < 10
+    except (ValueError, TypeError):
+        return False
 
 
 @app.get("/api/status")
 async def status(request: Request):
     require_local(request)
-    return {"hasReading": latest is not None, "mqttConnected": mqtt_connected,
-            "historyCount": len(history), "latest": latest}
+    return {"connected": meter_is_fresh(), "hasReading": latest is not None,
+            "mqttConnected": mqtt_connected, "historyCount": len(history), "latest": latest}
 
 
 @app.post("/api/measurement")
@@ -59,7 +69,10 @@ async def mqtt_connect(request: Request, config: dict[str, Any]):
     require_local(request)
     global mqtt_client, mqtt_topic, mqtt_connected
     host = str(config.get("host", "")).strip()
-    port = int(config.get("port", 1883))
+    try:
+        port = int(config.get("port", 1883))
+    except (TypeError, ValueError):
+        raise HTTPException(400, "Invalid MQTT port")
     if not host or not (1 <= port <= 65535):
         raise HTTPException(400, "Invalid MQTT host or port")
     if mqtt_client:
@@ -71,12 +84,15 @@ async def mqtt_connect(request: Request, config: dict[str, Any]):
     username = config.get("username")
     if username:
         client.username_pw_set(str(username), str(config.get("password") or ""))
+
     def on_connect(_client, _userdata, _flags, reason_code, _properties):
         global mqtt_connected
         mqtt_connected = int(reason_code) == 0
+
     def on_disconnect(_client, _userdata, _flags, _reason_code, _properties):
         global mqtt_connected
         mqtt_connected = False
+
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
     try:
@@ -114,7 +130,7 @@ async def mqtt_disconnect(request: Request):
 TOOLS = [
     {"name": "get_status", "description": "Get 121GW connection and latest measurement status.",
      "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False}},
-    {"name": "get_reading", "description": "Get the latest measurement reported by the selected 121GW web frontend instance.",
+    {"name": "get_reading", "description": "Get the latest measurement from the selected 121GW web frontend instance.",
      "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False}},
     {"name": "get_recent_readings", "description": "Get recent measurements from the local in-memory history.",
      "inputSchema": {"type": "object", "properties": {
@@ -123,14 +139,14 @@ TOOLS = [
 ]
 
 
-def mcp_result(name: str, args: dict[str, Any]) -> Any:
+def call_tool(name: str, arguments: dict[str, Any]) -> Any:
     if name == "get_status":
-        return {"connected": latest is not None, "latest": latest,
+        return {"connected": meter_is_fresh(), "latest": latest,
                 "historyCount": len(history), "mqttConnected": mqtt_connected}
     if name == "get_reading":
-        return latest or {"connected": False, "message": "No measurement has been received from the web frontend yet."}
+        return latest or {"connected": False, "message": "No measurement received from the web frontend yet."}
     if name == "get_recent_readings":
-        limit = max(1, min(500, int(args.get("limit", 50))))
+        limit = max(1, min(500, int(arguments.get("limit", 50))))
         return list(history)[-limit:]
     raise ValueError(f"Unknown tool: {name}")
 
@@ -145,9 +161,9 @@ async def mcp(request: Request, authorization: str | None = Header(default=None)
     if method == "notifications/initialized":
         return JSONResponse({}, status_code=202)
     if method == "initialize":
+        requested = body.get("params", {}).get("protocolVersion", "2024-11-05")
         return {"jsonrpc": "2.0", "id": request_id, "result": {
-            "protocolVersion": body.get("params", {}).get("protocolVersion", "2024-11-05"),
-            "capabilities": {"tools": {}},
+            "protocolVersion": requested, "capabilities": {"tools": {}},
             "serverInfo": {"name": "universal-multimeter-121gw", "version": "0.1.0"}}}
     if method == "ping":
         return {"jsonrpc": "2.0", "id": request_id, "result": {}}
@@ -156,13 +172,16 @@ async def mcp(request: Request, authorization: str | None = Header(default=None)
     if method == "tools/call":
         params = body.get("params", {})
         try:
-            result = mcp_result(str(params.get("name", "")), params.get("arguments") or {})
+            result = call_tool(str(params.get("name", "")), params.get("arguments") or {})
             return {"jsonrpc": "2.0", "id": request_id, "result": {
                 "content": [{"type": "text", "text": json.dumps(result, ensure_ascii=False)}],
                 "structuredContent": result, "isError": False}}
         except Exception as exc:
             return {"jsonrpc": "2.0", "id": request_id, "result": {
                 "content": [{"type": "text", "text": str(exc)}], "isError": True}}
-    return {"jsonrpc": "2.0", "id": request_id, "error": {
-        "code": -32601, "message": f"Method not found: {method}"}}
-\n# Serve the static web client from the same loopback origin as the local bridge.\nWEB_ROOT = Path(__file__).resolve().parent.parent\napp.mount("/", StaticFiles(directory=WEB_ROOT, html=True), name="web")\n
+    return {"jsonrpc": "2.0", "id": request_id,
+            "error": {"code": -32601, "message": f"Method not found: {method}"}}
+
+
+# Mount last so API routes take precedence over static asset handling.
+app.mount("/", StaticFiles(directory=WEB_ROOT, html=True), name="web")
