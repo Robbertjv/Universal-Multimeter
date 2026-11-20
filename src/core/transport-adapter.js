@@ -268,7 +268,7 @@ export class TransportAdapter {
         started = true;
         const execution = this._writeExecutionQueue.then(async () => {
           if (signal.aborted) throw signal.reason;
-          if (this._state !== "connected") {
+          if (!["connected", "disconnecting"].includes(this._state)) {
             throw new TransportError(
               "TRANSPORT_NOT_CONNECTED",
               "Transport disconnected before write.",
