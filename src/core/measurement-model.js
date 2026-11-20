@@ -3,14 +3,19 @@ import {
   NORMALIZED_FUNCTIONS,
   NORMALIZED_QUANTITIES,
 } from "./measurement-constants.js";
-import { assertValidMeasurement, validateMeasurement } from "./measurement-validation.js";
+import {
+  assertValidMeasurement,
+  validateMeasurement,
+} from "./measurement-validation.js";
 
 function cleanString(value) {
   return typeof value === "string" ? value.trim() : value;
 }
 
 function cloneMetadata(metadata) {
-  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return {};
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
+    return {};
+  }
   return structuredClone(metadata);
 }
 
@@ -22,17 +27,26 @@ export function createMeasurement(input) {
   if (!input || typeof input !== "object" || Array.isArray(input)) {
     assertValidMeasurement(input);
   }
+
   const source = structuredClone(input);
   const metadata = cloneMetadata(source.metadata);
 
   let quantity = cleanString(source.quantity);
-  if (typeof quantity === "string" && quantity.length > 0 && !NORMALIZED_QUANTITIES.includes(quantity)) {
+  if (
+    typeof quantity === "string" &&
+    quantity.length > 0 &&
+    !NORMALIZED_QUANTITIES.includes(quantity)
+  ) {
     metadata.sourceQuantity = quantity;
     quantity = "unknown";
   }
 
   let measurementFunction = cleanString(source.function);
-  if (typeof measurementFunction === "string" && measurementFunction.length > 0 && !NORMALIZED_FUNCTIONS.includes(measurementFunction)) {
+  if (
+    typeof measurementFunction === "string" &&
+    measurementFunction.length > 0 &&
+    !NORMALIZED_FUNCTIONS.includes(measurementFunction)
+  ) {
     metadata.sourceFunction = measurementFunction;
     measurementFunction = "unknown";
   }
