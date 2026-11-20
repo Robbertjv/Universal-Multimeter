@@ -8,19 +8,33 @@ export const MOCK_DRIVER_DESCRIPTOR = Object.freeze({
   protocolVariants: ["fixture-v1"],
   supportLevel: "experimental",
   capabilities: {
-    "measurement.voltage": { availability: "supported", description: "Mock voltage readings." },
-    "measurement.temperature": { availability: "unknown", description: "Not implemented by this mock." },
+    "measurement.voltage": {
+      availability: "supported",
+      description: "Mock voltage readings.",
+    },
+    "measurement.temperature": {
+      availability: "unknown",
+      description: "Not implemented by this mock.",
+    },
     "measurement.inductance": { availability: "unsupported" },
   },
   controls: {
     hold: {
       availability: "supported",
-      parameters: { type: "object", properties: { enabled: { type: "boolean" } }, required: ["enabled"], additionalProperties: false },
+      parameters: {
+        type: "object",
+        properties: { enabled: { type: "boolean" } },
+        required: ["enabled"],
+        additionalProperties: false,
+      },
       requiresAuthorization: true,
       confirmationRequired: false,
     },
     reset: { availability: "unknown", parameters: { type: "object" } },
-    calibration: { availability: "unsupported", parameters: { type: "object" } },
+    calibration: {
+      availability: "unsupported",
+      parameters: { type: "object" },
+    },
   },
 });
 
