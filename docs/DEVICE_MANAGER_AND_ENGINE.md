@@ -1,6 +1,6 @@
 # Device Manager and Measurement Engine Contracts
 
-**Status:** Proposed v1 service contract.
+**Status:** Reviewed v1.0 implementation baseline (2026-11-20).
 
 ## 1. Device Manager responsibilities
 
@@ -26,10 +26,10 @@ A profile describes the selected model/variant, driver factory, transport factor
 
 ### Connection sequence
 
-1. Validate profile and required browser API availability.
+1. Validate profile and required browser API/bridge availability.
 2. Ask transport to request/select endpoint if not already selected.
 3. Create transport and connect.
-4. Create driver with injected transport and dependencies.
+4. Create driver with injected transport and dependencies. Device Manager owns both instances and their lifetime; the driver owns only its subscriptions and protocol state.
 5. Initialize driver, then start its stream processing.
 6. Publish device descriptor, capabilities, and connected state.
 7. On any failure, stop driver if created, dispose transport, publish a categorized error, and leave no orphan resources.
