@@ -2,15 +2,9 @@ import { describe, expect, it } from "vitest";
 import { DeviceManager } from "./device-manager.js";
 import { DeviceProfileRegistry } from "./device-profile-registry.js";
 import { DriverRegistry } from "./driver-registry.js";
-import {
-  createMockDriver,
-  MOCK_DRIVER_DESCRIPTOR,
-} from "./mock-driver.js";
+import { createMockDriver, MOCK_DRIVER_DESCRIPTOR } from "./mock-driver.js";
 import { MeasurementEngine } from "./measurement-engine.js";
-import {
-  MockTransport,
-  MOCK_TRANSPORT_DESCRIPTOR,
-} from "./mock-transport.js";
+import { MockTransport, MOCK_TRANSPORT_DESCRIPTOR } from "./mock-transport.js";
 import { TransportRegistry } from "./transport-registry.js";
 
 function setup({ failConnect = false, clock } = {}) {
@@ -50,32 +44,35 @@ function setup({ failConnect = false, clock } = {}) {
 }
 
 describe("DeviceManager", () => {
-  it("connects a mock device, publishes normalized readings, and disconnects", async () => {
-    const { manager, engine } = setup();
-    const device = await manager.connect("mock.profile", {
-      deviceId: "dmm-1",
-    });
-    expect(device.state).toBe("connected");
-    const readings = [];
-    engine.subscribe((event) =>
-      readings.push(...(event.measurements ?? [])),
-    );
-    const session = manager._sessions.get("dmm-1");
-    session.driver.publish("measurement", {
-      quantity: "voltage",
-      function: "voltage.dc",
-      value: 12.5,
-      unit: "V",
-      state: "valid",
-      quality: "good",
-      channelId: "primary",
-    });
-    expect(engine.getLatest("dmm-1").value).toBe(12.5);
-    expect(readings).toHaveLength(1);
-    expect(await manager.disconnect("dmm-1")).toBe(true);
-    expect(await manager.disconnect("dmm-1")).toBe(false);
-    expect(manager.listConnectedDevices()).toEqual([]);
-  });
+  it(
+    "connects a mock device, publishes normalized readings, and disconnects",
+    async () => {
+      const { manager, engine } = setup();
+      const device = await manager.connect("mock.profile", {
+        deviceId: "dmm-1",
+      });
+      expect(device.state).toBe("connected");
+      const readings = [];
+      engine.subscribe((event) =>
+        readings.push(...(event.measurements ?? [])),
+      );
+      const session = manager._sessions.get("dmm-1");
+      session.driver.publish("measurement", {
+        quantity: "voltage",
+        function: "voltage.dc",
+        value: 12.5,
+        unit: "V",
+        state: "valid",
+        quality: "good",
+        channelId: "primary",
+      });
+      expect(engine.getLatest("dmm-1").value).toBe(12.5);
+      expect(readings).toHaveLength(1);
+      expect(await manager.disconnect("dmm-1")).toBe(true);
+      expect(await manager.disconnect("dmm-1")).toBe(false);
+      expect(manager.listConnectedDevices()).toEqual([]);
+    },
+  );
 
   it("coalesces concurrent connect calls for a profile", async () => {
     const { manager } = setup();
@@ -98,12 +95,8 @@ describe("DeviceManager", () => {
 
   it("isolates device sessions and disconnectAll is repeatable", async () => {
     const { manager } = setup();
-    const first = await manager.connect("mock.profile", {
-      deviceId: "one",
-    });
-    const second = await manager.connect("mock.profile", {
-      deviceId: "two",
-    });
+    const first = await manager.connect("mock.profile", { deviceId: "one" });
+    const second = await manager.connect("mock.profile", { deviceId: "two" });
     expect(first.deviceId).not.toBe(second.deviceId);
     expect(await manager.disconnectAll()).toBe(2);
     expect(await manager.disconnectAll()).toBe(0);
