@@ -71,7 +71,8 @@ The transport roadmap includes Bluetooth LE, Bluetooth Classic, USB Serial, MQTT
 ├── LICENSE
 ├── .gitignore
 └── docs/
-    └── PROJECT_SPECIFICATION.md
+    ├── PROJECT_SPECIFICATION.md
+    └── DEVICE_PROTOCOLS.md
 ```
 
 ## Development approach
