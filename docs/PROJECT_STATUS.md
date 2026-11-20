@@ -97,7 +97,7 @@ The initial implementation work packages are tracked as issues:
 
 | Issue | Work package | Status |
 |---|---|---|
-| [#2](https://github.com/Robbertjv/Universal-Multimeter/issues/2) | Review and ratify v1 architecture/data/driver/transport contracts | Open |
+| [#2](https://github.com/Robbertjv/Universal-Multimeter/issues/2) | Review and ratify v1 architecture/data/driver/transport contracts | Closed — completed |
 | [#3](https://github.com/Robbertjv/Universal-Multimeter/issues/3) | Application skeleton, JavaScript tooling, CI | Open |
 | [#4](https://github.com/Robbertjv/Universal-Multimeter/issues/4) | Universal measurement model and validation | Open |
 | [#5](https://github.com/Robbertjv/Universal-Multimeter/issues/5) | Driver base contract, registry, capabilities | Open |
