@@ -16,7 +16,7 @@ describe("driver and injected transport boundary", () => {
     expect(transport.state).toBe("disconnected");
     await transport.connect();
     transport.emitData(new Uint8Array([0x01, 0x02]));
-    expect(chunks).toHaveLength(1);
+    await vi.waitFor(() => expect(chunks).toHaveLength(1));
     expect([...chunks[0]]).toEqual([1, 2]);
 
     await driver.stop();
