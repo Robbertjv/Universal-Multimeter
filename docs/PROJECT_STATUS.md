@@ -41,7 +41,7 @@ These labels are independent. For example, a driver can be *in progress* and *ex
 | Driver contract and capability model | Done | Highest | Merged via PR #14; runtime base class, descriptor validation, stable-ID registry, capability/control gate, events, mock driver, and 15 contract tests. CI passes with 30 total tests. |
 | Transport base contract and mock | In review | Highest | Runtime, mock fixture, stable errors, operation timeouts with AbortSignal, serialized writes, bounded write queue/chunk size, and contract tests implemented; CI passed (ESLint, Prettier, 44 Vitest tests, Vite build); PR review pending. No browser adapter or hardware validation. |
 | Device Manager / Measurement Engine | In review | Highest | Initial registries, lifecycle orchestration, measurement ingestion/cache/staleness, and mock integration tests implemented on PR #16; CI passed (54 tests); review pending. No hardware validation. |
-| Web Bluetooth LE adapter | In progress | Highest | Profile-driven GATT adapter, notification byte chunks, optional writes, disconnect/cleanup, stable diagnostics, registry helper, and mock tests implemented on PR #17 branch. Chrome/platform and 121GW validation outstanding. |
+| Web Bluetooth LE adapter | In review | Highest | Profile-driven GATT adapter, notification byte chunks, optional writes, disconnect/cleanup, stable diagnostics, registry helper, and mock tests on PR #17; CI passed (59 tests). Chrome/platform and 121GW validation outstanding. |
 | BLE transport | Ready | High | Base contract available; concrete Web Bluetooth adapter not started. |
 | Serial transport | Ready | High | Base contract available; concrete Web Serial adapter not started. |
 | WebHID transport | Ready | High | Base contract available; concrete WebHID adapter not started. |
@@ -106,7 +106,7 @@ The initial implementation work packages are tracked as issues:
 | [#5](https://github.com/Robbertjv/Universal-Multimeter/issues/5) | Driver base contract, registry, capabilities | Closed — PR #14 merged |
 | [#6](https://github.com/Robbertjv/Universal-Multimeter/issues/6) | Transport base contract and mock transport | In review — PR pending |
 | [#7](https://github.com/Robbertjv/Universal-Multimeter/issues/7) | Device Manager and Measurement Engine | In review — PR #16 |
-| [#8](https://github.com/Robbertjv/Universal-Multimeter/issues/8) | Web Bluetooth LE adapter | In progress — PR #17 preparation |
+| [#8](https://github.com/Robbertjv/Universal-Multimeter/issues/8) | Web Bluetooth LE adapter | In review — PR #17 |
 | [#9](https://github.com/Robbertjv/Universal-Multimeter/issues/9) | Web Serial and WebHID adapters | Open |
 | [#10](https://github.com/Robbertjv/Universal-Multimeter/issues/10) | First driver wave: 121GW, Fluke 187, UT61E, UT71 | Open |
 | [#11](https://github.com/Robbertjv/Universal-Multimeter/issues/11) | Remaining driver skeletons and protocol research | Open |
