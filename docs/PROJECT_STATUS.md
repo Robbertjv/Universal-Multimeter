@@ -1,8 +1,8 @@
 # Project Status
 
 **Last reviewed:** 2026-11-20  
-**Overall phase:** Phase 1 — application foundation in progress  
-**Application implementation:** Foundation skeleton in progress  
+**Overall phase:** Phase 1 — application foundation integrated; measurement model in review  
+**Application implementation:** Foundation merged; core measurement model implemented  
 **Overall health:** On track for foundational work; protocol and hardware validation remain open across several devices.
 
 This page is the current project dashboard. Update it when meaningful work is completed, priorities change, or a dependency becomes blocked.
@@ -37,7 +37,7 @@ These labels are independent. For example, a driver can be *in progress* and *ex
 | Device protocol research | In progress | High | Consolidated reference exists; several models need captures and clarification. |
 | Workflow and roadmap | Done | High | Defined in repository. |
 | Application skeleton and tooling | In progress | Highest | Vite entry point, Web Component shell, Vitest smoke test, ESLint, Prettier, and CI added; GitHub Actions lint, format, test, and production build checks pass on PR #12. |
-| Universal measurement model | Done | Highest | Reviewed v1.0 implementation baseline documented in MEASUREMENT_DATA_MODEL.md; code not yet implemented. |
+| Universal measurement model | In review | Highest | Core model, validation, constants, unit metadata, tests, and API documentation implemented on feature branch for issue #4. |
 | Driver contract and capability model | Done | Highest | Reviewed v1.0 implementation baseline documented in DRIVER_CONTRACT.md; code not yet implemented. |
 | Device Manager / Measurement Engine | Done | Highest | Reviewed v1.0 service contracts documented; implementation not started. |
 | BLE transport | Ready | High | Contract documented; implementation not started. |
@@ -100,7 +100,7 @@ The initial implementation work packages are tracked as issues:
 |---|---|---|
 | [#2](https://github.com/Robbertjv/Universal-Multimeter/issues/2) | Review and ratify v1 architecture/data/driver/transport contracts | Closed — completed |
 | [#3](https://github.com/Robbertjv/Universal-Multimeter/issues/3) | Application skeleton, JavaScript tooling, CI | In review — PR pending |
-| [#4](https://github.com/Robbertjv/Universal-Multimeter/issues/4) | Universal measurement model and validation | Open |
+| [#4](https://github.com/Robbertjv/Universal-Multimeter/issues/4) | Universal measurement model and validation | In review — PR pending |
 | [#5](https://github.com/Robbertjv/Universal-Multimeter/issues/5) | Driver base contract, registry, capabilities | Open |
 | [#6](https://github.com/Robbertjv/Universal-Multimeter/issues/6) | Transport base contract and mock transport | Open |
 | [#7](https://github.com/Robbertjv/Universal-Multimeter/issues/7) | Device Manager and Measurement Engine | Open |
