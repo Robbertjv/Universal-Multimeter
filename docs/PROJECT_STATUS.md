@@ -42,9 +42,9 @@ These labels are independent. For example, a driver can be *in progress* and *ex
 | Transport base contract and mock | In review | Highest | Runtime, mock fixture, stable errors, operation timeouts with AbortSignal, serialized writes, bounded write queue/chunk size, and contract tests implemented; CI passed (ESLint, Prettier, 44 Vitest tests, Vite build); PR review pending. No browser adapter or hardware validation. |
 | Device Manager / Measurement Engine | In review | Highest | Initial registries, lifecycle orchestration, measurement ingestion/cache/staleness, and mock integration tests implemented on PR #16; CI passed (54 tests); review pending. No hardware validation. |
 | Web Bluetooth LE adapter | In review | Highest | Profile-driven GATT adapter, notification byte chunks, optional writes, disconnect/cleanup, stable diagnostics, registry helper, and mock tests on PR #17; CI passed (59 tests). Chrome/platform and 121GW validation outstanding. |
-| BLE transport | Ready | High | Base contract available; concrete Web Bluetooth adapter not started. |
-| Serial transport | Ready | High | Base contract available; concrete Web Serial adapter not started. |
-| WebHID transport | Ready | High | Base contract available; concrete WebHID adapter not started. |
+| BLE transport | In review | High | Initial profile-driven Web Bluetooth adapter implemented on PR #17; real browser and meter validation outstanding. |
+| Serial transport | In review | High | Initial profile-driven Web Serial adapter implemented on PR #18; browser/OS validation outstanding. |
+| WebHID transport | In review | High | Initial profile-driven WebHID adapter implemented on PR #18; CP2110 report mapping and hardware validation outstanding. |
 | MQTT / WebSocket / REST | Backlog | Medium | Planned integrations. |
 | Dashboard / charting | Backlog | High | Depends on universal measurement model. |
 | Logging / IndexedDB / CSV | Backlog | High | Depends on stable measurement model. |
@@ -79,6 +79,7 @@ No application drivers have been implemented or hardware-validated yet. The entr
 - [Universal Measurement Data Model](MEASUREMENT_DATA_MODEL.md)
 - [Device Driver Contract](DRIVER_CONTRACT.md)
 - [Transport Adapter Contract](TRANSPORT_CONTRACT.md)
+- [Web Serial and WebHID Runtime API](../src/core/WEB_SERIAL_HID_API.md)
 - [Device Manager and Measurement Engine](DEVICE_MANAGER_AND_ENGINE.md)
 - [Test Strategy](TEST_STRATEGY.md)
 
@@ -107,7 +108,7 @@ The initial implementation work packages are tracked as issues:
 | [#6](https://github.com/Robbertjv/Universal-Multimeter/issues/6) | Transport base contract and mock transport | In review — PR pending |
 | [#7](https://github.com/Robbertjv/Universal-Multimeter/issues/7) | Device Manager and Measurement Engine | In review — PR #16 |
 | [#8](https://github.com/Robbertjv/Universal-Multimeter/issues/8) | Web Bluetooth LE adapter | In review — PR #17 |
-| [#9](https://github.com/Robbertjv/Universal-Multimeter/issues/9) | Web Serial and WebHID adapters | Open |
+| [#9](https://github.com/Robbertjv/Universal-Multimeter/issues/9) | Web Serial and WebHID adapters | In review — PR #18 |
 | [#10](https://github.com/Robbertjv/Universal-Multimeter/issues/10) | First driver wave: 121GW, Fluke 187, UT61E, UT71 | Open |
 | [#11](https://github.com/Robbertjv/Universal-Multimeter/issues/11) | Remaining driver skeletons and protocol research | Open |
 
@@ -143,3 +144,5 @@ Review clarifications:
 - 2026-11-20 — Started issue #7 on `feature/issue-7-device-manager`: implemented profile/transport registries, Device Manager connect/rollback/disconnect orchestration, Measurement Engine ingestion/cache/staleness, and mock integration tests; PR #16 opened for review. CI passed (ESLint, Prettier, 54 Vitest tests, Vite production build).
 
 - 2026-11-20 — Started issue #8 on `feature/issue-8-web-bluetooth`: profile-driven Web Bluetooth LE transport, GATT notification/write handling, permission/error mapping, disconnect cleanup, registry integration, and mock tests. Browser/platform and physical 121GW validation remain outstanding.
+
+- 2026-11-20 — Started issue #9 on `feature/issue-9-serial-hid-adapters`: profile-driven Web Serial and WebHID adapters, registry helpers, stable unavailable-API errors, HID report-ID-preserving chunks, mock tests, and runtime documentation. CP2110 mapping and real browser/OS/hardware validation remain outstanding; PR #18 opened for review.
