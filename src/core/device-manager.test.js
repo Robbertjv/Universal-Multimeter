@@ -112,11 +112,12 @@ describe("DeviceManager", () => {
     const { manager, engine } = setup();
     await manager.connect("mock.profile", { deviceId: "lost-device" });
     const session = manager._sessions.get("lost-device");
-    await session.transport.simulateDisconnect(new Error("link lost"));
+    const transport = session.transport;
+    await transport.simulateDisconnect(new Error("link lost"));
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(manager.getDevice("lost-device")).toBeNull();
     expect(engine.getLatest("lost-device")).toBeNull();
-    expect(session.transport.state).toBe("disposed");
+    expect(transport.state).toBe("disposed");
   });
 
   it("isolates throwing manager listeners", async () => {
