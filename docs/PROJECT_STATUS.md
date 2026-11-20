@@ -1,7 +1,7 @@
 # Project Status
 
 **Last reviewed:** 2026-11-20  
-**Overall phase:** Phase 1 — application foundation, measurement model, and driver runtime integrated; transport and Device Manager under review  
+**Overall phase:** Phase 2 — transport adapters in progress; application foundation, measurement model, driver runtime, and Device Manager implemented on review branches  
 **Application implementation:** Foundation merged; core measurement model implemented  
 **Overall health:** On track for foundational work; protocol and hardware validation remain open across several devices.
 
@@ -40,7 +40,8 @@ These labels are independent. For example, a driver can be *in progress* and *ex
 | Universal measurement model | Done | Highest | Merged via PR #13; core model, validation, constants, unit metadata, API documentation; 15 tests pass with lint, formatting, and production build. |
 | Driver contract and capability model | Done | Highest | Merged via PR #14; runtime base class, descriptor validation, stable-ID registry, capability/control gate, events, mock driver, and 15 contract tests. CI passes with 30 total tests. |
 | Transport base contract and mock | In review | Highest | Runtime, mock fixture, stable errors, operation timeouts with AbortSignal, serialized writes, bounded write queue/chunk size, and contract tests implemented; CI passed (ESLint, Prettier, 44 Vitest tests, Vite build); PR review pending. No browser adapter or hardware validation. |
-| Device Manager / Measurement Engine | In progress | Highest | Initial DeviceProfileRegistry, TransportRegistry, DeviceManager lifecycle orchestration, MeasurementEngine cache/validation/staleness, and mock integration tests implemented on PR #16; CI passed (54 tests); PR review pending. No hardware adapter or device validation. |
+| Device Manager / Measurement Engine | In review | Highest | Initial registries, lifecycle orchestration, measurement ingestion/cache/staleness, and mock integration tests implemented on PR #16; CI passed (54 tests); review pending. No hardware validation. |
+| Web Bluetooth LE adapter | In progress | Highest | Profile-driven GATT adapter, notification byte chunks, optional writes, disconnect/cleanup, stable diagnostics, registry helper, and mock tests implemented on PR #17 branch. Chrome/platform and 121GW validation outstanding. |
 | BLE transport | Ready | High | Base contract available; concrete Web Bluetooth adapter not started. |
 | Serial transport | Ready | High | Base contract available; concrete Web Serial adapter not started. |
 | WebHID transport | Ready | High | Base contract available; concrete WebHID adapter not started. |
@@ -104,8 +105,8 @@ The initial implementation work packages are tracked as issues:
 | [#4](https://github.com/Robbertjv/Universal-Multimeter/issues/4) | Universal measurement model and validation | Closed — PR #13 merged |
 | [#5](https://github.com/Robbertjv/Universal-Multimeter/issues/5) | Driver base contract, registry, capabilities | Closed — PR #14 merged |
 | [#6](https://github.com/Robbertjv/Universal-Multimeter/issues/6) | Transport base contract and mock transport | In review — PR pending |
-| [#7](https://github.com/Robbertjv/Universal-Multimeter/issues/7) | Device Manager and Measurement Engine | Open |
-| [#8](https://github.com/Robbertjv/Universal-Multimeter/issues/8) | Web Bluetooth LE adapter | Open |
+| [#7](https://github.com/Robbertjv/Universal-Multimeter/issues/7) | Device Manager and Measurement Engine | In review — PR #16 |
+| [#8](https://github.com/Robbertjv/Universal-Multimeter/issues/8) | Web Bluetooth LE adapter | In progress — PR #17 preparation |
 | [#9](https://github.com/Robbertjv/Universal-Multimeter/issues/9) | Web Serial and WebHID adapters | Open |
 | [#10](https://github.com/Robbertjv/Universal-Multimeter/issues/10) | First driver wave: 121GW, Fluke 187, UT61E, UT71 | Open |
 | [#11](https://github.com/Robbertjv/Universal-Multimeter/issues/11) | Remaining driver skeletons and protocol research | Open |
@@ -140,3 +141,5 @@ Review clarifications:
 - 2026-11-20 — Started issue #3 on feature/issue-3-app-foundation: Vite app shell, Web Component, Vitest smoke test, ESLint/Prettier, and GitHub Actions. GitHub Actions quality gate passed on PR #12; awaiting review/merge.
 
 - 2026-11-20 — Started issue #7 on `feature/issue-7-device-manager`: implemented profile/transport registries, Device Manager connect/rollback/disconnect orchestration, Measurement Engine ingestion/cache/staleness, and mock integration tests; PR #16 opened for review. CI passed (ESLint, Prettier, 54 Vitest tests, Vite production build).
+
+- 2026-11-20 — Started issue #8 on `feature/issue-8-web-bluetooth`: profile-driven Web Bluetooth LE transport, GATT notification/write handling, permission/error mapping, disconnect cleanup, registry integration, and mock tests. Browser/platform and physical 121GW validation remain outstanding.
