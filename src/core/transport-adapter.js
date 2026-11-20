@@ -211,7 +211,10 @@ export class TransportAdapter {
   write(data, options = {}) {
     if (this._disposed) {
       return Promise.reject(
-        new TransportError("TRANSPORT_DISPOSED", "Transport has been disposed."),
+        new TransportError(
+          "TRANSPORT_DISPOSED",
+          "Transport has been disposed.",
+        ),
       );
     }
     if (this._state !== "connected") {
