@@ -8,8 +8,8 @@ describe("UniversalMultimeterApp", () => {
 
     document.body.append(app);
 
-    expect(app.shadowRoot.textContent).toContain("Universal Multimeter");
-    expect(app.shadowRoot.textContent).toContain("Geen instrument verbonden");
-    expect(app.shadowRoot.querySelector('[role="status"]')).not.toBeNull();
+    expect(app.textContent).toContain("Universal Multimeter");
+    expect(app.textContent).toContain("Geen instrument verbonden");
+    expect(app.querySelector('[role="status"]')).not.toBeNull();
   });
 });
