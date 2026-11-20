@@ -54,7 +54,7 @@ The v1 contract documents are reviewed implementation baselines. Checked items i
 
 Implement adapters independently and document browser/OS support.
 
-1. [ ] Web Bluetooth LE transport — first priority for EEVblog 121GW; concrete adapter remains outstanding.
+1. [x] Initial Web Bluetooth LE adapter implementation — profile-driven GATT service/characteristic discovery, notifications, optional writes, disconnect/cleanup, diagnostics, and mock tests (issue #8; PR #17 review pending). Real Chrome/platform and 121GW validation remain outstanding.
 2. [ ] Web Serial transport — serial/USB-serial instruments and compatible cables.
 3. [ ] WebHID transport — USB HID bridges and instruments such as the UT612 CP2110 cable path.
 4. [ ] MQTT transport — broker connection, topic configuration, reconnect, and message validation.
