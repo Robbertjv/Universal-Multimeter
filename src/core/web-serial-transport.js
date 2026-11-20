@@ -88,15 +88,15 @@ export class WebSerialTransport extends TransportAdapter {
     const reader = this._reader, writer = this._writer, port = this._port;
     this._reader = null; this._writer = null; this._port = null;
     if (reader) {
-      try { await reader.cancel(); } catch {}
-      try { reader.releaseLock(); } catch {}
+      try { await reader.cancel(); } catch { /* best-effort cleanup */ }
+      try { reader.releaseLock(); } catch { /* best-effort cleanup */ }
     }
-    if (this._readTask) { try { await this._readTask; } catch {} this._readTask = null; }
+    if (this._readTask) { try { await this._readTask; } catch { /* best-effort cleanup */ } this._readTask = null; }
     if (writer) {
-      try { await writer.close(); } catch {}
-      try { writer.releaseLock(); } catch {}
+      try { await writer.close(); } catch { /* best-effort cleanup */ }
+      try { writer.releaseLock(); } catch { /* best-effort cleanup */ }
     }
-    if (port?.close) { try { await port.close(); } catch {} }
+    if (port?.close) { try { await port.close(); } catch { /* best-effort cleanup */ } }
   }
 }
 export function createWebSerialTransport(dependencies = {}) { return new WebSerialTransport(dependencies); }
