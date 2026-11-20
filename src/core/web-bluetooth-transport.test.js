@@ -47,7 +47,7 @@ function createFixture() {
   const bluetooth = {
     requestDevice: vi.fn(async () => device),
   };
-  return { characteristic, device, bluetooth };
+  return { characteristic, service, device, bluetooth };
 }
 
 describe("WebBluetoothTransport", () => {
@@ -114,6 +114,40 @@ describe("WebBluetoothTransport", () => {
     });
   });
 
+  it("maps missing GATT services and characteristics", async () => {
+    const missingService = createFixture();
+    missingService.device.gatt.connect.mockResolvedValueOnce({
+      getPrimaryService: async () => {
+        const error = new Error("missing service");
+        error.name = "NotFoundError";
+        throw error;
+      },
+    });
+    const serviceTransport = new WebBluetoothTransport({
+      profile,
+      bluetooth: missingService.bluetooth,
+    });
+    await expect(serviceTransport.connect()).rejects.toMatchObject({
+      code: "TRANSPORT_GATT_SERVICE_NOT_FOUND",
+    });
+    await serviceTransport.dispose();
+
+    const missingCharacteristic = createFixture();
+    missingCharacteristic.service.getCharacteristic = async () => {
+      const error = new Error("missing characteristic");
+      error.name = "NotFoundError";
+      throw error;
+    };
+    const characteristicTransport = new WebBluetoothTransport({
+      profile,
+      bluetooth: missingCharacteristic.bluetooth,
+    });
+    await expect(characteristicTransport.connect()).rejects.toMatchObject({
+      code: "TRANSPORT_GATT_CHARACTERISTIC_NOT_FOUND",
+    });
+    await characteristicTransport.dispose();
+  });
+
   it("rejects invalid profiles and detects disconnects", async () => {
     const createInvalid = () =>
       new WebBluetoothTransport({
@@ -130,7 +164,7 @@ describe("WebBluetoothTransport", () => {
     const states = [];
     transport.on("state", (event) => states.push(event));
     await transport.connect();
-    fixture.device.dispatchEvent(new Event("gattserverdisconnected"));
+    fixture.device.gatt.disconnect();
     expect(states.some((event) => event.unexpected)).toBe(true);
     expect(transport.state).toBe("disconnected");
     await transport.dispose();
