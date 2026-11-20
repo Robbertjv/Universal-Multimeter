@@ -103,6 +103,8 @@ export function validateMeasurement(record) {
       !isNonEmptyString(range.unit)
     ) {
       errors.push({ code: "RANGE_INVALID", field: "range", message: "range requires finite min/max, min <= max, and a non-empty unit." });
+    } else if (record.unit && range.unit !== record.unit) {
+      errors.push({ code: "RANGE_UNIT_MISMATCH", field: "range.unit", message: "range.unit must match the measurement unit." });
     }
   }
 
