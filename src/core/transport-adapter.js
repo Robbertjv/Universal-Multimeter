@@ -175,6 +175,12 @@ export class TransportAdapter {
       this._setState("disconnecting");
       try {
         await this._withTimeout(
+          () => this._writeExecutionQueue,
+          options.timeoutMs,
+          "TRANSPORT_DISCONNECT_FAILED",
+          "Pending writes did not finish before disconnect.",
+        );
+        await this._withTimeout(
           (signal) => this.onDisconnect({ signal }),
           options.timeoutMs,
           "TRANSPORT_DISCONNECT_FAILED",
@@ -261,6 +267,7 @@ export class TransportAdapter {
       (signal) => {
         started = true;
         const execution = this._writeExecutionQueue.then(async () => {
+          if (signal.aborted) throw signal.reason;
           if (this._state !== "connected") {
             throw new TransportError(
               "TRANSPORT_NOT_CONNECTED",
@@ -344,6 +351,12 @@ export class TransportAdapter {
         if (this._disposed) return;
         if (this._state !== "disconnected") {
           this._setState("disconnecting");
+          await this._withTimeout(
+            () => this._writeExecutionQueue,
+            undefined,
+            "TRANSPORT_DISCONNECT_FAILED",
+            "Pending writes did not finish before disposal.",
+          );
           await this._withTimeout(
             (signal) => this.onDisconnect({ signal }),
             undefined,
