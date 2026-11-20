@@ -16,7 +16,13 @@ A transport adapter moves bytes or structured messages between the application a
 
 Transport adapters must not interpret measurement units, display modes, checksums specific to one meter, or device-specific commands.
 
-## 2. Suggested interface
+## 2. Runtime implementation
+
+The transport-independent runtime is implemented by `src/core/transport-adapter.js`; see `src/core/TRANSPORT_API.md`. Device Manager owns adapter creation, permission/discovery, connect/disconnect, and disposal. Drivers only subscribe to an injected adapter and never initiate browser permission prompts or own its lifecycle.
+
+The base contract uses byte-stream semantics: each `data` event is an independent `Uint8Array` chunk, not a protocol frame. Writes are serialized and bounded; writes outside connected state are rejected. Concrete adapters must translate platform failures/timeouts and unexpected disconnects into stable transport errors and state events.
+
+## 3. Suggested interface
 
 ```js
 class TransportAdapter {

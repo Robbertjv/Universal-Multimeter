@@ -5,6 +5,7 @@ export const DRIVER_EVENTS = Object.freeze([
   "error",
   "raw-frame",
   "state",
+  "transport-state",
 ]);
 
 export class DriverEventEmitter {
