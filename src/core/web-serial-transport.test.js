@@ -64,9 +64,8 @@ describe("WebSerialTransport", () => {
     const f = fixture(), transport = new WebSerialTransport({ profile, serial: f.serial });
     const states = []; transport.on("state", state => states.push(state));
     await transport.connect();
-    f.reader.read.mockRejectedValueOnce(new Error("unplugged"));
-    // Trigger a pending read rejection.
-    f.push(new Uint8Array([1]));
+    // A non-requested stream close is surfaced as an unexpected disconnect.
+    await f.reader.cancel();
     await vi.waitFor(() => expect(states.some(s => s.unexpected)).toBe(true));
     await transport.dispose();
     expect(transport.state).toBe("disposed");
