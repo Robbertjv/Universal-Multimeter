@@ -36,7 +36,7 @@ These labels are independent. For example, a driver can be *in progress* and *ex
 | Project specification and scope | Done | High | Initial scope and architecture documented. |
 | Device protocol research | In progress | High | Consolidated reference exists; several models need captures and clarification. |
 | Workflow and roadmap | Done | High | Defined in repository. |
-| Application skeleton and tooling | In progress | Highest | Vite entry point, Web Component shell, Vitest smoke test, ESLint, Prettier, and CI added on feature branch; awaiting local/CI execution. |
+| Application skeleton and tooling | In progress | Highest | Vite entry point, Web Component shell, Vitest smoke test, ESLint, Prettier, and CI added; GitHub Actions lint, format, test, and production build checks pass on PR #12. |
 | Universal measurement model | Done | Highest | Reviewed v1.0 implementation baseline documented in MEASUREMENT_DATA_MODEL.md; code not yet implemented. |
 | Driver contract and capability model | Done | Highest | Reviewed v1.0 implementation baseline documented in DRIVER_CONTRACT.md; code not yet implemented. |
 | Device Manager / Measurement Engine | Done | Highest | Reviewed v1.0 service contracts documented; implementation not started. |
@@ -134,4 +134,4 @@ Review clarifications:
 ## Update log
 
 - 2026-11-20 — Added repository workflow, implementation roadmap, and initial project/driver status register.
-- 2026-11-20 — Started issue #3 on feature/issue-3-app-foundation: Vite app shell, Web Component, Vitest smoke test, ESLint/Prettier, and GitHub Actions. Local execution and CI validation are pending.
+- 2026-11-20 — Started issue #3 on feature/issue-3-app-foundation: Vite app shell, Web Component, Vitest smoke test, ESLint/Prettier, and GitHub Actions. GitHub Actions quality gate passed on PR #12; awaiting review/merge.
