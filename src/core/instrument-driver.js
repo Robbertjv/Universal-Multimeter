@@ -166,6 +166,7 @@ export class InstrumentDriver {
       this._state = "starting";
       this._emitState();
       try {
+        this._attachTransport();
         await this.onStart();
         this._state = "running";
         this._emitState();
