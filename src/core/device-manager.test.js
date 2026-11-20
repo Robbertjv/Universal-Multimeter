@@ -51,9 +51,7 @@ describe("DeviceManager", () => {
     });
     expect(device.state).toBe("connected");
     const readings = [];
-    engine.subscribe((event) =>
-      readings.push(...(event.measurements ?? [])),
-    );
+    engine.subscribe((event) => readings.push(...(event.measurements ?? [])));
     const session = manager._sessions.get("dmm-1");
     session.driver.publish("measurement", {
       quantity: "voltage",
