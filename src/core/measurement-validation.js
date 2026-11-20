@@ -47,11 +47,7 @@ export function validateMeasurement(record) {
     return {
       valid: false,
       errors: [
-        diagnostic(
-          "RECORD_INVALID",
-          null,
-          "Measurement must be an object.",
-        ),
+        diagnostic("RECORD_INVALID", null, "Measurement must be an object."),
       ],
     };
   }
@@ -144,7 +140,11 @@ export function validateMeasurement(record) {
         "A valid reading requires a finite numeric value.",
       ),
     );
-  } else if (record.state && record.state !== "valid" && record.value !== null) {
+  } else if (
+    record.state &&
+    record.state !== "valid" &&
+    record.value !== null
+  ) {
     errors.push(
       diagnostic(
         "VALUE_MUST_BE_NULL",
@@ -238,11 +238,7 @@ export function validateMeasurement(record) {
       Array.isArray(record.metadata))
   ) {
     errors.push(
-      diagnostic(
-        "METADATA_INVALID",
-        "metadata",
-        "metadata must be an object.",
-      ),
+      diagnostic("METADATA_INVALID", "metadata", "metadata must be an object."),
     );
   }
 
@@ -255,7 +251,11 @@ export function validateDeviceDescriptor(device) {
     return {
       valid: false,
       errors: [
-        diagnostic("DEVICE_INVALID", null, "Device descriptor must be an object."),
+        diagnostic(
+          "DEVICE_INVALID",
+          null,
+          "Device descriptor must be an object.",
+        ),
       ],
     };
   }
