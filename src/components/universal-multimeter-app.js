@@ -35,12 +35,11 @@ template.innerHTML = `
 export class UniversalMultimeterApp extends HTMLElement {
   constructor() {
     super();
-    this.attachShadow({ mode: "open" });
   }
 
   connectedCallback() {
-    if (this.shadowRoot.childElementCount === 0) {
-      this.shadowRoot.append(template.content.cloneNode(true));
+    if (this.childElementCount === 0) {
+      this.append(template.content.cloneNode(true));
     }
   }
 }
