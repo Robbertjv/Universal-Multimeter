@@ -22,9 +22,5 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install --no-audit --no-fund --legacy-peer-deps --package-lock=false
-      - name: Format foundation files for verification
-        run: npm run format
-      - name: Show formatter changes
-        run: git diff -- package.json index.html vite.config.js eslint.config.js .prettierrc.json src
       - name: Run quality checks
         run: npm run check
