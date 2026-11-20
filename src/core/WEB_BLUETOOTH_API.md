@@ -16,9 +16,9 @@ const profile = {
   driverId: "example.driver",
   transportId: "web.bluetooth.le",
   ble: {
-    serviceUuid: "0000180f-0000-1000-8000-00805f9b34fb",
-    notifyCharacteristicUuid: "00002a19-0000-1000-8000-00805f9b34fb",
-    writeCharacteristicUuid: "00002a1a-0000-1000-8000-00805f9b34fb",
+    serviceUuid: "12345678-1234-5678-1234-56789abcdef0",
+    notifyCharacteristicUuid: "12345678-1234-5678-1234-56789abcdef1",
+    writeCharacteristicUuid: "12345678-1234-5678-1234-56789abcdef2",
     filters: [{ namePrefix: "Example" }],
     optionalServices: [],
     writeMode: "with-response"
@@ -26,7 +26,7 @@ const profile = {
 };
 ```
 
-The UUIDs above are illustrative Bluetooth SIG values only; they are **not** EEVblog 121GW UUIDs. Do not copy them into a real meter profile without evidence from the manufacturer or a verified GATT capture.
+The UUIDs above are placeholders for documentation only; they are **not** EEVblog 121GW UUIDs or assigned Bluetooth SIG identifiers. Replace them with values established from manufacturer documentation or a verified GATT capture.
 
 Required fields:
 - `ble.serviceUuid`
