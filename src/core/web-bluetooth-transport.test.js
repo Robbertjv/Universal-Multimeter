@@ -4,7 +4,9 @@ import {
   createWebBluetoothTransport,
   WebBluetoothTransport,
   WEB_BLUETOOTH_TRANSPORT_DESCRIPTOR,
+  registerWebBluetoothTransport,
 } from "./web-bluetooth-transport.js";
+import { TransportRegistry } from "./transport-registry.js";
 
 const PROFILE = {
   profileId: "test.ble",
@@ -123,6 +125,18 @@ function setup() {
 }
 
 describe("WebBluetoothTransport", () => {
+  it("registers a transport factory with the shared registry", async () => {
+    const registry = new TransportRegistry();
+    const bluetooth = { requestDevice: vi.fn() };
+    registerWebBluetoothTransport(registry, { bluetooth });
+    expect(registry.getDescriptor("web.bluetooth.le")).toMatchObject(
+      WEB_BLUETOOTH_TRANSPORT_DESCRIPTOR,
+    );
+    const transport = registry.create("web.bluetooth.le", { profile: PROFILE });
+    expect(transport).toBeInstanceOf(WebBluetoothTransport);
+    expect(transport.getDescriptor().transportId).toBe("web.bluetooth.le");
+  });
+
   it("uses profile-configured discovery and GATT UUIDs", async () => {
     const { transport, bluetooth, device } = setup();
     await transport.connect();
@@ -208,6 +222,22 @@ describe("WebBluetoothTransport", () => {
     await expect(missing.transport.connect()).rejects.toMatchObject({
       code: "TRANSPORT_GATT_SERVICE_NOT_FOUND",
     });
+  });
+
+  it("maps a missing configured characteristic to a stable GATT error", async () => {
+    const { bluetooth } = setup();
+    const profile = {
+      ...PROFILE,
+      ble: {
+        ...PROFILE.ble,
+        notifyCharacteristicUuid: "00002a00-0000-1000-8000-00805f9b34fb",
+      },
+    };
+    const transport = new WebBluetoothTransport({ profile, bluetooth });
+    await expect(transport.connect()).rejects.toMatchObject({
+      code: "TRANSPORT_GATT_CHARACTERISTIC_NOT_FOUND",
+    });
+    await transport.dispose();
   });
 
   it("cleans up notification listeners and reports unexpected disconnect", async () => {
