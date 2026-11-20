@@ -1,6 +1,6 @@
 # System Architecture and Technical Contracts
 
-**Status:** Proposed implementation baseline; contracts may evolve through recorded decisions and versioned changes.
+**Status:** Reviewed v1.0 implementation baseline (2026-11-20). Changes to public contracts require an update to the relevant document and a recorded decision when compatibility or architecture is affected.
 
 ## 1. Goals
 
@@ -197,10 +197,13 @@ Each capability should have a tri-state or richer availability representation: `
 
 ## 11. Platform strategy
 
+The browser application and optional helper/native bridge are separate deployment targets. Browser-only functionality must continue to work without the helper wherever the selected transport is supported. The helper must expose a narrow, authenticated local interface and must not silently broaden device access.
+
 Transport support is capability-based, not assumed universal:
 - Web Bluetooth LE, Web Serial, and WebHID require secure contexts and user permission and differ across browsers/OS.
 - Android Chrome support must be tested on actual devices; desktop API availability cannot be assumed.
 - Bluetooth Classic and conventional MQTT TCP may require an optional local/native helper because browser APIs do not expose arbitrary system sockets.
+- The transport contract includes a future bridge adapter boundary for Bluetooth Classic, MQTT over TCP, and other OS-level interfaces unavailable directly to browser code. The browser-to-helper protocol is a separate, authenticated integration contract scoped to the selected app instance.
 - USB cable chipset and driver determine whether a meter appears as serial, HID, or vendor-specific USB.
 - Keep an explicit compatibility matrix in documentation as tests become available.
 
