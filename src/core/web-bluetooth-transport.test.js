@@ -47,6 +47,10 @@ class FakeCharacteristic extends EventTarget {
     this.writes.push(bytes.slice());
   }
 
+  async writeValueWithoutResponse(bytes) {
+    this.writes.push(bytes.slice());
+  }
+
   emit(bytes) {
     const copy = bytes.slice();
     this.value = new DataView(copy.buffer, copy.byteOffset, copy.byteLength);
@@ -172,6 +176,19 @@ describe("WebBluetoothTransport", () => {
     await transport.connect();
     await transport.write(new Uint8Array([0xaa, 0xbb]));
     expect(write.writes.map((chunk) => [...chunk])).toEqual([[0xaa, 0xbb]]);
+    await transport.dispose();
+  });
+
+  it("uses the configured write-without-response mode", async () => {
+    const profile = {
+      ...PROFILE,
+      ble: { ...PROFILE.ble, writeMode: "without-response" },
+    };
+    const { bluetooth, write } = setup();
+    const transport = new WebBluetoothTransport({ profile, bluetooth });
+    await transport.connect();
+    await transport.write(new Uint8Array([0x33]));
+    expect(write.writes.map((chunk) => [...chunk])).toEqual([[0x33]]);
     await transport.dispose();
   });
 
