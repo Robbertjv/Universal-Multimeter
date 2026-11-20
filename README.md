@@ -47,7 +47,7 @@ The planned device roadmap extends beyond the initial EEVblog 121GW support and 
 
 These are requested future targets, not currently implemented or verified as supported. Protocol details, cable variants, and model-specific differences must be confirmed before driver development.
 
-See the [Project Specification](docs/PROJECT_SPECIFICATION.md#13-additional-instruments-requested-for-future-implementation) for the preliminary protocol research, references, and outstanding verification tasks.
+See [Device Communication Protocol Reference](docs/DEVICE_PROTOCOLS.md) for consolidated protocol research, transport settings, frame layouts, source references, and validation requirements. The [Project Specification](docs/PROJECT_SPECIFICATION.md) describes the overall architecture and roadmap.
 
 ## Planned technologies
 
