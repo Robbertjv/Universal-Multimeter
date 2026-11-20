@@ -8,14 +8,18 @@ describe("driver and injected transport boundary", () => {
     const driver = createMockDriver({ transport });
     const chunks = [];
     vi.spyOn(driver, "onTransportData").mockImplementation((chunk) => chunks.push(chunk));
+
     await driver.initialize();
+    await driver.start();
     expect(transport.state).toBe("disconnected");
     await transport.connect();
     transport.emitData(new Uint8Array([0x01, 0x02]));
     expect(chunks).toHaveLength(1);
     expect([...chunks[0]]).toEqual([1, 2]);
+
     await driver.stop();
-    transport.emitData(new Uint8Array([0x03])).catch?.(() => {});
+    transport.emitData(new Uint8Array([0x03]));
     expect(chunks).toHaveLength(1);
+    expect(transport.state).toBe("connected");
   });
 });
