@@ -117,11 +117,11 @@ describe("transport adapter contract", () => {
       new Promise((resolve) => {
         finish = resolve;
       });
-    const timedOutWrite = bounded.write(new Uint8Array([1]));
+    const timedOutWrite = expect(
+      bounded.write(new Uint8Array([1])),
+    ).rejects.toMatchObject({ code: "TRANSPORT_TIMEOUT" });
     await vi.waitFor(() => expect(finish).toBeTypeOf("function"));
-    await expect(timedOutWrite).rejects.toMatchObject({
-      code: "TRANSPORT_TIMEOUT",
-    });
+    await timedOutWrite;
     await expect(bounded.write(new Uint8Array([2]))).rejects.toMatchObject({
       code: "TRANSPORT_WRITE_QUEUE_FULL",
     });
@@ -133,14 +133,16 @@ describe("transport adapter contract", () => {
   });
 
   it("drains accepted writes before disconnecting", async () => {
-    const bounded = new MockTransport({ timeoutMs: 100 });
+    const bounded = new MockTransport({ timeoutMs: 2_000 });
     await bounded.connect();
     let finish;
     bounded.hooks.write = () =>
       new Promise((resolve) => {
         finish = resolve;
       });
-    const write = bounded.write(new Uint8Array([1]));
+    const write = expect(
+      bounded.write(new Uint8Array([1])),
+    ).resolves.toBeUndefined();
     await vi.waitFor(() => expect(finish).toBeTypeOf("function"));
     const disconnect = bounded.disconnect();
     await vi.waitFor(() => expect(bounded.state).toBe("disconnecting"));
@@ -157,7 +159,9 @@ describe("transport adapter contract", () => {
       new Promise((resolve) => {
         finish = resolve;
       });
-    const first = bounded.write(new Uint8Array([1]));
+    const first = expect(
+      bounded.write(new Uint8Array([1])),
+    ).resolves.toBeUndefined();
     await vi.waitFor(() => expect(finish).toBeTypeOf("function"));
     await expect(bounded.write(new Uint8Array([2]))).rejects.toMatchObject({
       code: "TRANSPORT_WRITE_QUEUE_FULL",
