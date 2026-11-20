@@ -16,9 +16,10 @@ completes in that order. Disposal waits behind pending lifecycle work.
 
 Each operation accepts an optional `timeoutMs`; otherwise the adapter default
 is 10 seconds. Set the default to `0` to disable timeouts. A timeout rejects
-with `TransportError` code `TRANSPORT_TIMEOUT`. The underlying platform
-operation may not be cancellable; concrete adapters must still release any
-late-arriving resources safely.
+with `TransportError` code `TRANSPORT_TIMEOUT`. The relevant hook receives an
+`AbortSignal` in its options (`onConnect(options)`, `onDisconnect(options)`,
+and `onWrite(bytes, options)`). Concrete adapters should abort platform work
+where supported and release resources if a completion arrives after timeout.
 
 Other stable errors include `TRANSPORT_NOT_CONNECTED`,
 `TRANSPORT_CONNECT_FAILED`, `TRANSPORT_DISCONNECT_FAILED`,
@@ -38,8 +39,10 @@ backpressure, or use a bounded queue and explicitly drop/report overflow.
 
 Writes copy caller-owned bytes and are serialized in order. The outstanding
 write count, including the active write, is bounded by `maxQueuedWrites`.
-Overflow rejects with `TRANSPORT_WRITE_QUEUE_FULL`. A timed-out write releases
-its queue slot, but adapters must handle a platform write that completes late.
+Overflow rejects with `TRANSPORT_WRITE_QUEUE_FULL`. A timed-out write rejects
+to its caller promptly, but retains its queue slot until the underlying
+platform operation settles; later writes remain serialized behind it. A
+disconnect drains already-accepted writes before closing the connection.
 
 ## Ownership
 
