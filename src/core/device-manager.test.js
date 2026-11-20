@@ -99,6 +99,28 @@ describe("DeviceManager", () => {
     expect(await manager.disconnectAll()).toBe(0);
   });
 
+  it("allows concurrent sessions for distinct device IDs", async () => {
+    const { manager } = setup();
+    const [first, second] = await Promise.all([
+      manager.connect("mock.profile", { deviceId: "parallel-one" }),
+      manager.connect("mock.profile", { deviceId: "parallel-two" }),
+    ]);
+    expect(first.deviceId).not.toBe(second.deviceId);
+    expect(manager.listConnectedDevices()).toHaveLength(2);
+    await manager.disconnectAll();
+  });
+
+  it("cleans up a session after an unexpected transport disconnect", async () => {
+    const { manager, engine } = setup();
+    await manager.connect("mock.profile", { deviceId: "lost-device" });
+    const session = manager._sessions.get("lost-device");
+    await session.transport.simulateDisconnect(new Error("link lost"));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(manager.getDevice("lost-device")).toBeNull();
+    expect(engine.getLatest("lost-device")).toBeNull();
+    expect(session.transport.state).toBe("disposed");
+  });
+
   it("isolates throwing manager listeners", async () => {
     const { manager } = setup();
     manager.on("device-state", () => {
