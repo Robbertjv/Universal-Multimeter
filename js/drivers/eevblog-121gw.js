@@ -1,4 +1,4 @@
-export const SERVICE_UUID = "e7add780-b042-4876-aae1-112855353cc0";
+export const SERVICE_UUID = "0bd51666-e7cb-469b-8e4d-2742f1ba77cc";
 export const DATA_CHARACTERISTIC_UUID = "e7add780-b042-4876-aae1-112855353cc1";
 export const PACKET_LENGTH = 19;
 const START = 0xf2;
