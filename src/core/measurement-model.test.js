@@ -20,14 +20,14 @@ const validReading = {
 };
 
 describe("measurement model", () => {
-  it("creates a versioned normalized record without rounding the value", () => {
+  it("creates a versioned record without rounding the value", () => {
     const record = createMeasurement(validReading);
     expect(record.schemaVersion).toBe(1);
     expect(record.value).toBe(12.345);
     expect(Object.isFrozen(record)).toBe(true);
   });
 
-  it("rejects missing required fields instead of silently treating them as unknown", () => {
+  it("rejects missing required fields instead of treating them as unknown", () => {
     const missingFunction = { ...validReading };
     delete missingFunction.function;
     expect(inspectMeasurement(missingFunction).valid).toBe(false);
@@ -35,16 +35,37 @@ describe("measurement model", () => {
   });
 
   it("requires a finite number for valid readings", () => {
-    expect(inspectMeasurement({ ...validReading, value: Number.NaN }).valid).toBe(false);
-    expect(inspectMeasurement({ ...validReading, value: Infinity }).valid).toBe(false);
+    expect(
+      inspectMeasurement({ ...validReading, value: Number.NaN }).valid,
+    ).toBe(false);
+    expect(
+      inspectMeasurement({ ...validReading, value: Infinity }).valid,
+    ).toBe(false);
     expect(createMeasurement({ ...validReading, value: 0 }).value).toBe(0);
   });
 
   it("requires null values for special and non-valid states", () => {
-    for (const state of ["overload", "open-circuit", "invalid", "warming-up", "disconnected", "unavailable", "unknown"]) {
-      const result = inspectMeasurement({ ...validReading, state, value: null });
+    const states = [
+      "overload",
+      "open-circuit",
+      "invalid",
+      "warming-up",
+      "disconnected",
+      "unavailable",
+      "unknown",
+    ];
+
+    for (const state of states) {
+      const result = inspectMeasurement({
+        ...validReading,
+        state,
+        value: null,
+      });
       expect(result.valid, state).toBe(true);
-      expect(inspectMeasurement({ ...validReading, state, value: 123 }).valid, state).toBe(false);
+      expect(
+        inspectMeasurement({ ...validReading, state, value: 123 }).valid,
+        state,
+      ).toBe(false);
     }
   });
 
@@ -67,7 +88,7 @@ describe("measurement model", () => {
     expect(record.metadata.sourceFunction).toBe("vendor-private-mode");
   });
 
-  it("supports multiple channels and shared frame correlation metadata", () => {
+  it("supports multiple channels with shared frame correlation metadata", () => {
     const primary = createMeasurement({
       ...validReading,
       metadata: { frameId: "frame-77" },
@@ -86,18 +107,20 @@ describe("measurement model", () => {
     expect(primary.channelId).not.toBe(secondary.channelId);
   });
 
-  it("reports useful diagnostics for malformed timestamps and ranges", () => {
+  it("reports diagnostics for malformed timestamps and ranges", () => {
     const result = inspectMeasurement({
       ...validReading,
       receivedAt: "not-a-date",
       range: { min: 10, max: -10, unit: "V" },
     });
     expect(result.valid).toBe(false);
-    expect(result.errors.map((error) => error.code)).toContain("TIMESTAMP_INVALID");
+    expect(result.errors.map((error) => error.code)).toContain(
+      "TIMESTAMP_INVALID",
+    );
     expect(result.errors.map((error) => error.code)).toContain("RANGE_INVALID");
   });
 
-  it("creates a new record when quality changes without mutating the original", () => {
+  it("changes quality without mutating the original record", () => {
     const original = createMeasurement(validReading);
     const stale = withMeasurementQuality(original, "stale");
     expect(original.quality).toBe("good");
@@ -107,13 +130,14 @@ describe("measurement model", () => {
 
 describe("device descriptor", () => {
   it("validates required device identity fields", () => {
-    expect(validateDeviceDescriptor({
+    const validDevice = {
       deviceId: "d1",
       manufacturer: "EEVblog",
       model: "121GW",
       driverId: "eevblog-121gw",
       transportId: "web-bluetooth",
-    }).valid).toBe(true);
+    };
+    expect(validateDeviceDescriptor(validDevice).valid).toBe(true);
     expect(validateDeviceDescriptor({ model: "121GW" }).valid).toBe(false);
   });
 });
