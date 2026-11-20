@@ -13,10 +13,10 @@ Build the shared foundations once, then develop all requested device drivers inc
 - [x] Establish project specification and repository documentation.
 - [x] Add consolidated device protocol research.
 - [x] Define this workflow, roadmap, and status tracking.
-- [ ] Review and resolve inconsistencies between specification, protocol notes, and implementation decisions.
+- [x] Review and resolve architectural contract inconsistencies; continue tracking model-specific protocol questions during driver work.
 - [x] Create GitHub issues for the first implementation work packages.
 
-**Exit criteria:** scope, workflow, driver inventory, and status vocabulary are documented.
+**Exit criteria:** scope, workflow, driver inventory, status vocabulary, and reviewed v1.0 technical contracts are documented.
 
 ## Initial execution issues
 
