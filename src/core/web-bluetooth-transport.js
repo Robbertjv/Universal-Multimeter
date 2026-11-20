@@ -147,7 +147,10 @@ export class WebBluetoothTransport extends TransportAdapter {
   }
 
   async onConnect({ signal } = {}) {
-    if (!this._bluetooth || typeof this._bluetooth.requestDevice !== "function") {
+    if (
+      !this._bluetooth ||
+      typeof this._bluetooth.requestDevice !== "function"
+    ) {
       throw new TransportError(
         "TRANSPORT_BLUETOOTH_UNAVAILABLE",
         "Web Bluetooth is not available in this browser or context.",
