@@ -1,6 +1,8 @@
 # Device Manager and Measurement Engine Contracts
 
-**Status:** Reviewed v1.0 implementation baseline (2026-11-20).\n\nSee [DEVICE_MANAGER_API.md](DEVICE_MANAGER_API.md) for the initial runtime API and current implementation limitations.
+**Status:** Reviewed v1.0 implementation baseline (2026-11-20).
+
+See [DEVICE_MANAGER_API.md](DEVICE_MANAGER_API.md) for the initial runtime API and current implementation limitations.
 
 ## 1. Device Manager responsibilities
 
