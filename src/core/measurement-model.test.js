@@ -7,6 +7,7 @@ import {
 import { validateDeviceDescriptor } from "./measurement-validation.js";
 
 const validReading = {
+  schemaVersion: 1,
   measurementId: "m-001",
   deviceId: "device-121gw",
   channelId: "primary",
@@ -38,9 +39,9 @@ describe("measurement model", () => {
     expect(
       inspectMeasurement({ ...validReading, value: Number.NaN }).valid,
     ).toBe(false);
-    expect(
-      inspectMeasurement({ ...validReading, value: Infinity }).valid,
-    ).toBe(false);
+    expect(inspectMeasurement({ ...validReading, value: Infinity }).valid).toBe(
+      false,
+    );
     expect(createMeasurement({ ...validReading, value: 0 }).value).toBe(0);
   });
 
