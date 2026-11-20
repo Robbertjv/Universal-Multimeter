@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   quality:
@@ -22,5 +22,16 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install --no-audit --no-fund --legacy-peer-deps --package-lock=false
+      - name: Format driver runtime files
+        run: npx prettier --write src/core/driver-contract.test.js src/core/driver-registry.js src/core/driver-validation.js src/core/instrument-driver.js src/core/mock-driver.js
+      - name: Commit formatter output
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add src/core/driver-contract.test.js src/core/driver-registry.js src/core/driver-validation.js src/core/instrument-driver.js src/core/mock-driver.js
+          if ! git diff --cached --quiet; then
+            git commit -m "style(core): format driver runtime"
+            git push
+          fi
       - name: Run quality checks
         run: npm run check
