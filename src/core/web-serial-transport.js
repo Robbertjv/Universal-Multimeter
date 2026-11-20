@@ -78,7 +78,7 @@ function mapError(error, operation) {
 }
 
 export class WebSerialTransport extends TransportAdapter {
-  constructor({ profile, serial = globalThis.navigator?.serial, ...options } = {}) {
+  constructor({\n    profile,\n    serial = globalThis.navigator?.serial,\n    ...options\n  } = {}) {
     super({ descriptor: WEB_SERIAL_TRANSPORT_DESCRIPTOR, ...options });
     this._config = validate(profile ?? {});
     this._serial = serial;
