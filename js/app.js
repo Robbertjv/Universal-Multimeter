@@ -18,6 +18,7 @@ function fmt(value,unit="",digits=6){return value==null?"—":Number(value).toLo
 function setIcon(name,on){const el=document.querySelector(`[data-icon="${name}"]`);if(el)el.classList.toggle("active",!!on);}
 function render(reading){
  state.latest=reading;
+ fetch("/api/measurement",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(mqttPayload(reading))}).catch(()=>{});
  $("mode-name").textContent=reading.modeName;
  $("main-reading").textContent=reading.main.text.trim()||"—";
  $("main-unit").textContent=reading.main.unit;
@@ -124,12 +125,12 @@ async function sendKey(key,longPress=false){
  }catch(e){log("Knop verzenden mislukt: "+e.message,"error");}
 }
 function mqttPayload(r){return {device:"EEVblog 121GW",serial:r.serial,timestamp:new Date(r.receivedAt).toISOString(),mode:r.modeName,value:r.main.value,unit:r.main.unit,baseValue:r.main.baseValue,baseUnit:r.main.baseUnit,overload:r.main.overload,sub:r.sub,bar:r.bar,icons:r.icons,batteryVoltage:r.batteryVoltage};}
-function publishMqtt(r){if(state.mqtt?.connected){const topic=$("mqtt-topic").value.trim();if(topic)state.mqtt.publish(topic,JSON.stringify(mqttPayload(r)),{qos:0,retain:false},e=>{if(e)log("MQTT publish: "+e.message,"error");});}}
+function publishMqtt(r){const payload=mqttPayload(r);if(state.mqtt?.connected){const topic=$("mqtt-topic").value.trim();if(topic)state.mqtt.publish(topic,JSON.stringify(payload),{qos:0,retain:false},e=>{if(e)log("MQTT publish: "+e.message,"error");});}else if($("mqtt-transport").value==="tcp"&&$("mqtt-state").textContent==="BRIDGE CONNECTED"){fetch("/api/mqtt/publish",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}).catch(()=>{});}}
 function mqttConnect(){
  if(!window.mqtt){log("MQTT.js niet geladen.","error");return;}
  const host=$("mqtt-host").value.trim(),port=Number($("mqtt-port").value),transport=$("mqtt-transport").value;
  if(!host||!port){log("Vul broker host en poort in.","warn");return;}
- if(transport==="tcp"){log("MQTT TCP is alleen beschikbaar via de optionele lokale Python-bridge. Start backend en gebruik de bridgeconfiguratie in README.","warn");return;}
+ if(transport==="tcp"){fetch("/api/mqtt/connect",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({host,port,username:$("mqtt-user").value,password:$("mqtt-password").value,topic:$("mqtt-topic").value})}).then(async res=>{if(!res.ok)throw new Error(await res.text());$("mqtt-state").textContent="BRIDGE CONNECTED";$("mqtt-connect").disabled=true;$("mqtt-disconnect").disabled=false;log("MQTT TCP bridge verbonden.");}).catch(e=>log("MQTT TCP bridge: "+e.message,"error"));return;}
  const scheme=location.protocol==="https:"?"wss":"ws";const url=`${scheme}://${host}:${port}/mqtt`;
  try{
   state.mqtt=window.mqtt.connect(url,{username:$("mqtt-user").value||undefined,password:$("mqtt-password").value||undefined,clientId:"universal-meter-"+Math.random().toString(16).slice(2),clean:true,connectTimeout:10000,reconnectPeriod:3000});
@@ -138,7 +139,7 @@ function mqttConnect(){
   state.mqtt.on("close",()=>{$("mqtt-state").textContent="DISCONNECTED";$("mqtt-connect").disabled=false;$("mqtt-disconnect").disabled=true;});
  }catch(e){log(e.message,"error");}
 }
-function mqttDisconnect(){if(state.mqtt){state.mqtt.end(true);state.mqtt=null;}$("mqtt-state").textContent="DISCONNECTED";$("mqtt-connect").disabled=false;$("mqtt-disconnect").disabled=true;}
+function mqttDisconnect(){if(state.mqtt){state.mqtt.end(true);state.mqtt=null;}fetch("/api/mqtt/disconnect",{method:"POST"}).catch(()=>{});$("mqtt-state").textContent="DISCONNECTED";$("mqtt-connect").disabled=false;$("mqtt-disconnect").disabled=true;}
 $("connect-btn").addEventListener("click",connectBle);$("disconnect-btn").addEventListener("click",disconnectBle);
 document.querySelectorAll("[data-key]").forEach(btn=>{btn.addEventListener("click",()=>sendKey(btn.dataset.key));btn.addEventListener("contextmenu",e=>{e.preventDefault();sendKey(btn.dataset.key,true);});});
 $("logging-toggle").addEventListener("click",()=>setLogging(!state.logging));
