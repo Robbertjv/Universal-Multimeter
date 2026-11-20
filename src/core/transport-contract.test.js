@@ -109,6 +109,43 @@ describe("transport adapter contract", () => {
     });
   });
 
+  it("keeps timed-out writes serialized until the platform operation settles", async () => {
+    const bounded = new MockTransport({ maxQueuedWrites: 1, timeoutMs: 5 });
+    await bounded.connect();
+    let finish;
+    bounded.hooks.write = () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      });
+    await expect(bounded.write(new Uint8Array([1]))).rejects.toMatchObject({
+      code: "TRANSPORT_TIMEOUT",
+    });
+    await expect(bounded.write(new Uint8Array([2]))).rejects.toMatchObject({
+      code: "TRANSPORT_WRITE_QUEUE_FULL",
+    });
+    finish();
+    await vi.waitFor(() => expect(bounded._queuedWrites).toBe(0));
+    bounded.hooks.write = undefined;
+    await bounded.write(new Uint8Array([3]));
+    expect(bounded.receivedWrites.map((bytes) => [...bytes])).toEqual([[3]]);
+  });
+
+  it("drains accepted writes before disconnecting", async () => {
+    const bounded = new MockTransport({ timeoutMs: 100 });
+    await bounded.connect();
+    let finish;
+    bounded.hooks.write = () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      });
+    const write = bounded.write(new Uint8Array([1]));
+    const disconnect = bounded.disconnect();
+    await vi.waitFor(() => expect(bounded.state).toBe("disconnecting"));
+    finish();
+    await Promise.all([write, disconnect]);
+    expect(bounded.state).toBe("disconnected");
+  });
+
   it("bounds queued writes and releases queue capacity after completion", async () => {
     const bounded = new MockTransport({ maxQueuedWrites: 1, timeoutMs: 0 });
     await bounded.connect();
