@@ -183,7 +183,7 @@ export class InstrumentDriver {
 
   async stop() {
     return this._enqueue(async () => {
-      if (["new", "initialized", "stopped"].includes(this._state)) return this;
+      if (["new", "initialized", "stopped"].includes(this._state)) {\n        this._detachTransport();\n        return this;\n      }
       this._state = "stopping";
       this._emitState();
       try {
