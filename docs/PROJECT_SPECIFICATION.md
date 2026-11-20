@@ -48,11 +48,12 @@ The architecture should allow for the following interfaces over time:
 - Bluetooth LE
 - Bluetooth Classic
 - USB Serial
-- MQTT
-- WebSocket
+- MQTT over its standard TCP transport
+- MQTT over WebSockets (including secure WSS where supported)
+- WebSocket as a communication interface
 - Potentially a REST API
 
-These interfaces are part of the intended roadmap. They are not implemented or guaranteed to be available on every target platform.
+These interfaces are part of the intended roadmap. MQTT support must cover both the conventional MQTT transport (typically TCP, with TLS where configured) and MQTT over WebSockets (WS/WSS), since browser environments commonly use WebSockets to reach an MQTT broker. These interfaces are not implemented or guaranteed to be available on every target platform.
 
 ## 6. Architectural principles and modules
 
@@ -86,6 +87,24 @@ Responsible for displaying live and recorded measurement data in graphical form.
 
 Responsible for recording measurement data and making stored data available for review and export. IndexedDB is the planned browser-side storage technology.
 
+### 6.7 AI integration through MCP
+
+The project should include a planned integration using the **Model Context Protocol (MCP)**. The purpose is to allow an AI client to connect to a specific running meter/web frontend instance and work with that meter's current measurement context.
+
+The MCP integration should make suitable meter information available through clearly defined resources and/or tools. At minimum, the design should consider:
+
+- Identifying the connected meter and its capabilities.
+- Reading current measurement values and relevant measurement metadata.
+- Accessing measurement history or logged data where permitted.
+- Reporting connection state and device status where available.
+- Exposing device controls only when supported by the meter and only through explicitly permission-controlled operations.
+
+The integration must distinguish between read-only measurement access and actions that can change meter state. Read-only access should be the safe baseline; control operations should require explicit authorization and must respect the capabilities and safety constraints of the instrument.
+
+The MCP design must account for the fact that the meter interface runs as a web frontend instance. The implementation may require an MCP server or bridge component alongside the frontend; the exact hosting, connection, authentication, and deployment model remains an implementation design decision. The goal is to let an AI session address the intended meter instance rather than ambiguously accessing another connected device.
+
+MCP support is a planned capability, not an implemented feature.
+
 ## 7. Planned technology
 
 The current technology choices are:
@@ -95,7 +114,8 @@ The current technology choices are:
 - **Chart.js** — measurement charts and graphical presentation.
 - **Web Bluetooth API** — browser-based Bluetooth LE communication where supported.
 - **Web Serial API** — browser-based serial communication where supported.
-- **MQTT.js** — MQTT communication.
+- **MQTT.js** — MQTT communication over the conventional MQTT transport and MQTT over WebSockets (WS/WSS), as supported by the selected broker and environment.
+- **Model Context Protocol (MCP)** — planned standardized interface for connecting AI clients to a running meter/web frontend instance.
 - **IndexedDB** — browser-side measurement data storage.
 - **PWA** — Progressive Web App capabilities.
 - **Python FastAPI** — optional component; not a required part of the initial browser application.
@@ -137,6 +157,8 @@ In particular:
 - The Device Manager should coordinate supported connection types.
 - Graphing, logging, and storage should not depend on a single multimeter model.
 - Instrument-specific controls should be exposed only where supported.
+- The MCP integration should expose the selected meter instance and its measurement context to authorized AI clients.
+- MQTT connectivity should support both conventional MQTT transport and MQTT over WebSockets.
 
 ## 11. Initial documentation milestone
 
@@ -159,6 +181,8 @@ The following details have not been established and should not be assumed to be 
 - Exact dashboard layout and styling.
 - Logging retention and data-management policies.
 - Detailed CSV schema.
+- MCP server/bridge deployment model, authentication, authorization, and exact resource/tool definitions.
+- MQTT broker configuration details, including connection profiles and credentials handling.
 - Implementation schedule and release milestones.
 
 These can be specified when the relevant implementation work is planned.
