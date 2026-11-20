@@ -1,7 +1,7 @@
 # Project Status
 
 **Last reviewed:** 2026-11-20  
-**Overall phase:** Architecture contracts defined; implementation backlog being established  
+**Overall phase:** Architecture v1.0 baseline reviewed; ready to begin implementation  
 **Application implementation:** Not started  
 **Overall health:** On track for foundational work; protocol and hardware validation remain open across several devices.
 
@@ -36,9 +36,9 @@ These labels are independent. For example, a driver can be *in progress* and *ex
 | Project specification and scope | Done | High | Initial scope and architecture documented. |
 | Device protocol research | In progress | High | Consolidated reference exists; several models need captures and clarification. |
 | Workflow and roadmap | Done | High | Defined in repository. |
-| Universal measurement model | In review | Highest | Proposed v1 contract documented in MEASUREMENT_DATA_MODEL.md. |
-| Driver contract and capability model | In review | Highest | Proposed v1 contract documented in DRIVER_CONTRACT.md. |
-| Device Manager / Measurement Engine | In review | Highest | Service contracts documented; implementation not started. |
+| Universal measurement model | Done | Highest | Reviewed v1.0 implementation baseline documented in MEASUREMENT_DATA_MODEL.md; code not yet implemented. |
+| Driver contract and capability model | Done | Highest | Reviewed v1.0 implementation baseline documented in DRIVER_CONTRACT.md; code not yet implemented. |
+| Device Manager / Measurement Engine | Done | Highest | Reviewed v1.0 service contracts documented; implementation not started. |
 | BLE transport | Ready | High | Contract documented; implementation not started. |
 | Serial transport | Ready | High | Contract documented; implementation not started. |
 | WebHID transport | Ready | High | Contract documented; implementation not started. |
@@ -109,6 +109,17 @@ The initial implementation work packages are tracked as issues:
 | [#11](https://github.com/Robbertjv/Universal-Multimeter/issues/11) | Remaining driver skeletons and protocol research | Open |
 
 GitHub Issues are the execution-level task tracker. This document remains the project-level summary; update it when issue status or priorities materially change.
+
+## Issue #2 review outcome
+
+**Completed 2026-11-20:** The six v1 technical contract documents have been reviewed and accepted as the implementation baseline. This marks documentation readiness only; it does not mean application code has been implemented.
+
+Review clarifications:
+- Quantity, function, and unit identifier conventions are explicit.
+- Measurement state and data quality are distinct; stale readings retain their last instrument state/value.
+- Browser transport and optional native/helper bridge responsibilities are explicit, including Bluetooth Classic and conventional MQTT-TCP.
+- Device Manager owns driver/transport lifetime; drivers own parser state and their subscriptions.
+- Unknown protocol fields remain explicit unknowns and do not block driver scaffolding or known-field implementation.
 
 ## Known project-wide risks
 
