@@ -23,13 +23,13 @@ export function createMeasurement(input) {
   const metadata = cloneMetadata(source.metadata);
 
   let quantity = cleanString(source.quantity);
-  if (!NORMALIZED_QUANTITIES.includes(quantity)) {
+  if (typeof quantity === "string" && quantity.length > 0 && !NORMALIZED_QUANTITIES.includes(quantity)) {
     metadata.sourceQuantity = quantity;
     quantity = "unknown";
   }
 
   let measurementFunction = cleanString(source.function);
-  if (!NORMALIZED_FUNCTIONS.includes(measurementFunction)) {
+  if (typeof measurementFunction === "string" && measurementFunction.length > 0 && !NORMALIZED_FUNCTIONS.includes(measurementFunction)) {
     metadata.sourceFunction = measurementFunction;
     measurementFunction = "unknown";
   }
