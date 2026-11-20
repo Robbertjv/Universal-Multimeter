@@ -1,7 +1,7 @@
 # Project Status
 
 **Last reviewed:** 2026-11-20  
-**Overall phase:** Phase 1 — application foundation, measurement model, and driver runtime integrated  
+**Overall phase:** Phase 1 — application foundation, measurement model, and driver runtime integrated; transport and Device Manager under review  
 **Application implementation:** Foundation merged; core measurement model implemented  
 **Overall health:** On track for foundational work; protocol and hardware validation remain open across several devices.
 
@@ -139,4 +139,4 @@ Review clarifications:
 - 2026-11-20 — Started issue #6 on feature/issue-6-transport-contract: transport runtime, mock transport, stable errors, and reusable transport/driver integration tests; awaiting review.
 - 2026-11-20 — Started issue #3 on feature/issue-3-app-foundation: Vite app shell, Web Component, Vitest smoke test, ESLint/Prettier, and GitHub Actions. GitHub Actions quality gate passed on PR #12; awaiting review/merge.
 
-- 2026-11-20 — Started issue #7 on `feature/issue-7-device-manager`: implemented profile/transport registries, Device Manager connect/rollback/disconnect orchestration, Measurement Engine ingestion/cache/staleness, and mock integration tests; PR #16 opened for review.
+- 2026-11-20 — Started issue #7 on `feature/issue-7-device-manager`: implemented profile/transport registries, Device Manager connect/rollback/disconnect orchestration, Measurement Engine ingestion/cache/staleness, and mock integration tests; PR #16 opened for review. CI passed (ESLint, Prettier, 54 Vitest tests, Vite production build).
