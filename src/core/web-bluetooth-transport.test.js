@@ -159,18 +159,18 @@ describe("WebBluetoothTransport", () => {
   it(
     "delivers copied notification chunks without frame assumptions",
     async () => {
-    const { transport, notify } = setup();
-    const chunks = [];
-    transport.on("data", (chunk) => chunks.push(chunk));
-    await transport.connect();
-    notify.emit(new Uint8Array([0x10, 0x20]));
-    notify.emit(new Uint8Array([0x30]));
-    expect(chunks.map((chunk) => [...chunk])).toEqual([
-      [0x10, 0x20],
-      [0x30],
-    ]);
-    expect(chunks[0]).not.toBe(notify.value);
-    await transport.dispose();
+      const { transport, notify } = setup();
+      const chunks = [];
+      transport.on("data", (chunk) => chunks.push(chunk));
+      await transport.connect();
+      notify.emit(new Uint8Array([0x10, 0x20]));
+      notify.emit(new Uint8Array([0x30]));
+      expect(chunks.map((chunk) => [...chunk])).toEqual([
+        [0x10, 0x20],
+        [0x30],
+      ]);
+      expect(chunks[0]).not.toBe(notify.value);
+      await transport.dispose();
     },
   );
 
@@ -212,21 +212,21 @@ describe("WebBluetoothTransport", () => {
   it(
     "maps user cancellation and permission denial to stable errors",
     async () => {
-    const cancelled = setup();
-    const cancelError = new Error("cancelled");
-    cancelError.name = "NotFoundError";
-    cancelled.bluetooth.requestDevice.mockRejectedValueOnce(cancelError);
-    await expect(cancelled.transport.connect()).rejects.toMatchObject({
-      code: "TRANSPORT_DEVICE_SELECTION_CANCELLED",
-    });
+      const cancelled = setup();
+      const cancelError = new Error("cancelled");
+      cancelError.name = "NotFoundError";
+      cancelled.bluetooth.requestDevice.mockRejectedValueOnce(cancelError);
+      await expect(cancelled.transport.connect()).rejects.toMatchObject({
+        code: "TRANSPORT_DEVICE_SELECTION_CANCELLED",
+      });
 
-    const denied = setup();
-    const deniedError = new Error("denied");
-    deniedError.name = "NotAllowedError";
-    denied.bluetooth.requestDevice.mockRejectedValueOnce(deniedError);
-    await expect(denied.transport.connect()).rejects.toMatchObject({
-      code: "TRANSPORT_PERMISSION_DENIED",
-    });
+      const denied = setup();
+      const deniedError = new Error("denied");
+      deniedError.name = "NotAllowedError";
+      denied.bluetooth.requestDevice.mockRejectedValueOnce(deniedError);
+      await expect(denied.transport.connect()).rejects.toMatchObject({
+        code: "TRANSPORT_PERMISSION_DENIED",
+      });
     },
   );
 
@@ -255,38 +255,38 @@ describe("WebBluetoothTransport", () => {
   it(
     "maps a missing configured characteristic to a stable GATT error",
     async () => {
-    const { bluetooth } = setup();
-    const profile = {
-      ...PROFILE,
-      ble: {
-        ...PROFILE.ble,
-        notifyCharacteristicUuid: "00002a00-0000-1000-8000-00805f9b34fb",
-      },
-    };
-    const transport = new WebBluetoothTransport({ profile, bluetooth });
-    await expect(transport.connect()).rejects.toMatchObject({
-      code: "TRANSPORT_GATT_CHARACTERISTIC_NOT_FOUND",
-    });
-    await transport.dispose();
+      const { bluetooth } = setup();
+      const profile = {
+        ...PROFILE,
+        ble: {
+          ...PROFILE.ble,
+          notifyCharacteristicUuid: "00002a00-0000-1000-8000-00805f9b34fb",
+        },
+      };
+      const transport = new WebBluetoothTransport({ profile, bluetooth });
+      await expect(transport.connect()).rejects.toMatchObject({
+        code: "TRANSPORT_GATT_CHARACTERISTIC_NOT_FOUND",
+      });
+      await transport.dispose();
     },
   );
 
   it(
     "cleans up notification listeners and reports unexpected disconnect",
     async () => {
-    const { transport, device, notify } = setup();
-    const states = [];
-    transport.on("state", (event) => states.push(event));
-    await transport.connect();
-    expect(notify.notificationsStarted).toBe(1);
-    device.simulateDisconnect();
-    expect(states.some((event) => event.unexpected)).toBe(true);
-    expect(transport.state).toBe("disconnected");
-    const chunks = [];
-    transport.on("data", (chunk) => chunks.push(chunk));
-    notify.emit(new Uint8Array([1]));
-    expect(chunks).toHaveLength(0);
-    await transport.dispose();
+      const { transport, device, notify } = setup();
+      const states = [];
+      transport.on("state", (event) => states.push(event));
+      await transport.connect();
+      expect(notify.notificationsStarted).toBe(1);
+      device.simulateDisconnect();
+      expect(states.some((event) => event.unexpected)).toBe(true);
+      expect(transport.state).toBe("disconnected");
+      const chunks = [];
+      transport.on("data", (chunk) => chunks.push(chunk));
+      notify.emit(new Uint8Array([1]));
+      expect(chunks).toHaveLength(0);
+      await transport.dispose();
     },
   );
 
