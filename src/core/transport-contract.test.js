@@ -71,18 +71,28 @@ describe("transport adapter contract", () => {
   });
 
   it("times out stalled connect, write, and disconnect hooks", async () => {
-    transport.hooks.connect = () => new Promise(() => {});
+    let connectSignal;
+    transport.hooks.connect = ({ signal }) => {
+      connectSignal = signal;
+      return new Promise(() => {});
+    };
     await expect(transport.connect()).rejects.toMatchObject({
       code: "TRANSPORT_TIMEOUT",
     });
+    expect(connectSignal.aborted).toBe(true);
     expect(transport.state).toBe("error");
 
     transport.hooks.connect = undefined;
     await transport.connect();
-    transport.hooks.write = () => new Promise(() => {});
+    let writeSignal;
+    transport.hooks.write = (_bytes, { signal }) => {
+      writeSignal = signal;
+      return new Promise(() => {});
+    };
     await expect(transport.write(new Uint8Array([1]))).rejects.toMatchObject({
       code: "TRANSPORT_TIMEOUT",
     });
+    expect(writeSignal.aborted).toBe(true);
 
     transport.hooks.write = undefined;
     transport.hooks.disconnect = () => new Promise(() => {});
