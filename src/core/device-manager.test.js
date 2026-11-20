@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { DeviceManager } from "./device-manager.js";
 import { DeviceProfileRegistry } from "./device-profile-registry.js";
 import { DriverRegistry } from "./driver-registry.js";
