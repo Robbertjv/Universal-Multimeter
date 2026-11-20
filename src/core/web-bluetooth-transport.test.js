@@ -252,7 +252,7 @@ describe("WebBluetoothTransport", () => {
     await transport.dispose();
   });
 
-  it("cleans up after notification failure and unexpected disconnect", async () => {
+  it("cleans up failures and disconnects", async () => {
     const failed = setup();
     failed.notify.startNotifications = vi.fn(async () => {
       throw new Error("notification failed");
