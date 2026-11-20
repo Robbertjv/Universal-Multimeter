@@ -44,9 +44,7 @@ function setup({ failConnect = false, clock } = {}) {
 }
 
 describe("DeviceManager", () => {
-  it(
-    "connects a mock device, publishes normalized readings, and disconnects",
-    async () => {
+  it("connects a mock device, publishes normalized readings, and disconnects", async () => {
       const { manager, engine } = setup();
       const device = await manager.connect("mock.profile", {
         deviceId: "dmm-1",
@@ -71,8 +69,7 @@ describe("DeviceManager", () => {
       expect(await manager.disconnect("dmm-1")).toBe(true);
       expect(await manager.disconnect("dmm-1")).toBe(false);
       expect(manager.listConnectedDevices()).toEqual([]);
-    },
-  );
+  });
 
   it("coalesces concurrent connect calls for a profile", async () => {
     const { manager } = setup();
