@@ -31,20 +31,23 @@ export class MockTransport extends TransportAdapter {
     }
   }
 
-  async onConnect(options) {
+  async onConnect(options = {}) {
     this.connectCount += 1;
     await this.hooks.connect?.(options);
+    if (options.signal?.aborted) throw options.signal.reason;
     this._maybeFail("connect");
   }
 
-  async onDisconnect() {
+  async onDisconnect(options = {}) {
     this.disconnectCount += 1;
-    await this.hooks.disconnect?.();
+    await this.hooks.disconnect?.(options);
+    if (options.signal?.aborted) throw options.signal.reason;
     this._maybeFail("disconnect");
   }
 
-  async onWrite(bytes) {
-    await this.hooks.write?.(bytes);
+  async onWrite(bytes, options = {}) {
+    await this.hooks.write?.(bytes, options);
+    if (options.signal?.aborted) throw options.signal.reason;
     this._maybeFail("write");
     this.receivedWrites.push(bytes.slice());
   }
