@@ -90,7 +90,7 @@ export class WebHIDTransport extends TransportAdapter {
   async _close() {
     this._removeListeners();
     const device = this._device; this._device = null;
-    if (device?.opened) { try { await device.close(); } catch {} }
+    if (device?.opened) { try { await device.close(); } catch { /* best-effort cleanup */ } }
   }
 }
 export function createWebHIDTransport(dependencies = {}) { return new WebHIDTransport(dependencies); }
