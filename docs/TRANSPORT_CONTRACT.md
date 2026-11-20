@@ -1,6 +1,6 @@
 # Transport Adapter Contract
 
-**Status:** Proposed v1 contract.
+**Status:** Reviewed v1.0 implementation baseline (2026-11-20).
 
 A transport adapter moves bytes or structured messages between the application and a device/service. It does not decode meter-specific protocol fields.
 
@@ -62,6 +62,11 @@ Each adapter documents:
 
 ## 5. Planned adapters
 
+### Bluetooth Classic (native/helper bridge)
+- Bluetooth Classic/SPP is not exposed by the standard Web Bluetooth LE API. Use an explicitly installed/launched native helper or platform-specific bridge when a target meter requires it.
+- The bridge-facing adapter implements the same transport contract and exposes a narrow, authenticated local connection; it must not grant arbitrary system Bluetooth access to web content.
+- Record pairing, service/port selection, reconnect behavior, OS permissions, and platform compatibility separately.
+
 ### Web Bluetooth LE
 - Device selection through browser permission flow and service/characteristic filters.
 - Subscribe to notifications where supported.
@@ -82,7 +87,7 @@ Each adapter documents:
 - A HID-to-UART bridge requires bridge-specific initialization and report mapping in the transport adapter, while meter protocol parsing remains in the driver.
 
 ### MQTT
-- Browser implementation normally uses MQTT over WebSockets (WS/WSS); conventional MQTT TCP may require a helper service.
+- Browser implementation normally uses MQTT over WebSockets (WS/WSS); conventional MQTT TCP may require a helper service. Keep MQTT protocol/client behavior separate from the underlying network adapter; the helper path is an explicit bridge integration, not direct browser TCP access.
 - Topics, QoS, retained-message handling, authentication, reconnect, and payload format are configuration/schema concerns.
 - Validate payload size and topic allowlist; never expose credentials in logs.
 
