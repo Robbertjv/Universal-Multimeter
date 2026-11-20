@@ -1,6 +1,6 @@
 # Universal Measurement and Device Data Model
 
-**Status:** Proposed v1 contract for implementation and review.
+**Status:** Reviewed v1.0 implementation baseline (2026-11-20).
 
 The model is device-independent. Device-specific information may be retained in namespaced metadata, but common consumers must not need to understand a meter's proprietary protocol.
 
@@ -71,7 +71,15 @@ Recommended JavaScript shape:
 - `rawFrameRef`: reference to a stored raw frame, not an unbounded duplicate payload.
 - `metadata`: namespaced additional fields, e.g. `vendor.eevblog`.
 
-## 3. Reading states
+## 3. Identifier and unit conventions
+
+- `quantity` uses stable lowercase identifiers (for example `voltage`, `current`, `resistance`, `capacitance`, `inductance`, `frequency`, `temperature`, `continuity`, `phase-angle`, `dissipation-factor`, `quality-factor`). New identifiers are added deliberately and documented; vendor-specific unknowns remain in metadata.
+- `function` uses a normalized lowercase identifier or `unknown` (for example `voltage.dc`, `voltage.ac`, `voltage.acdc`, `resistance`, `diode`, `continuity`, `capacitance`, `inductance`, `current.dc`). Preserve the original device function code separately.
+- `unit` uses a UCUM-compatible symbol where possible (for example `V`, `mV`, `A`, `mA`, `ohm`, `kohm`, `Hz`, `F`, `uF`, `H`, `degC`, `degF`, `%`, `1`). The exact display glyph is a presentation concern. Use `1` for dimensionless values such as D/Q or logic states when a numeric dimensionless quantity is appropriate.
+- Never assume that displayed unit and numeric scale agree until the device decoder establishes prefix and decimal placement. Store the decoded numeric value in the unit stated by `unit`.
+- A missing/unknown unit must be represented explicitly as `unit: "unknown"` until resolved; it must not be silently guessed.
+
+## 4. Reading states
 
 Recommended `state` enum:
 - `valid` — numeric value is valid.
@@ -85,7 +93,7 @@ Recommended `state` enum:
 
 Invariant: `value` must be a finite number only when `state === "valid"`; otherwise it should be `null`. If the instrument provides a meaningful numeric value with a warning, define the exact state/quality semantics rather than discarding it.
 
-## 4. Quality
+## 5. Quality
 
 Recommended `quality` enum:
 - `good`
@@ -94,9 +102,9 @@ Recommended `quality` enum:
 - `degraded`
 - `unknown`
 
-Quality describes trust/freshness, not the electrical reading state. For example, an overload can have good quality if the overload flag was decoded reliably.
+Quality describes trust/freshness, not the electrical reading state. For example, an overload can have good quality if the overload flag was decoded reliably. A valid reading can be stale if no newer sample has arrived within the configured freshness interval. A stale reading retains its last value and instrument state; staleness changes quality, not the instrument-reported state.
 
-## 5. Device descriptor
+## 6. Device descriptor
 
 ```js
 {
@@ -116,7 +124,7 @@ Quality describes trust/freshness, not the electrical reading state. For example
 
 Do not use Bluetooth addresses, USB serial numbers, or other identifiers as public display names by default. Store only identifiers needed for connection and user-authorized device selection.
 
-## 6. Capability descriptor
+## 7. Capability descriptor
 
 Each capability is explicitly available as `supported`, `unsupported`, or `unknown`. Suggested structure:
 
@@ -140,7 +148,7 @@ Each capability is explicitly available as `supported`, `unsupported`, or `unkno
 
 Control capabilities must also specify command semantics, read/write nature, allowed values, and confirmation requirements before they can be invoked.
 
-## 7. Device and connection states
+## 8. Device and connection states
 
 Device state is separate from reading state:
 - `disconnected`
@@ -153,7 +161,7 @@ Device state is separate from reading state:
 
 Connection metadata may include transport name, connectedAt, lastSeenAt, and lastError code. Do not put credentials in this object.
 
-## 8. Normalization rules
+## 9. Normalization rules
 
 - Store numeric values in base units chosen consistently per quantity, or store the actual unit with an explicit conversion policy. The initial implementation should preserve the instrument's reported unit and provide tested conversion utilities rather than silently converting.
 - Preserve sign and decimal precision from decoded data.
@@ -165,7 +173,7 @@ Connection metadata may include transport name, connectedAt, lastSeenAt, and las
 - Host receipt timestamp is mandatory; source timestamp is optional.
 - Sequence gaps should be observable as diagnostics where the protocol provides sequence information.
 
-## 9. Validation
+## 10. Validation
 
 Reject or quarantine records with:
 - missing identity/channel/function/state/quality;
@@ -177,7 +185,7 @@ Reject or quarantine records with:
 
 Do not let one malformed record terminate a device stream. Emit a diagnostic and continue where safe.
 
-## 10. CSV interoperability
+## 11. CSV interoperability
 
 CSV export should include at least:
 `timestamp_received, timestamp_source, device_id, manufacturer, model, session_id, channel_id, quantity, function, value, unit, state, quality, range_min, range_max, resolution, sequence`.
