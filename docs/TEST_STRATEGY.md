@@ -1,5 +1,7 @@
 # Test Strategy and Acceptance Plan
 
+**Status:** Reviewed v1.0 implementation baseline (2026-11-20).
+
 ## 1. Test layers
 
 ### Unit tests
