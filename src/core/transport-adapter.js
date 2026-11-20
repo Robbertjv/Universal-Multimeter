@@ -137,7 +137,7 @@ export class TransportAdapter {
       this._setState("connecting");
       try {
         await this._withTimeout(
-          () => this.onConnect(options),
+          (signal) => this.onConnect({ ...options, signal }),
           options.timeoutMs,
           "TRANSPORT_CONNECT_FAILED",
           "Transport connection timed out.",
@@ -175,7 +175,7 @@ export class TransportAdapter {
       this._setState("disconnecting");
       try {
         await this._withTimeout(
-          () => this.onDisconnect(),
+          (signal) => this.onDisconnect({ signal }),
           options.timeoutMs,
           "TRANSPORT_DISCONNECT_FAILED",
           "Transport disconnect timed out.",
@@ -260,7 +260,7 @@ export class TransportAdapter {
         );
       }
       await this._withTimeout(
-        () => this.onWrite(bytes),
+        (signal) => this.onWrite(bytes, { signal }),
         options.timeoutMs,
         "TRANSPORT_WRITE_FAILED",
         "Transport write timed out.",
@@ -334,7 +334,7 @@ export class TransportAdapter {
         if (this._state !== "disconnected") {
           this._setState("disconnecting");
           await this._withTimeout(
-            () => this.onDisconnect(),
+            (signal) => this.onDisconnect({ signal }),
             undefined,
             "TRANSPORT_DISCONNECT_FAILED",
             "Transport disconnect timed out during disposal.",
@@ -346,7 +346,10 @@ export class TransportAdapter {
         this._events.removeAllListeners();
         await this.onDispose();
       });
-    })();
+    })().catch((error) => {
+      this._disposePromise = null;
+      throw error;
+    });
 
     return this._disposePromise;
   }
