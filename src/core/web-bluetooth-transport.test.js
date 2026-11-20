@@ -277,9 +277,8 @@ describe("WebBluetoothTransport", () => {
   });
 
   it("rejects incomplete BLE profile configuration", () => {
-    expect(
-      () =>
-        new WebBluetoothTransport({ profile: { ble: {} }, bluetooth: {} }),
+    expect(() =>
+      new WebBluetoothTransport({ profile: { ble: {} }, bluetooth: {} }),
     ).toThrow(TransportError);
   });
 
