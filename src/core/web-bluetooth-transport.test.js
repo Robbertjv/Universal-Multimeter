@@ -132,7 +132,9 @@ describe("WebBluetoothTransport", () => {
     expect(registry.getDescriptor("web.bluetooth.le")).toMatchObject(
       WEB_BLUETOOTH_TRANSPORT_DESCRIPTOR,
     );
-    const transport = registry.create("web.bluetooth.le", { profile: PROFILE });
+    const transport = registry.create("web.bluetooth.le", {
+      profile: PROFILE,
+    });
     expect(transport).toBeInstanceOf(WebBluetoothTransport);
     expect(transport.getDescriptor().transportId).toBe("web.bluetooth.le");
   });
@@ -206,7 +208,10 @@ describe("WebBluetoothTransport", () => {
   });
 
   it("reports unavailable browser APIs and missing GATT services", async () => {
-    const unavailable = new WebBluetoothTransport({ profile: PROFILE, bluetooth: null });
+    const unavailable = new WebBluetoothTransport({
+      profile: PROFILE,
+      bluetooth: null,
+    });
     await expect(unavailable.connect()).rejects.toMatchObject({
       code: "TRANSPORT_BLUETOOTH_UNAVAILABLE",
     });
@@ -258,7 +263,8 @@ describe("WebBluetoothTransport", () => {
 
   it("rejects incomplete BLE profile configuration", () => {
     expect(
-      () => new WebBluetoothTransport({ profile: { ble: {} }, bluetooth: {} }),
+      () =>
+        new WebBluetoothTransport({ profile: { ble: {} }, bluetooth: {} }),
     ).toThrow(TransportError);
   });
 
