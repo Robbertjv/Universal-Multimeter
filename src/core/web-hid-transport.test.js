@@ -67,6 +67,47 @@ describe("WebHIDTransport", () => {
     await transport.dispose();
   });
 
+  it("applies product-only and usage-page chooser filters", async () => {
+    const f = fixture();
+    const productTransport = new WebHIDTransport({
+      profile: { hid: { productId: 0xea80 } },
+      hid: f.hid,
+    });
+    await productTransport.connect();
+    expect(f.hid.requestDevice).toHaveBeenCalledWith({
+      filters: [{ productId: 0xea80 }],
+    });
+    await productTransport.dispose();
+
+    const usageFixture = fixture();
+    const usageTransport = new WebHIDTransport({
+      profile: { hid: { filters: [{ usagePage: 1, usage: 2 }] } },
+      hid: usageFixture.hid,
+    });
+    await usageTransport.connect();
+    expect(usageFixture.hid.requestDevice).toHaveBeenCalledWith({
+      filters: [{ usagePage: 1, usage: 2 }],
+    });
+    await usageTransport.dispose();
+  });
+
+  it("rejects unconstrained or malformed HID chooser filters", () => {
+    expect(
+      () =>
+        new WebHIDTransport({
+          profile: { hid: { inputReportId: 1 } },
+          hid: {},
+        }),
+    ).toThrow();
+    expect(
+      () =>
+        new WebHIDTransport({
+          profile: { hid: { filters: [{}] } },
+          hid: {},
+        }),
+    ).toThrow();
+  });
+
   it("maps unavailable, permission denial and cancelled chooser", async () => {
     const unavailable = new WebHIDTransport({ profile, hid: null });
     await expect(unavailable.connect()).rejects.toMatchObject({
