@@ -16,6 +16,8 @@ import { registerUniTUt71xDriver } from "../drivers/uni-t-ut71x-driver.js";
 import { registerUniTUt71xProfiles } from "../drivers/uni-t-ut71x-profile.js";
 import { registerUniTUt61eDriver } from "../drivers/uni-t-ut61e-driver.js";
 import { registerUniTUt61eProfile } from "../drivers/uni-t-ut61e-profile.js";
+import { registerVoltcraftVc870Driver } from "../drivers/voltcraft-vc870-driver.js";
+import { registerVoltcraftVc870Profile } from "../drivers/voltcraft-vc870-profile.js";
 
 const RUNTIME_EVENTS = new Set([
   "device-state",
@@ -76,6 +78,8 @@ export function createApplicationRuntime({
     registerUniTUt71xProfiles(profileRegistry);
     registerUniTUt61eDriver(driverRegistry);
     registerUniTUt61eProfile(profileRegistry);
+    registerVoltcraftVc870Driver(driverRegistry);
+    registerVoltcraftVc870Profile(profileRegistry);
   }
 
   for (const entry of transports) {
