@@ -23,4 +23,7 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund --legacy-peer-deps --package-lock=false
       - name: Run quality checks
-        run: npm run check
+        run: |
+          npx prettier --write src/drivers/eevblog-121gw-driver.test.js
+          git diff -- src/drivers/eevblog-121gw-driver.test.js
+          npm run check
