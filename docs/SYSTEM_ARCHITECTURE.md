@@ -105,6 +105,8 @@ It must not contain Fluke-, EEVblog- or other model-specific protocol logic. It 
 These coordinate complete application use cases and keep UI components independent from device protocols.
 
 Examples:
+- **MQTT integration:** manages independent named northbound and southbound connections. Southbound connections publish normalized meter measurements; northbound connections subscribe to external messages. Broker transport clients are injected, so browser MQTT-over-WebSockets and an optional local TCP bridge can use the same service. Routing is explicit and no automatic message forwarding is implied.
+- **MCP integration:** exposes a read-only Model Context Protocol tool service over the application runtime. It reports connected devices and normalized measurements; HTTP hosting, authentication, and transport framing belong to a separate host adapter. Instrument controls are not exposed by the initial MCP tool set.
 - **Device Manager:** device profiles, driver/transport factories, connection lifecycle, active sessions and capability access.
 - **Logging/session service:** start/stop sessions and persist normalized measurements.
 - **Storage/export service:** IndexedDB retention and CSV export.

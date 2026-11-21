@@ -31,6 +31,7 @@ function fixture() {
   };
   const port = {
     open: vi.fn(async () => {}),
+    setSignals: vi.fn(async () => {}),
     close: vi.fn(async () => {
       closed = true;
     }),
@@ -117,6 +118,48 @@ describe("WebSerialTransport", () => {
       await expect(transport.connect()).rejects.toMatchObject({ code });
       await transport.dispose();
     }
+  });
+
+  it("asserts configured DTR/RTS signals after opening the serial port", async () => {
+    const f = fixture();
+    const signalProfile = {
+      serial: {
+        ...profile.serial,
+        signals: { dataTerminalReady: true, requestToSend: false },
+      },
+    };
+    const transport = new WebSerialTransport({
+      profile: signalProfile,
+      serial: f.serial,
+    });
+
+    await transport.connect();
+
+    expect(f.port.setSignals).toHaveBeenCalledWith({
+      dataTerminalReady: true,
+      requestToSend: false,
+    });
+    await transport.dispose();
+  });
+
+  it("fails clearly when required modem signal control is unavailable", async () => {
+    const f = fixture();
+    delete f.port.setSignals;
+    const transport = new WebSerialTransport({
+      profile: {
+        serial: {
+          ...profile.serial,
+          signals: { dataTerminalReady: true },
+        },
+      },
+      serial: f.serial,
+    });
+
+    await expect(transport.connect()).rejects.toMatchObject({
+      code: "TRANSPORT_SERIAL_SIGNALS_UNSUPPORTED",
+    });
+    expect(f.port.close).toHaveBeenCalled();
+    await transport.dispose();
   });
 
   it("passes validated USB filters to the chooser", async () => {
