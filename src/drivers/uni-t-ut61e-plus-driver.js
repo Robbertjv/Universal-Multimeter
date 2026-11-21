@@ -16,7 +16,14 @@ const CONTROL_COMMANDS = Object.freeze({
 export const UNI_T_UT61E_PLUS_DRIVER_DESCRIPTOR = Object.freeze({
   driverId: "uni-t.ut61e-plus",
   manufacturer: "UNI-T",
-  models: ["UT61B+", "UT61D+", "UT61E+", "UT161B", "UT161D", "UT161E"],
+  models: [
+    "UT61B+",
+    "UT61D+",
+    "UT61E+",
+    "UT161B",
+    "UT161D",
+    "UT161E",
+  ],
   protocolFamily: "uni-t-ut61-plus-19-byte-polled",
   protocolVariants: ["cp2110-hid-9600-8n1"],
   supportLevel: "experimental",
@@ -149,8 +156,26 @@ const MODES = new Map([
     },
   ],
   [0x14, { quantity: "unknown", function: "unknown", unit: "1", prefix: true }],
-  [0x15, { quantity: "voltage", function: "voltage.ac", unit: "V", prefix: true, lowImpedance: true }],
-  [0x16, { quantity: "voltage", function: "voltage.ac", unit: "V", prefix: true, lowImpedance: true }],
+  [
+    0x15,
+    {
+      quantity: "voltage",
+      function: "voltage.ac",
+      unit: "V",
+      prefix: true,
+      lowImpedance: true,
+    },
+  ],
+  [
+    0x16,
+    {
+      quantity: "voltage",
+      function: "voltage.ac",
+      unit: "V",
+      prefix: true,
+      lowImpedance: true,
+    },
+  ],
   [
     0x18,
     {
