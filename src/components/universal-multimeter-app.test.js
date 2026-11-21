@@ -9,12 +9,14 @@ if (!customElements.get(tag)) {
 function createRuntime() {
   const listeners = new Map();
   return {
-    listProfiles: () => [{
-      profileId: "demo.profile",
-      manufacturer: "Demo",
-      model: "Meter",
-      supportLevel: "experimental",
-    }],
+    listProfiles: () => [
+      {
+        profileId: "demo.profile",
+        manufacturer: "Demo",
+        model: "Meter",
+        supportLevel: "experimental",
+      },
+    ],
     listConnectedDevices: () => [],
     getSnapshot: () => [],
     on: (type, listener) => {
@@ -27,7 +29,8 @@ function createRuntime() {
     disconnect: vi.fn(async () => true),
     shutdown: vi.fn(async () => {}),
     emit(type, event) {
-      for (const listener of listeners.get(type) ?? []) listener({ type, ...event });
+      for (const listener of listeners.get(type) ?? [])
+        listener({ type, ...event });
     },
   };
 }
@@ -71,19 +74,23 @@ describe("UniversalMultimeterApp", () => {
       state: "connected",
     });
     runtime.emit("measurement", {
-      measurements: [{
-        deviceId: "demo-1",
-        value: 230.1,
-        unit: "V",
-        quantity: "voltage",
-        function: "voltage.ac",
-        quality: "good",
-        state: "valid",
-        receivedAt: "2026-11-21T10:00:00.000Z",
-      }],
+      measurements: [
+        {
+          deviceId: "demo-1",
+          value: 230.1,
+          unit: "V",
+          quantity: "voltage",
+          function: "voltage.ac",
+          quality: "good",
+          state: "valid",
+          receivedAt: "2026-11-21T10:00:00.000Z",
+        },
+      ],
     });
 
-    expect(app.querySelector("[data-status]").textContent).toContain("Verbonden");
+    expect(app.querySelector("[data-status]").textContent).toContain(
+      "Verbonden",
+    );
     expect(app.querySelector(".reading-value").textContent).toBe("230.1");
     expect(app.querySelector(".reading-unit").textContent).toBe("V");
 
