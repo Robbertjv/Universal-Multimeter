@@ -60,39 +60,123 @@ export class Fluke187ResponseParser {
   }
 }
 
-function parseUnit(token) {
-  const normalized = token
-    .replaceAll(" ", "")
+function normalizeUnit(token) {
+  return token
+    .trim()
     .replaceAll("µ", "u")
     .replaceAll("μ", "u")
+    .replaceAll("Ω", "ohm")
+    .replaceAll("ω", "ohm")
+    .replace(/\s+/g, " ")
     .toLowerCase();
+}
+
+function parseUnit(token) {
+  const normalized = normalizeUnit(token);
   const units = {
     v: ["voltage", "V"],
+    vac: ["voltage", "V", "ac"],
+    vdc: ["voltage", "V", "dc"],
+    "vac&dc": ["voltage", "V", "ac+dc"],
+    "vac+dc": ["voltage", "V", "ac+dc"],
+    "v ac": ["voltage", "V", "ac"],
+    "v dc": ["voltage", "V", "dc"],
+    "v ac&dc": ["voltage", "V", "ac+dc"],
+    "v ac+dc": ["voltage", "V", "ac+dc"],
     mv: ["voltage", "mV"],
+    mvac: ["voltage", "mV", "ac"],
+    mvdc: ["voltage", "mV", "dc"],
+    "mvac&dc": ["voltage", "mV", "ac+dc"],
+    "mvac+dc": ["voltage", "mV", "ac+dc"],
+    "mv ac": ["voltage", "mV", "ac"],
+    "mv dc": ["voltage", "mV", "dc"],
+    "mv ac&dc": ["voltage", "mV", "ac+dc"],
+    "mv ac+dc": ["voltage", "mV", "ac+dc"],
     uv: ["voltage", "uV"],
     a: ["current", "A"],
+    aac: ["current", "A", "ac"],
+    adc: ["current", "A", "dc"],
+    "aac&dc": ["current", "A", "ac+dc"],
+    "aac+dc": ["current", "A", "ac+dc"],
+    "a ac": ["current", "A", "ac"],
+    "a dc": ["current", "A", "dc"],
+    "a ac&dc": ["current", "A", "ac+dc"],
+    "a ac+dc": ["current", "A", "ac+dc"],
     ma: ["current", "mA"],
+    maac: ["current", "mA", "ac"],
+    madc: ["current", "mA", "dc"],
+    "maac&dc": ["current", "mA", "ac+dc"],
+    "maac+dc": ["current", "mA", "ac+dc"],
+    "ma ac": ["current", "mA", "ac"],
+    "ma dc": ["current", "mA", "dc"],
+    "ma ac&dc": ["current", "mA", "ac+dc"],
+    "ma ac+dc": ["current", "mA", "ac+dc"],
     ua: ["current", "uA"],
+    uaac: ["current", "uA", "ac"],
+    uadc: ["current", "uA", "dc"],
+    "uaac&dc": ["current", "uA", "ac+dc"],
+    "uaac+dc": ["current", "uA", "ac+dc"],
+    "ua ac": ["current", "uA", "ac"],
+    "ua dc": ["current", "uA", "dc"],
+    "ua ac&dc": ["current", "uA", "ac+dc"],
+    "ua ac+dc": ["current", "uA", "ac+dc"],
     na: ["current", "nA"],
     ohm: ["resistance", "ohm"],
-    ω: ["resistance", "ohm"],
+    ohms: ["resistance", "ohm"],
     kohm: ["resistance", "kohm"],
+    kohms: ["resistance", "kohm"],
     mohm: ["resistance", "Mohm"],
+    mohms: ["resistance", "Mohm"],
     gohm: ["resistance", "Gohm"],
+    gohms: ["resistance", "Gohm"],
+    ns: ["conductance", "nS"],
+    f: ["capacitance", "F"],
+    farad: ["capacitance", "F"],
+    farads: ["capacitance", "F"],
+    nf: ["capacitance", "nF"],
+    uf: ["capacitance", "uF"],
+    mf: ["capacitance", "mF"],
+    pf: ["capacitance", "pF"],
+    "deg c": ["temperature", "degC"],
+    "°c": ["temperature", "degC"],
+    "deg f": ["temperature", "degF"],
+    "°f": ["temperature", "degF"],
     hz: ["frequency", "Hz"],
     khz: ["frequency", "kHz"],
     mhz: ["frequency", "MHz"],
-    uf: ["capacitance", "uF"],
-    nf: ["capacitance", "nF"],
-    pf: ["capacitance", "pF"],
-    mf: ["capacitance", "mF"],
-    fc: ["temperature", "degC"],
-    "°c": ["temperature", "degC"],
-    ff: ["temperature", "degF"],
-    "°f": ["temperature", "degF"],
     "%": ["duty-cycle", "%"],
+    ms: ["time", "ms"],
+    dbm: ["power", "dBm"],
+    dbv: ["voltage", "dBV"],
   };
   return units[normalized] ?? null;
+}
+
+function parseOverload(payload) {
+  const match = /^out of range(?:\s+(.+))?$/i.exec(payload);
+  if (!match && !/^(?:ol|o\.l\.|over|overload)$/i.test(payload)) {
+    return null;
+  }
+  const unit = match?.[1] ? parseUnit(match[1]) : null;
+  return {
+    ok: true,
+    type: "measurement",
+    measurement: {
+      quantity: unit?.[0] ?? "unknown",
+      function: "unknown",
+      value: null,
+      unit: unit?.[1] ?? "unknown",
+      state: "overload",
+      quality: "good",
+      metadata: {
+        "vendor.fluke187": {
+          response: "QM",
+          reportedUnit: match?.[1] ?? null,
+          mode: unit?.[2] ?? null,
+        },
+      },
+    },
+  };
 }
 
 export function parseFluke187ResponseLine(line) {
@@ -112,7 +196,8 @@ export function parseFluke187ResponseLine(line) {
         };
   }
 
-  const identification = /^ID,(.*)$/i.exec(text);
+  // ID replies are raw identity strings, not "ID,<value>" records.
+  const identification = /^(?:ID,)?(FLUKE\b.*)$/i.exec(text);
   if (identification) {
     return {
       ok: true,
@@ -130,20 +215,8 @@ export function parseFluke187ResponseLine(line) {
   }
 
   const payload = response[1].trim();
-  if (/^(?:OL|O.L.|OVER|OVERLOAD)$/i.test(payload)) {
-    return {
-      ok: true,
-      type: "measurement",
-      measurement: {
-        quantity: "unknown",
-        function: "unknown",
-        value: null,
-        unit: "unknown",
-        state: "overload",
-        quality: "good",
-      },
-    };
-  }
+  const overload = parseOverload(payload);
+  if (overload) return overload;
 
   const match =
     /^([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(.*?)$/.exec(payload);
@@ -166,7 +239,7 @@ export function parseFluke187ResponseLine(line) {
     };
   }
 
-  const [quantity, normalizedUnit] = unit;
+  const [quantity, normalizedUnit, mode] = unit;
   return {
     ok: true,
     type: "measurement",
@@ -181,6 +254,7 @@ export function parseFluke187ResponseLine(line) {
         "vendor.fluke187": {
           response: "QM",
           reportedUnit: match[2],
+          mode: mode ?? null,
         },
       },
     },

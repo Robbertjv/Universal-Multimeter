@@ -27,7 +27,7 @@ The meter acknowledges a command with a single ASCII digit followed by CR (0 = a
 
 - Exact IR adapter/cable part number and USB VID/PID/interface class.
 - Flow control and adapter-specific behavior on target browsers/OSes.
-- Actual response examples for each measurement function, overload spelling and unit glyph encoding.
+- Physical response examples for each measurement function, overload spelling and unit glyph encoding. The parser now has separate synthetic fixtures transcribed from the published protocol note.
 - Polling cadence and any command/response timing requirements.
 - Real meter display comparison and reconnect behavior.
 
