@@ -54,8 +54,8 @@ The v1 contract documents are reviewed implementation baselines. Checked items i
 
 Implement adapters independently and document browser/OS support.
 
-1. [x] Initial Web Bluetooth LE adapter — profile-driven GATT discovery, notifications, optional writes, disconnect/cleanup, diagnostics, and mock tests (issue #8; PR #17 review pending). Real browser/platform and 121GW validation remain outstanding.
-2. [x] Initial Web Serial adapter — profile-configured framing, chooser/open/read/write/cleanup, arbitrary byte chunks, and mock tests (issue #9; PR #18 review pending). Browser/OS and hardware validation outstanding.
+1. [x] Initial Web Bluetooth LE adapter — profile-driven GATT discovery, notifications, optional writes, disconnect/cleanup, diagnostics, and mock tests (issue #8; PR #17 merged). Real browser/platform and 121GW validation remain outstanding.
+2. [x] Initial Web Serial adapter — profile-configured framing, chooser/open/read/write/cleanup, arbitrary byte chunks, and mock tests (issue #9; PR #18 merged). Browser/OS and hardware validation outstanding.
 3. [x] Initial WebHID adapter — profile-driven selection, input/output reports, preserved report IDs/boundaries, disconnect/cleanup, and mock tests (issue #9; PR #18 review pending). CP2110 report mapping remains to be verified before UT612 cable support is claimed.
 4. [ ] MQTT transport — broker connection, topic configuration, reconnect, and message validation.
 5. [ ] WebSocket transport — generic streaming endpoint.
