@@ -170,9 +170,7 @@ export function parseFs9922Frame(input) {
   if (!overload && !/^\d{4}$/.test(digits)) {
     return invalid("FS9922_DIGITS_INVALID");
   }
-  const decimalExponent = DECIMAL_EXPONENTS.get(
-    String.fromCharCode(frame[6]),
-  );
+  const decimalExponent = DECIMAL_EXPONENTS.get(String.fromCharCode(frame[6]));
   if (decimalExponent === undefined) {
     return invalid("FS9922_DECIMAL_POSITION_INVALID");
   }
@@ -181,9 +179,7 @@ export function parseFs9922Frame(input) {
   const exponent = decimalExponent + (multiplier?.exponent ?? 0);
   let value = overload
     ? null
-    : (frame[0] === 0x2d ? -1 : 1) *
-      Number(digits) *
-      10 ** exponent;
+    : (frame[0] === 0x2d ? -1 : 1) * Number(digits) * 10 ** exponent;
   let state = overload ? "overload" : "valid";
   if (flags.beep) {
     value = overload ? 0 : 1;
