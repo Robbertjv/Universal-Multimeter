@@ -145,7 +145,8 @@ export function parseFluke187ResponseLine(line) {
     };
   }
 
-  const match = /^([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(.*?)$/.exec(payload);
+  const match =
+    /^([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(.*?)$/.exec(payload);
   if (!match || !match[2]) {
     return {
       ok: false,
