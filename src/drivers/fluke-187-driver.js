@@ -1,5 +1,8 @@
 import { InstrumentDriver } from "../core/instrument-driver.js";
-import { Fluke187ResponseParser } from "./fluke-187-parser.js";
+import {
+  Fluke187ResponseParser,
+  parseFluke187ResponseLine,
+} from "./fluke-187-parser.js";
 
 export const FLUKE_187_DRIVER_DESCRIPTOR = Object.freeze({
   driverId: "fluke.187",
@@ -30,7 +33,9 @@ export class Fluke187Driver extends InstrumentDriver {
   } = {}) {
     super({ ...dependencies, descriptor: FLUKE_187_DRIVER_DESCRIPTOR });
     if (!Number.isSafeInteger(pollIntervalMs) || pollIntervalMs < 250) {
-      throw new TypeError("pollIntervalMs must be a safe integer of at least 250.");
+      throw new TypeError(
+        "pollIntervalMs must be a safe integer of at least 250.",
+      );
     }
     this.pollIntervalMs = pollIntervalMs;
     this.requestIdentification = requestIdentification;
@@ -104,11 +109,6 @@ export class Fluke187Driver extends InstrumentDriver {
   }
 }
 
-export function parseFluke187ResponseLine(line) {
-  return parseFluke187ResponseLineImpl(line);
-}
-
-import { parseFluke187ResponseLine as parseFluke187ResponseLineImpl } from "./fluke-187-parser.js";
 
 export function registerFluke187Driver(driverRegistry) {
   driverRegistry.register(
