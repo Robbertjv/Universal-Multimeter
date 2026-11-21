@@ -719,10 +719,50 @@ export class UniversalMultimeterApp extends HTMLElement {
     } · min ${min} · max ${max} · ${points.length} punten`;
   }
 
+  _renderControls() {
+    const panel = this.querySelector("[data-controls-panel]");
+    const list = this.querySelector("[data-controls-list]");
+    list.replaceChildren();
+    const device = this._deviceStates.get(this._currentDeviceId);
+    const controls = device?.controls ?? {};
+    const supported = Object.entries(controls).filter(
+      ([, descriptor]) => descriptor.availability === "supported",
+    );
+    panel.hidden = supported.length === 0 || !this._runtime?.executeControl;
+    if (panel.hidden) return;
+
+    for (const [controlId] of supported) {
+      const button = document.createElement("button");
+      const label = CONTROL_LABELS[controlId] ?? controlId;
+      button.type = "button";
+      button.textContent = label;
+      button.addEventListener("click", async () => {
+        const deviceId = this._currentDeviceId;
+        if (!deviceId) return;
+        button.disabled = true;
+        try {
+          await this._runtime.executeControl(
+            deviceId,
+            controlId,
+            {},
+            { authorized: true },
+          );
+          this._setMessage(`${label} verzonden naar het instrument.`);
+        } catch (error) {
+          this._setMessage(this._friendlyError(error));
+        } finally {
+          button.disabled = false;
+        }
+      });
+      list.append(button);
+    }
+  }
+
   _renderAll() {
     this._renderStatus();
     this._renderDevices();
     this._renderMeasurement();
     this._renderLogging();
+    this._renderControls();
   }
 }
