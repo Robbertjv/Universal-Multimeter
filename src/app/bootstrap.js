@@ -13,7 +13,8 @@ export function bootstrapApplication({
     throw new Error("A document is required to bootstrap the application.");
   }
 
-  const registry = documentRef.defaultView?.customElements ?? globalThis.customElements;
+  const registry =
+    documentRef.defaultView?.customElements ?? globalThis.customElements;
   if (!registry.get("universal-multimeter-app")) {
     registry.define("universal-multimeter-app", UniversalMultimeterApp);
   }
