@@ -123,6 +123,7 @@ export function parseVc870Frame(input) {
         rangeIndex,
         exponent: Number.isInteger(exponent) ? exponent : null,
         rawDisplayValue: rawValue,
+        rawAuxiliaryDisplay: decodeDisplay(frame.subarray(8, 13)),
         sourceFunction: mode?.sourceFunction,
         batteryLow,
         hold: (option2 & 0x01) !== 0,
