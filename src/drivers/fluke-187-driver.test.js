@@ -126,10 +126,7 @@ describe("Fluke 187 driver", () => {
     await driver.start();
     expect(
       transport.receivedWrites.map((item) => new TextDecoder().decode(item)),
-    ).toEqual([
-      "ID\r",
-      "QM\r",
-    ]);
+    ).toEqual(["ID\r", "QM\r"]);
     transport.emitData(bytes("0\rID,Fluke 187,1.0\r0\rQM,230.1 V\r"));
     await tick();
     expect(readings).toHaveLength(1);
