@@ -22,5 +22,14 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install --no-audit --no-fund --legacy-peer-deps --package-lock=false
+      - name: Format and capture implementation files
+        run: |
+          npm run format
+          for file in src/app/application-runtime.js src/app/application-runtime.test.js src/components/universal-multimeter-app.js src/components/universal-multimeter-app.test.js src/styles.css; do
+            echo "FORMAT_FILE_BEGIN:$file"
+            base64 -w0 "$file"
+            echo
+            echo "FORMAT_FILE_END:$file"
+          done
       - name: Run quality checks
         run: npm run check
