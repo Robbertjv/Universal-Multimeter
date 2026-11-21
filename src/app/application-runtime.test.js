@@ -119,9 +119,9 @@ describe("application runtime composition", () => {
     });
     expect(runtime.stopLogging("meter-log").sessionId).toBe(session.sessionId);
     expect(runtime.listLoggingSessions()).toEqual([]);
-    expect(await runtime.exportHistoryCsv({ sessionId: session.sessionId })).toContain(
-      "5.2",
-    );
+    expect(
+      await runtime.exportHistoryCsv({ sessionId: session.sessionId }),
+    ).toContain("5.2");
     await runtime.disconnect("meter-log");
     await runtime.shutdown();
     expect(historyStore.close).toHaveBeenCalledOnce();
