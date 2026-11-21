@@ -22,9 +22,5 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install --no-audit --no-fund --legacy-peer-deps --package-lock=false
-      - name: Format diagnostic
-        run: |
-          npx prettier --write src/components/universal-multimeter-app.js
-          git diff -- src/components/universal-multimeter-app.js
       - name: Run quality checks
         run: npm run check
