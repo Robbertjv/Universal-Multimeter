@@ -12,7 +12,6 @@ import {
   registerEevblog121gwDriver,
 } from "./eevblog-121gw-driver.js";
 import {
-  EEVBLOG_121GW_DEVICE_PROFILE,
   registerEevblog121gwProfile,
 } from "./eevblog-121gw-profile.js";
 import { DeviceProfileRegistry } from "../core/device-profile-registry.js";
