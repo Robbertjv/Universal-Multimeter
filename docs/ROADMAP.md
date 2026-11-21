@@ -43,7 +43,7 @@ Build the shared foundations once, then develop all requested device drivers inc
 - [x] Draft Device Manager and Measurement Engine contracts in DEVICE_MANAGER_AND_ENGINE.md.
 - [x] Define protocol fixture/test conventions in TEST_STRATEGY.md.
 - [x] Implement Device Manager and Measurement Engine runtime against mock transport/driver (issue #7; PR #16 merged).
-- [x] Implement transport-independent base adapter, mock transport, stable errors, timeout/AbortSignal behavior, serialized writes, bounded queues/chunks, and contract tests (issue #6; PR #15 merged).\n- [x] Implement the v1 universal measurement model, validation utilities, and unit metadata (issue #4; awaiting PR review).
+- [x] Implement transport-independent base adapter, mock transport, stable errors, timeout/AbortSignal behavior, serialized writes, bounded queues/chunks, and contract tests (issue #6; PR #15 merged).\n- [x] Implement the v1 universal measurement model, validation utilities, and unit metadata (issue #4; PR #13 merged).
 - [x] Add CI for automated checks.
 
 The v1 contract documents are reviewed implementation baselines. Checked items indicate code or configuration has been added; runtime and CI validation are recorded separately.
@@ -56,7 +56,7 @@ Implement adapters independently and document browser/OS support.
 
 1. [x] Initial Web Bluetooth LE adapter — profile-driven GATT discovery, notifications, optional writes, disconnect/cleanup, diagnostics, and mock tests (issue #8; PR #17 merged). Real browser/platform and 121GW validation remain outstanding.
 2. [x] Initial Web Serial adapter — profile-configured framing, chooser/open/read/write/cleanup, arbitrary byte chunks, and mock tests (issue #9; PR #18 merged). Browser/OS and hardware validation outstanding.
-3. [x] Initial WebHID adapter — profile-driven selection, input/output reports, preserved report IDs/boundaries, disconnect/cleanup, and mock tests (issue #9; PR #18 review pending). CP2110 report mapping remains to be verified before UT612 cable support is claimed.
+3. [x] Initial WebHID adapter — profile-driven selection, input/output reports, preserved report IDs/boundaries, disconnect/cleanup, and mock tests (issue #9; PR #18 merged). CP2110 report mapping remains to be verified before UT612 cable support is claimed.
 4. [ ] MQTT transport — broker connection, topic configuration, reconnect, and message validation.
 5. [ ] WebSocket transport — generic streaming endpoint.
 6. [ ] REST integration — polling and/or command interface where a target device/server supports it.
@@ -70,10 +70,10 @@ Drivers are developed in increments. The order below is a suggested sequence, no
 
 ### First implementation wave
 
-- [ ] EEVblog 121GW — BLE notifications and version-aware frame decoder.
-- [ ] Fluke 187 — optical serial protocol and command/response handling.
-- [ ] UNI-T UT61E — ES51922-family serial frame decoder and cable/transport variants.
-- [ ] UNI-T UT71 series — 11-byte frame decoder; verify serial framing discrepancy on hardware.
+- [ ] EEVblog 121GW — initial experimental BLE V2 parser/primary-display decoder in [PR #19](https://github.com/Robbertjv/Universal-Multimeter/pull/19); hardware validation tracked in [#20](https://github.com/Robbertjv/Universal-Multimeter/issues/20).
+- [ ] Fluke 187 — optical serial protocol and command/response handling ([#21](https://github.com/Robbertjv/Universal-Multimeter/issues/21)).
+- [ ] UNI-T UT61E — ES51922-family serial frame decoder and cable/transport variants ([#22](https://github.com/Robbertjv/Universal-Multimeter/issues/22)).
+- [ ] UNI-T UT71 series — 11-byte frame decoder; verify serial framing discrepancy on hardware ([#23](https://github.com/Robbertjv/Universal-Multimeter/issues/23)).
 
 ### Second implementation wave
 
