@@ -32,6 +32,9 @@ export const UNI_T_UT61E_PLUS_DRIVER_DESCRIPTOR = Object.freeze({
     "measurement.temperature": { availability: "supported" },
     "measurement.ncv": { availability: "supported" },
     "measurement.hfe": { availability: "supported" },
+    "measurement.live": { availability: "supported" },
+    "measurement.lpf-voltage": { availability: "supported" },
+    "measurement.acdc-voltage": { availability: "supported" },
     "measurement.low-impedance-voltage": { availability: "supported" },
     "status.battery": { availability: "supported" },
     "status.hold": { availability: "supported" },
@@ -281,7 +284,9 @@ export function parseUt61EPlusFrame(input, { model = "UT61E+" } = {}) {
         bargraphValue,
         bargraphMax: 46,
         rawDisplay,
-        confidence: mode?.confidence ?? "vendor-documented",
+        confidence: mode
+          ? (mode.confidence ?? "vendor-documented")
+          : "unsupported-for-model",
       },
     },
   };
