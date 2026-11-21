@@ -231,13 +231,12 @@ export class VoltcraftGdm704Driver extends InstrumentDriver {
         continue;
       }
       this._sequence += 1;
-      this.publish(
-        "measurement",
-        result.measurements.map((measurement) => ({
+      for (const measurement of result.measurements) {
+        this.publish("measurement", {
           ...measurement,
           sequence: this._sequence,
-        })),
-      );
+        });
+      }
     }
   }
 }
