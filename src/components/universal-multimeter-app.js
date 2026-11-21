@@ -51,6 +51,31 @@ template.innerHTML = `
       <p class="measurement-detail" data-detail>Verbind een instrument om metingen te ontvangen.</p>
     </section>
 
+    <section class="graph-panel" aria-labelledby="graph-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">MEETVERLOOP</p>
+          <h2 id="graph-title">Live trend</h2>
+        </div>
+        <div class="graph-actions">
+          <label for="graph-window">Tijdsvenster
+            <select id="graph-window" data-graph-window>
+              <option value="60000">1 minuut</option>
+              <option value="300000" selected>5 minuten</option>
+              <option value="900000">15 minuten</option>
+              <option value="3600000">1 uur</option>
+            </select>
+          </label>
+          <button type="button" class="secondary" data-clear-graph>Wis grafiek</button>
+        </div>
+      </div>
+      <svg data-graph viewBox="0 0 800 220" role="img" aria-label="Live meetwaardegrafiek">
+        <text x="400" y="110" text-anchor="middle" class="graph-empty">Nog geen numerieke meetpunten</text>
+      </svg>
+      <p data-graph-detail class="measurement-detail">Grafiek toont één kanaal en één eenheid tegelijk.</p>
+      <ul data-channels class="channel-list" aria-label="Meetkanalen"></ul>
+    </section>
+
     <section class="device-list-panel" aria-labelledby="devices-title">
       <h2 id="devices-title">Verbonden instrumenten</h2>
       <ul data-devices><li class="empty-state">Geen instrument verbonden</li></ul>
@@ -79,6 +104,7 @@ export class UniversalMultimeterApp extends HTMLElement {
     this._unsubscribers = [];
     this._deviceStates = new Map();
     this._latestMeasurements = new Map();
+    this._measurementHistory = [];
     this._currentDeviceId = null;
     this._bound = false;
     this._disposed = false;
@@ -114,6 +140,14 @@ export class UniversalMultimeterApp extends HTMLElement {
         this.querySelector("[data-connect]").disabled = false;
         this._renderStatus();
       });
+    });
+
+    this.querySelector("[data-graph-window]").addEventListener("change", () => {
+      this._renderGraph();
+    });
+    this.querySelector("[data-clear-graph]").addEventListener("click", () => {
+      this._measurementHistory = [];
+      this._renderGraph();
     });
 
     this.querySelector("[data-disconnect]").addEventListener("click", () => {
@@ -203,7 +237,11 @@ export class UniversalMultimeterApp extends HTMLElement {
         break;
       case "device-disconnected":
         this._deviceStates.delete(event.deviceId);
-        this._latestMeasurements.delete(event.deviceId);
+        for (const key of this._latestMeasurements.keys()) {
+          if (key.startsWith(`${event.deviceId}\u0000`)) {
+            this._latestMeasurements.delete(key);
+          }
+        }
         if (this._currentDeviceId === event.deviceId) {
           this._currentDeviceId =
             this._deviceStates.keys().next().value ?? null;
@@ -223,7 +261,17 @@ export class UniversalMultimeterApp extends HTMLElement {
         break;
       case "measurement":
         for (const measurement of event.measurements ?? []) {
-          this._latestMeasurements.set(measurement.deviceId, measurement);
+          this._latestMeasurements.set(
+            `${measurement.deviceId}\u0000${measurement.channelId ?? "primary"}`,
+            measurement,
+          );
+          this._measurementHistory.push(measurement);
+          if (this._measurementHistory.length > 5000) {
+            this._measurementHistory.splice(
+              0,
+              this._measurementHistory.length - 5000,
+            );
+          }
           this._currentDeviceId = measurement.deviceId;
         }
         break;
@@ -297,7 +345,10 @@ export class UniversalMultimeterApp extends HTMLElement {
   _renderMeasurement() {
     const reading = this.querySelector("[data-reading]");
     const measurement = this._currentDeviceId
-      ? this._latestMeasurements.get(this._currentDeviceId)
+      ? this._latestMeasurements.get(`${this._currentDeviceId}\u0000primary`) ??
+        [...this._latestMeasurements.entries()].find(([key]) =>
+          key.startsWith(`${this._currentDeviceId}\u0000`),
+        )?.[1]
       : null;
     const value = reading.querySelector(".reading-value");
     const unit = reading.querySelector(".reading-unit");
@@ -326,6 +377,82 @@ export class UniversalMultimeterApp extends HTMLElement {
     ]
       .filter(Boolean)
       .join(" · ");
+    this._renderChannels();
+    this._renderGraph();
+  }
+
+  _renderChannels() {
+    const list = this.querySelector("[data-channels]");
+    list.replaceChildren();
+    for (const [key, measurement] of this._latestMeasurements) {
+      if (
+        this._currentDeviceId &&
+        !key.startsWith(`${this._currentDeviceId}\u0000`)
+      ) continue;
+      const item = document.createElement("li");
+      item.textContent = `${measurement.channelId}: ${measurement.value ?? "OL"} ${measurement.unit ?? ""} · ${measurement.function ?? "onbekend"}`;
+      list.append(item);
+    }
+  }
+
+  _renderGraph() {
+    const graph = this.querySelector("[data-graph]");
+    const detail = this.querySelector("[data-graph-detail]");
+    if (!graph || !detail) return;
+    graph.replaceChildren();
+    const windowMs = Number(this.querySelector("[data-graph-window]").value);
+    const now = Date.now();
+    const measurement = this._currentDeviceId
+      ? this._latestMeasurements.get(`${this._currentDeviceId}\u0000primary`) ??
+        [...this._latestMeasurements.entries()].find(([key]) =>
+          key.startsWith(`${this._currentDeviceId}\u0000`),
+        )?.[1]
+      : null;
+    if (!measurement) {
+      detail.textContent = "Verbind een instrument om een trend op te bouwen.";
+      return;
+    }
+    const points = this._measurementHistory.filter((entry) =>
+      entry.deviceId === measurement.deviceId &&
+      entry.channelId === measurement.channelId &&
+      entry.unit === measurement.unit &&
+      entry.quantity === measurement.quantity &&
+      entry.state === "valid" &&
+      Number.isFinite(entry.value) &&
+      now - new Date(entry.receivedAt).valueOf() <= windowMs,
+    );
+    if (points.length < 2) {
+      const empty = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      empty.setAttribute("x", "400");
+      empty.setAttribute("y", "110");
+      empty.setAttribute("text-anchor", "middle");
+      empty.setAttribute("class", "graph-empty");
+      empty.textContent = "Minimaal twee geldige meetpunten nodig";
+      graph.append(empty);
+      detail.textContent = `Kanaal ${measurement.channelId} · ${measurement.unit ?? "eenheid onbekend"} · ${points.length} punt(en)`;
+      return;
+    }
+    const values = points.map((entry) => entry.value);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const span = max - min || Math.max(Math.abs(max) * 0.02, 1);
+    const start = Math.min(...points.map((entry) => new Date(entry.receivedAt).valueOf()));
+    const end = Math.max(...points.map((entry) => new Date(entry.receivedAt).valueOf()));
+    const duration = end - start || 1;
+    const coordinates = points.map((entry) => {
+      const x = 48 + ((new Date(entry.receivedAt).valueOf() - start) / duration) * 704;
+      const y = 184 - ((entry.value - min) / span) * 148;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    });
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    line.setAttribute("points", coordinates.join(" "));
+    line.setAttribute("fill", "none");
+    line.setAttribute("stroke", "currentColor");
+    line.setAttribute("stroke-width", "3");
+    line.setAttribute("stroke-linecap", "round");
+    line.setAttribute("stroke-linejoin", "round");
+    graph.append(line);
+    detail.textContent = `${measurement.function ?? "Meting"} · ${measurement.unit} · min ${min} · max ${max} · ${points.length} punten`;
   }
 
   _renderAll() {
