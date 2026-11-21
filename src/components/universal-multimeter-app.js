@@ -84,6 +84,11 @@ template.innerHTML = `
         </div>
         <span data-logging-status class="measurement-quality">Logging gestopt</span>
       </div>
+      <label for="history-session">Bewaarde sessie
+        <select id="history-session" data-history-session>
+          <option value="">Geen opgeslagen sessies</option>
+        </select>
+      </label>
       <div class="history-actions">
         <button type="button" data-log-start disabled>Start logging</button>
         <button type="button" class="secondary" data-log-stop disabled>Stop logging</button>
@@ -173,12 +178,17 @@ export class UniversalMultimeterApp extends HTMLElement {
       this._renderLogging();
     });
 
+    this.querySelector("[data-history-session]").addEventListener("change", () => {
+      this._renderLogging();
+    });
+
     this.querySelector("[data-log-start]").addEventListener("click", () => {
       if (!this._currentDeviceId || !this._runtime) return;
       try {
         const session = this._runtime.startLogging(this._currentDeviceId);
         this._activeLoggingSessions.set(this._currentDeviceId, session);
         this._lastLoggingSessions.set(this._currentDeviceId, session);
+        this._ensureHistorySessionOption(session);
         this._renderLogging();
         this._setMessage("Lokale meetlogging gestart.");
       } catch (error) {
@@ -197,7 +207,14 @@ export class UniversalMultimeterApp extends HTMLElement {
     this.querySelector("[data-log-export]").addEventListener(
       "click",
       async () => {
-        const session = this._lastLoggingSessions.get(this._currentDeviceId);
+        const selectedSessionId = this.querySelector(
+          "[data-history-session]",
+        ).value;
+        const session =
+          (selectedSessionId
+            ? { sessionId: selectedSessionId }
+            : null) ??
+          this._lastLoggingSessions.get(this._currentDeviceId);
         if (!session || !this._runtime) return;
         try {
           const csv = await this._runtime.exportHistoryCsv({
@@ -284,6 +301,59 @@ export class UniversalMultimeterApp extends HTMLElement {
       );
     }
     this._renderAll();
+    void this._loadHistorySessions();
+  }
+
+  async _loadHistorySessions() {
+    if (!this._runtime?.listHistorySessions) return;
+    try {
+      const sessions = await this._runtime.listHistorySessions();
+      const select = this.querySelector("[data-history-session]");
+      const selectedSessionId = select.value;
+      select.replaceChildren();
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = sessions.length
+        ? "Selecteer een logsessie"
+        : "Geen opgeslagen sessies";
+      select.append(placeholder);
+      for (const session of sessions) {
+        this._ensureHistorySessionOption(session);
+      }
+      const preferredSession =
+        selectedSessionId ||
+        this._lastLoggingSessions.get(this._currentDeviceId)?.sessionId ||
+        sessions[0]?.sessionId ||
+        "";
+      select.value = preferredSession;
+      this._renderLogging();
+    } catch (error) {
+      this._setMessage(this._friendlyError(error));
+    }
+  }
+
+  _ensureHistorySessionOption(session) {
+    const select = this.querySelector("[data-history-session]");
+    if (!select || !session?.sessionId) return;
+    let option = [...select.options].find(
+      (entry) => entry.value === session.sessionId,
+    );
+    if (!option) {
+      option = document.createElement("option");
+      option.value = session.sessionId;
+      const device = session.device ?? {};
+      const deviceName =
+        [device.manufacturer, device.model].filter(Boolean).join(" ") ||
+        session.deviceId;
+      const timestamp = session.startedAt
+        ? new Date(session.startedAt).toLocaleString()
+        : "nieuwe sessie";
+      option.textContent = `${deviceName} · ${timestamp} · ${
+        session.measurementCount ?? "actief"
+      } metingen`;
+      select.append(option);
+    }
+    select.value = session.sessionId;
   }
 
   _detachRuntime() {
@@ -390,7 +460,8 @@ export class UniversalMultimeterApp extends HTMLElement {
     const active = Boolean(activeSession);
     start.disabled = !device || device.state !== "connected" || active;
     stop.disabled = !active;
-    exportButton.disabled = !lastSession;
+    exportButton.disabled =
+      !this.querySelector("[data-history-session]").value && !lastSession;
     status.textContent = active
       ? `Logging actief · ${activeSession.sessionId}`
       : lastSession
