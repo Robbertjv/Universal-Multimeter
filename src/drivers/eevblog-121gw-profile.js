@@ -13,7 +13,8 @@ export const EEVBLOG_121GW_DEVICE_PROFILE = Object.freeze({
   supportLevel: "experimental",
   evidence: {
     gatt: "UUIDs taken from vendor Android app; physical device verification outstanding",
-    packetFormat: "documented 19-byte binary V2 packet; firmware 1.22+ is inferred",
+    packetFormat:
+      "documented 19-byte binary V2 packet; firmware 1.22+ is inferred",
     hardwareValidated: false,
   },
 });
