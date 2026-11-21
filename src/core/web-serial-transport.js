@@ -47,6 +47,23 @@ function validate(profile) {
     );
   }
 
+  if (
+    config.signals !== undefined &&
+    (!config.signals ||
+      typeof config.signals !== "object" ||
+      Array.isArray(config.signals) ||
+      Object.entries(config.signals).some(
+        ([key, value]) =>
+          !["dataTerminalReady", "requestToSend", "break"].includes(key) ||
+          typeof value !== "boolean",
+      ))
+  ) {
+    throw new TransportError(
+      "TRANSPORT_INVALID_DESCRIPTOR",
+      "serial.signals must contain supported boolean signal values.",
+    );
+  }
+
   const options = {
     baudRate: 9600,
     dataBits: 8,
@@ -156,6 +173,16 @@ export class WebSerialTransport extends TransportAdapter {
         bufferSize: config.bufferSize,
       });
       if (signal?.aborted) throw signal.reason;
+      if (config.signals) {
+        if (typeof port.setSignals !== "function") {
+          throw new TransportError(
+            "TRANSPORT_SERIAL_SIGNALS_UNSUPPORTED",
+            "The selected serial port does not support modem signal control.",
+          );
+        }
+        await port.setSignals(config.signals);
+        if (signal?.aborted) throw signal.reason;
+      }
 
       if (port.readable) {
         this._reader = port.readable.getReader();
