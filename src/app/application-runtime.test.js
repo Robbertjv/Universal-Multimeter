@@ -17,7 +17,7 @@ const mockProfile = {
   transportId: "mock.bytes",
 };
 
-function createRuntime() {
+function createRuntime({ historyStoreFactory } = {}) {
   let transport;
   let driver;
   const runtime = createApplicationRuntime({
@@ -40,6 +40,7 @@ function createRuntime() {
       let next = 0;
       return () => `test-${++next}`;
     })(),
+    ...(historyStoreFactory ? { historyStoreFactory } : {}),
   });
   return { runtime, getTransport: () => transport, getDriver: () => driver };
 }
@@ -76,6 +77,54 @@ describe("application runtime composition", () => {
     await runtime.disconnect("meter-1");
     expect(runtime.listConnectedDevices()).toEqual([]);
     await runtime.shutdown();
+  });
+
+  it("records normalized measurements only during an explicit logging session", async () => {
+    const records = [];
+    const historyStore = {
+      append: vi.fn(async (measurements, { sessionId, device }) => {
+        records.push(
+          ...measurements.map((measurement) => ({
+            ...measurement,
+            sessionId,
+            device,
+          })),
+        );
+      }),
+      query: vi.fn(async () => records),
+      clear: vi.fn(async () => records.splice(0).length),
+      close: vi.fn(async () => {}),
+    };
+    const { runtime, getDriver } = createRuntime({
+      historyStoreFactory: () => historyStore,
+    });
+    await runtime.connect("test.mock", { deviceId: "meter-log" });
+    const session = runtime.startLogging("meter-log");
+    expect(session.sessionId).toMatch(/^session-/);
+    getDriver().publish("measurement", {
+      quantity: "voltage",
+      function: "voltage.dc",
+      value: 5.2,
+      unit: "V",
+      state: "valid",
+      quality: "good",
+      channelId: "primary",
+    });
+    await vi.waitFor(() => expect(historyStore.append).toHaveBeenCalledOnce());
+    expect(records[0]).toMatchObject({
+      deviceId: "meter-log",
+      sessionId: session.sessionId,
+      value: 5.2,
+      device: { model: "Mock meter" },
+    });
+    expect(runtime.stopLogging("meter-log").sessionId).toBe(session.sessionId);
+    expect(runtime.listLoggingSessions()).toEqual([]);
+    expect(await runtime.exportHistoryCsv({ sessionId: session.sessionId })).toContain(
+      "5.2",
+    );
+    await runtime.disconnect("meter-log");
+    await runtime.shutdown();
+    expect(historyStore.close).toHaveBeenCalledOnce();
   });
 
   it("registers both production instrument profiles through the same registry", () => {
