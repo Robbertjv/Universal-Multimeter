@@ -140,7 +140,12 @@ export function parseUt61EPlusFrame(input) {
   const factor = mode?.prefix
     ? prefixFactor
     : (mode?.factor ?? 1);
-  const supported = Boolean(mode) && Number.isFinite(factor);
+  const validRange =
+    Number.isInteger(rangeIndex) &&
+    rangeIndex >= 0 &&
+    rangeIndex < PREFIX_FACTORS.length;
+  const supported =
+    Boolean(mode) && validRange && Number.isFinite(factor);
   const state = overload ? "overload" : supported ? "valid" : "unknown";
   const value = state === "valid" ? parsedValue * factor : null;
   const bargraphMagnitude = frame[12] * 10 + frame[13];
@@ -173,7 +178,7 @@ export function parseUt61EPlusFrame(input) {
         modeCode,
         rangeIndex,
         prefixFactor: mode?.prefix ? prefixFactor : 1,
-        lowBattery: (flags2 & 0x02) !== 0,
+        batteryLow: (flags2 & 0x02) !== 0,
         highVoltageWarning: (flags2 & 0x01) !== 0,
         autoRange: (flags2 & 0x04) === 0,
         hold: (flags1 & 0x02) !== 0,
