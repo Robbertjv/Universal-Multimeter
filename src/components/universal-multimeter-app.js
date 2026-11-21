@@ -51,6 +51,17 @@ template.innerHTML = `
       <p class="measurement-detail" data-detail>Verbind een instrument om metingen te ontvangen.</p>
     </section>
 
+    <section
+      class="controls-panel"
+      data-controls-panel
+      aria-labelledby="controls-title"
+      hidden
+    >
+      <div class="section-heading">
+        <h2 id="controls-title">Instrumentbediening</h2>
+      </div>
+      <div class="control-actions" data-controls-list></div>
+    </section>
     <section class="graph-panel" aria-labelledby="graph-title">
       <div class="section-heading">
         <div>
@@ -178,6 +189,7 @@ export class UniversalMultimeterApp extends HTMLElement {
         this._currentDeviceId = event.target.value || null;
         this._renderMeasurement();
         this._renderLogging();
+        this._renderControls();
       },
     );
 
