@@ -2,6 +2,20 @@
 
 Record decisions that materially affect architecture, compatibility, scope, or development practice. Add new decisions at the top and include date, context, decision, and consequences.
 
+## 2026-11-21 — MQTT and MCP are universal integrations, not meter-specific features
+
+**Context:** The parked `feature/121gw-web-application` branch contains a standalone EEVblog 121GW web application, an MQTT publisher/bridge, and a read-only MCP endpoint. The modular application already has a shared Measurement Engine and Device Manager. Reintroducing the old UI/backend as a second application would duplicate device and measurement state and couple integrations to one meter.
+
+**Decision:** Retain MQTT and MCP as independent application integration modules. Both consume the universal runtime and normalized measurement model; neither may depend on a specific driver, profile, or device name. The standalone 121GW UI is superseded and will not be ported. MQTT connections are named, independently configured instances with explicit southbound (publish meter measurements) or northbound (subscribe to external data) direction. MCP starts read-only and exposes connected-device status and normalized measurements; instrument controls are excluded until explicit authorization and confirmation semantics are designed.
+
+**Consequences:**
+- MQTT transport clients are injected so browser MQTT-over-WebSockets and an optional local MQTT/TCP bridge can share the same connection manager.
+- MQTT routing is explicit; no implicit forwarding between northbound and southbound connections.
+- MCP protocol handling is separated from HTTP hosting, authentication, and transport framing.
+- The old Python backend is not copied wholesale. Only independently justified host/transport capabilities may be added later.
+- The legacy 121GW-only UI, parser copy, PWA shell, and frontend are not part of the universal application.
+- These modules are software integration work and do not constitute hardware validation.
+
 ## 2026-11-20 — Incomplete device support does not block development
 
 **Context:** Protocol research and hardware availability vary by instrument. Waiting for every protocol to be completely documented would unnecessarily delay the project.
