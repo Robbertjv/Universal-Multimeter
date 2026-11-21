@@ -649,6 +649,15 @@ export class UniversalMultimeterApp extends HTMLElement {
       measurement.quantity,
       measurement.receivedAt,
       metadata.batteryLow === true ? "Batterij laag" : null,
+      metadata.batteryGrade !== undefined
+        ? `Batterijstatus ${metadata.batteryGrade}`
+        : null,
+      metadata.highVoltageWarning === true ? "Hoge spanning" : null,
+      metadata.lowImpedance === true ? "LoZ" : null,
+      metadata.misplugWarning
+        ? "Controleer meetsnoeren"
+        : null,
+      metadata.autoRange === false ? "Handmatig bereik" : null,
       metadata.hold === true ? "HOLD" : null,
       metadata.relative === true ? "REL" : null,
       metadata.peak ? `PEAK ${metadata.peak.toUpperCase()}` : null,
