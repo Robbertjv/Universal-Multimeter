@@ -121,8 +121,8 @@ export class UniversalMultimeterApp extends HTMLElement {
     this._deviceStates = new Map();
     this._latestMeasurements = new Map();
     this._measurementHistory = [];
-    this._activeLoggingSession = null;
-    this._lastLoggingSession = null;
+    this._activeLoggingSessions = new Map();
+    this._lastLoggingSessions = new Map();
     this._currentDeviceId = null;
     this._bound = false;
     this._disposed = false;
@@ -163,10 +163,9 @@ export class UniversalMultimeterApp extends HTMLElement {
     this.querySelector("[data-log-start]").addEventListener("click", () => {
       if (!this._currentDeviceId || !this._runtime) return;
       try {
-        this._activeLoggingSession = this._runtime.startLogging(
-          this._currentDeviceId,
-        );
-        this._lastLoggingSession = this._activeLoggingSession;
+        const session = this._runtime.startLogging(this._currentDeviceId);
+        this._activeLoggingSessions.set(this._currentDeviceId, session);
+        this._lastLoggingSessions.set(this._currentDeviceId, session);
         this._renderLogging();
         this._setMessage("Lokale meetlogging gestart.");
       } catch (error) {
@@ -175,15 +174,14 @@ export class UniversalMultimeterApp extends HTMLElement {
     });
     this.querySelector("[data-log-stop]").addEventListener("click", () => {
       if (!this._currentDeviceId || !this._runtime) return;
-      this._lastLoggingSession =
-        this._runtime.stopLogging(this._currentDeviceId) ??
-        this._lastLoggingSession;
-      this._activeLoggingSession = null;
+      const session = this._runtime.stopLogging(this._currentDeviceId);
+      if (session) this._lastLoggingSessions.set(this._currentDeviceId, session);
+      this._activeLoggingSessions.delete(this._currentDeviceId);
       this._renderLogging();
       this._setMessage("Lokale meetlogging gestopt.");
     });
     this.querySelector("[data-log-export]").addEventListener("click", async () => {
-      const session = this._lastLoggingSession;
+      const session = this._lastLoggingSessions.get(this._currentDeviceId);
       if (!session || !this._runtime) return;
       try {
         const csv = await this._runtime.exportHistoryCsv({
@@ -199,7 +197,7 @@ export class UniversalMultimeterApp extends HTMLElement {
         link.href = url;
         link.download = `universal-multimeter-${session.sessionId}.csv`;
         link.click();
-        URL.revokeObjectURL(url);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
         this._setMessage("CSV-export is aangemaakt.");
       } catch (error) {
         this._setMessage(this._friendlyError(error));
@@ -306,9 +304,10 @@ export class UniversalMultimeterApp extends HTMLElement {
         );
         break;
       case "device-disconnected":
-        if (this._activeLoggingSession?.deviceId === event.deviceId) {
-          this._lastLoggingSession = this._activeLoggingSession;
-          this._activeLoggingSession = null;
+        const activeSession = this._activeLoggingSessions.get(event.deviceId);
+        if (activeSession) {
+          this._lastLoggingSessions.set(event.deviceId, activeSession);
+          this._activeLoggingSessions.delete(event.deviceId);
         }
         this._deviceStates.delete(event.deviceId);
         for (const key of this._latestMeasurements.keys()) {
@@ -366,13 +365,17 @@ export class UniversalMultimeterApp extends HTMLElement {
     const device = this._currentDeviceId
       ? this._deviceStates.get(this._currentDeviceId)
       : null;
-    const active = this._activeLoggingSession?.deviceId === this._currentDeviceId;
+    const activeSession = this._activeLoggingSessions.get(
+      this._currentDeviceId,
+    );
+    const lastSession = this._lastLoggingSessions.get(this._currentDeviceId);
+    const active = Boolean(activeSession);
     start.disabled = !device || device.state !== "connected" || active;
     stop.disabled = !active;
-    exportButton.disabled = !this._lastLoggingSession;
+    exportButton.disabled = !lastSession;
     status.textContent = active
-      ? `Logging actief · ${this._activeLoggingSession.sessionId}`
-      : this._lastLoggingSession
+      ? `Logging actief · ${activeSession.sessionId}`
+      : lastSession
         ? "Logging gestopt · export beschikbaar"
         : "Logging gestopt";
   }
