@@ -132,6 +132,11 @@ describe("application runtime composition", () => {
     expect(runtime.listProfiles().map((profile) => profile.profileId)).toEqual([
       "eevblog.121gw.ble",
       "fluke.187.ir-serial",
+      "uni-t.ut71a.serial",
+      "uni-t.ut71b.serial",
+      "uni-t.ut71c.serial",
+      "uni-t.ut71d.serial",
+      "uni-t.ut71e.serial",
     ]);
   });
 
