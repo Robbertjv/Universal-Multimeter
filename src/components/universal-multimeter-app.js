@@ -76,6 +76,22 @@ template.innerHTML = `
       <ul data-channels class="channel-list" aria-label="Meetkanalen"></ul>
     </section>
 
+    <section class="history-panel" aria-labelledby="history-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">LOKALE DATA</p>
+          <h2 id="history-title">Meetgeschiedenis</h2>
+        </div>
+        <span data-logging-status class="measurement-quality">Logging gestopt</span>
+      </div>
+      <div class="history-actions">
+        <button type="button" data-log-start disabled>Start logging</button>
+        <button type="button" class="secondary" data-log-stop disabled>Stop logging</button>
+        <button type="button" class="secondary" data-log-export disabled>Exporteer CSV</button>
+      </div>
+      <p class="help-text">Metingen worden lokaal in IndexedDB opgeslagen. Export bevat alleen de gekozen logsessie.</p>
+    </section>
+
     <section class="device-list-panel" aria-labelledby="devices-title">
       <h2 id="devices-title">Verbonden instrumenten</h2>
       <ul data-devices><li class="empty-state">Geen instrument verbonden</li></ul>
@@ -105,6 +121,8 @@ export class UniversalMultimeterApp extends HTMLElement {
     this._deviceStates = new Map();
     this._latestMeasurements = new Map();
     this._measurementHistory = [];
+    this._activeLoggingSession = null;
+    this._lastLoggingSession = null;
     this._currentDeviceId = null;
     this._bound = false;
     this._disposed = false;
@@ -140,6 +158,52 @@ export class UniversalMultimeterApp extends HTMLElement {
         this.querySelector("[data-connect]").disabled = false;
         this._renderStatus();
       });
+    });
+
+    this.querySelector("[data-log-start]").addEventListener("click", () => {
+      if (!this._currentDeviceId || !this._runtime) return;
+      try {
+        this._activeLoggingSession = this._runtime.startLogging(
+          this._currentDeviceId,
+        );
+        this._lastLoggingSession = this._activeLoggingSession;
+        this._renderLogging();
+        this._setMessage("Lokale meetlogging gestart.");
+      } catch (error) {
+        this._setMessage(this._friendlyError(error));
+      }
+    });
+    this.querySelector("[data-log-stop]").addEventListener("click", () => {
+      if (!this._currentDeviceId || !this._runtime) return;
+      this._lastLoggingSession =
+        this._runtime.stopLogging(this._currentDeviceId) ??
+        this._lastLoggingSession;
+      this._activeLoggingSession = null;
+      this._renderLogging();
+      this._setMessage("Lokale meetlogging gestopt.");
+    });
+    this.querySelector("[data-log-export]").addEventListener("click", async () => {
+      const session = this._lastLoggingSession;
+      if (!session || !this._runtime) return;
+      try {
+        const csv = await this._runtime.exportHistoryCsv({
+          sessionId: session.sessionId,
+        });
+        if (!csv.split("\\r\\n").length || csv.split("\\r\\n").length < 2) {
+          this._setMessage("Geen meetgegevens om te exporteren.");
+          return;
+        }
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `universal-multimeter-${session.sessionId}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+        this._setMessage("CSV-export is aangemaakt.");
+      } catch (error) {
+        this._setMessage(this._friendlyError(error));
+      }
     });
 
     this.querySelector("[data-graph-window]").addEventListener("change", () => {
@@ -187,6 +251,7 @@ export class UniversalMultimeterApp extends HTMLElement {
       "device-warning",
       "measurement",
       "measurement-error",
+      "history-error",
     ];
     for (const type of eventTypes) {
       this._unsubscribers.push(
@@ -241,6 +306,10 @@ export class UniversalMultimeterApp extends HTMLElement {
         );
         break;
       case "device-disconnected":
+        if (this._activeLoggingSession?.deviceId === event.deviceId) {
+          this._lastLoggingSession = this._activeLoggingSession;
+          this._activeLoggingSession = null;
+        }
         this._deviceStates.delete(event.deviceId);
         for (const key of this._latestMeasurements.keys()) {
           if (key.startsWith(`${event.deviceId}\u0000`)) {
@@ -255,6 +324,7 @@ export class UniversalMultimeterApp extends HTMLElement {
         break;
       case "device-error":
       case "measurement-error":
+      case "history-error":
         this._setMessage(this._friendlyError(event.error));
         break;
       case "device-warning":
@@ -286,6 +356,25 @@ export class UniversalMultimeterApp extends HTMLElement {
         break;
     }
     this._renderAll();
+  }
+
+  _renderLogging() {
+    const start = this.querySelector("[data-log-start]");
+    const stop = this.querySelector("[data-log-stop]");
+    const exportButton = this.querySelector("[data-log-export]");
+    const status = this.querySelector("[data-logging-status]");
+    const device = this._currentDeviceId
+      ? this._deviceStates.get(this._currentDeviceId)
+      : null;
+    const active = this._activeLoggingSession?.deviceId === this._currentDeviceId;
+    start.disabled = !device || device.state !== "connected" || active;
+    stop.disabled = !active;
+    exportButton.disabled = !this._lastLoggingSession;
+    status.textContent = active
+      ? `Logging actief · ${this._activeLoggingSession.sessionId}`
+      : this._lastLoggingSession
+        ? "Logging gestopt · export beschikbaar"
+        : "Logging gestopt";
   }
 
   _friendlyError(error) {
@@ -485,5 +574,6 @@ export class UniversalMultimeterApp extends HTMLElement {
     this._renderStatus();
     this._renderDevices();
     this._renderMeasurement();
+    this._renderLogging();
   }
 }
