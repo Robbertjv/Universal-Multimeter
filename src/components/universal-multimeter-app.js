@@ -14,7 +14,7 @@ function describeError(error) {
   const code = error?.code ?? error?.cause?.code;
   const messages = {
     TRANSPORT_SERIAL_UNAVAILABLE:
-      "Web Serial is niet beschikbaar. Gebruik een ondersteunde Chromium-browser via HTTPS of localhost.",
+      "Web Serial vereist Chrome/Edge via HTTPS of localhost.",
     TRANSPORT_PERMISSION_DENIED:
       "Toegang tot de seriële poort is geweigerd.",
     TRANSPORT_DEVICE_SELECTION_CANCELLED:
@@ -58,11 +58,10 @@ export class UniversalMultimeterApp extends HTMLElement {
       '[data-role="measurement-meta"]',
     );
     this._identity = this.querySelector('[data-role="identity"]');
-    this._connectButton.addEventListener("click", () =>
-      void this._connect(),
-    );
-    this._disconnectButton.addEventListener("click", () =>
-      void this._disconnect(),
+    this._connectButton.addEventListener("click", this._connect.bind(this));
+    this._disconnectButton.addEventListener(
+      "click",
+      this._disconnect.bind(this),
     );
 
     this._runtime = createFluke187Runtime();
@@ -136,12 +135,10 @@ export class UniversalMultimeterApp extends HTMLElement {
 
   _renderMeasurement(record) {
     this._measurementValue.textContent = formatValue(record);
-    this._measurementState.textContent =
-      record.state === "overload"
-        ? "Overbelasting"
-        : record.quality === "stale"
-          ? "Verouderd"
-          : record.state;
+    let stateLabel = record.state;
+    if (record.state === "overload") stateLabel = "Overbelasting";
+    else if (record.quality === "stale") stateLabel = "Verouderd";
+    this._measurementState.textContent = stateLabel;
     this._measurementMeta.textContent = [
       `Kanaal: ${record.channelId}`,
       `ontvangen: ${new Date(record.receivedAt).toLocaleTimeString()}`,
@@ -156,7 +153,7 @@ export class UniversalMultimeterApp extends HTMLElement {
       "Selecteer de seriële poort van de Fluke IR-adapter in de browser…",
     );
     try {
-      // Called directly from the user's click gesture for Web Serial permission.
+      // This runs directly from the click gesture to request Web Serial permission.
       const device = await this._runtime.deviceManager.connect(
         "fluke.187.ir-serial",
       );
