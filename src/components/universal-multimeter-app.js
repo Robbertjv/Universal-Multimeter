@@ -582,6 +582,7 @@ export class UniversalMultimeterApp extends HTMLElement {
       unit.textContent = "";
       quality.textContent = "Geen meetgegevens";
       detail.textContent = "Verbind een instrument om metingen te ontvangen.";
+      this.querySelector("[data-bargraph-container]").hidden = true;
       return;
     }
     value.textContent =
