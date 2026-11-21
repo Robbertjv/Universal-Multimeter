@@ -94,7 +94,9 @@ export class InstrumentDriver {
       !Number.isSafeInteger(maxPendingTransportBytes) ||
       maxPendingTransportBytes < 1
     ) {
-      throw new TypeError("Transport receive queue limits must be positive safe integers.");
+      throw new TypeError(
+        "Transport receive queue limits must be positive safe integers.",
+      );
     }
     this._maxPendingTransportChunks = maxPendingTransportChunks;
     this._maxPendingTransportBytes = maxPendingTransportBytes;
@@ -298,7 +300,8 @@ export class InstrumentDriver {
         const byteLength = bytes?.byteLength ?? 0;
         if (
           this._pendingTransportChunks >= this._maxPendingTransportChunks ||
-          this._pendingTransportBytes + byteLength > this._maxPendingTransportBytes
+          this._pendingTransportBytes + byteLength >
+            this._maxPendingTransportBytes
         ) {
           this.publish("error", new DriverError(
             "DRIVER_RECEIVE_QUEUE_FULL",
