@@ -21,7 +21,8 @@ export const VOLTCRAFT_VC850_DEVICE_PROFILE = Object.freeze({
     interface: "Fortune Semiconductor FS9922-DMM4 / UNI-T UT-D02",
     serialSettings: "2400 baud, 8N1; DTR asserted by host",
     packet: "Shared 14-byte FS9922 frame",
-    diodeMode: "VC850 uses the ADP user-defined symbol bit rather than the normal diode flag.",
+    diodeMode:
+      "VC850 uses the ADP user-defined symbol bit rather than the normal diode flag.",
     hardwareValidated: false,
   },
 });

@@ -28,11 +28,23 @@ export const VOLTCRAFT_GDM704_DRIVER_DESCRIPTOR = Object.freeze({
 
 const UNIT_DEFINITIONS = new Map([
   ["v", { quantity: "voltage", unit: "V", factor: 1 }],
-  ["vac", { quantity: "voltage", function: "voltage.ac", unit: "V", factor: 1 }],
-  ["vdc", { quantity: "voltage", function: "voltage.dc", unit: "V", factor: 1 }],
+  [
+    "vac",
+    { quantity: "voltage", function: "voltage.ac", unit: "V", factor: 1 },
+  ],
+  [
+    "vdc",
+    { quantity: "voltage", function: "voltage.dc", unit: "V", factor: 1 },
+  ],
   ["mv", { quantity: "voltage", unit: "V", factor: 1e-3 }],
-  ["mvac", { quantity: "voltage", function: "voltage.ac", unit: "V", factor: 1e-3 }],
-  ["mvdc", { quantity: "voltage", function: "voltage.dc", unit: "V", factor: 1e-3 }],
+  [
+    "mvac",
+    { quantity: "voltage", function: "voltage.ac", unit: "V", factor: 1e-3 },
+  ],
+  [
+    "mvdc",
+    { quantity: "voltage", function: "voltage.dc", unit: "V", factor: 1e-3 },
+  ],
   ["ohm", { quantity: "resistance", unit: "ohm", factor: 1 }],
   ["ω", { quantity: "resistance", unit: "ohm", factor: 1 }],
   ["kohm", { quantity: "resistance", unit: "ohm", factor: 1e3 }],
@@ -41,12 +53,30 @@ const UNIT_DEFINITIONS = new Map([
   ["uf", { quantity: "capacitance", unit: "F", factor: 1e-6 }],
   ["mf", { quantity: "capacitance", unit: "F", factor: 1e-3 }],
   ["f", { quantity: "capacitance", unit: "F", factor: 1 }],
-  ["uaac", { quantity: "current", function: "current.ac", unit: "A", factor: 1e-6 }],
-  ["uadc", { quantity: "current", function: "current.dc", unit: "A", factor: 1e-6 }],
-  ["maac", { quantity: "current", function: "current.ac", unit: "A", factor: 1e-3 }],
-  ["madc", { quantity: "current", function: "current.dc", unit: "A", factor: 1e-3 }],
-  ["aac", { quantity: "current", function: "current.ac", unit: "A", factor: 1 }],
-  ["adc", { quantity: "current", function: "current.dc", unit: "A", factor: 1 }],
+  [
+    "uaac",
+    { quantity: "current", function: "current.ac", unit: "A", factor: 1e-6 },
+  ],
+  [
+    "uadc",
+    { quantity: "current", function: "current.dc", unit: "A", factor: 1e-6 },
+  ],
+  [
+    "maac",
+    { quantity: "current", function: "current.ac", unit: "A", factor: 1e-3 },
+  ],
+  [
+    "madc",
+    { quantity: "current", function: "current.dc", unit: "A", factor: 1e-3 },
+  ],
+  [
+    "aac",
+    { quantity: "current", function: "current.ac", unit: "A", factor: 1 },
+  ],
+  [
+    "adc",
+    { quantity: "current", function: "current.dc", unit: "A", factor: 1 },
+  ],
   ["hz", { quantity: "frequency", unit: "Hz", factor: 1 }],
   ["khz", { quantity: "frequency", unit: "Hz", factor: 1e3 }],
   ["degc", { quantity: "temperature", unit: "degC", factor: 1 }],
@@ -98,18 +128,15 @@ function parseDisplay(signByte, valueBytes, unitBytes, channelId, mode) {
   const functionName =
     modeFunction === "diode" || modeFunction === "continuity"
       ? modeFunction
-      : definition.function ?? modeFunction ?? "unknown";
+      : (definition.function ?? modeFunction ?? "unknown");
 
   return {
     channelId,
     quantity:
-      modeFunction === "continuity"
-        ? "continuity"
-        : definition.quantity,
+      modeFunction === "continuity" ? "continuity" : definition.quantity,
     function: functionName,
     value: sign * numericValue * definition.factor,
-    unit:
-      modeFunction === "continuity" ? "ohm" : definition.unit,
+    unit: modeFunction === "continuity" ? "ohm" : definition.unit,
     state: "valid",
     quality: "good",
     metadata: {
@@ -125,11 +152,7 @@ function parseDisplay(signByte, valueBytes, unitBytes, channelId, mode) {
 export function parseGdm704Frame(input) {
   const frame =
     input instanceof Uint8Array ? input : Uint8Array.from(input ?? []);
-  if (
-    frame.length !== 26 ||
-    frame[0] !== 0x02 ||
-    frame[25] !== 0x03
-  ) {
+  if (frame.length !== 26 || frame[0] !== 0x02 || frame[25] !== 0x03) {
     return invalid("VOLTCRAFT_GDM704_FRAME_INVALID");
   }
   const mode = String.fromCharCode(frame[1]);

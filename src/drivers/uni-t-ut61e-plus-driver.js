@@ -43,40 +43,110 @@ export const UNI_T_UT61E_PLUS_DRIVER_DESCRIPTOR = Object.freeze({
 });
 
 const PREFIX_FACTORS = [
-  1e12,
-  1e9,
-  1e6,
-  1e3,
-  1e3,
-  1,
-  1,
-  1e-3,
-  1e-6,
-  1e-9,
-  1e-12,
+  1e12, 1e9, 1e6, 1e3, 1e3, 1, 1, 1e-3, 1e-6, 1e-9, 1e-12,
 ];
 
 const MODES = new Map([
   [0x00, { quantity: "voltage", function: "voltage.ac", unit: "V" }],
-  [0x01, { quantity: "voltage", function: "voltage.ac", unit: "V", factor: 1e-3 }],
+  [
+    0x01,
+    { quantity: "voltage", function: "voltage.ac", unit: "V", factor: 1e-3 },
+  ],
   [0x02, { quantity: "voltage", function: "voltage.dc", unit: "V" }],
-  [0x03, { quantity: "voltage", function: "voltage.dc", unit: "V", factor: 1e-3, confidence: "unverified" }],
-  [0x04, { quantity: "frequency", function: "frequency", unit: "Hz", prefix: true }],
+  [
+    0x03,
+    {
+      quantity: "voltage",
+      function: "voltage.dc",
+      unit: "V",
+      factor: 1e-3,
+      confidence: "unverified",
+    },
+  ],
+  [
+    0x04,
+    { quantity: "frequency", function: "frequency", unit: "Hz", prefix: true },
+  ],
   [0x05, { quantity: "duty-cycle", function: "duty-cycle", unit: "%" }],
-  [0x06, { quantity: "resistance", function: "resistance", unit: "ohm", prefix: true }],
-  [0x07, { quantity: "continuity", function: "continuity", unit: "ohm", prefix: true }],
+  [
+    0x06,
+    {
+      quantity: "resistance",
+      function: "resistance",
+      unit: "ohm",
+      prefix: true,
+    },
+  ],
+  [
+    0x07,
+    {
+      quantity: "continuity",
+      function: "continuity",
+      unit: "ohm",
+      prefix: true,
+    },
+  ],
   [0x08, { quantity: "voltage", function: "diode", unit: "V" }],
-  [0x09, { quantity: "capacitance", function: "capacitance", unit: "F", prefix: true }],
-  [0x0c, { quantity: "current", function: "current.dc", unit: "A", factor: 1e-6 }],
-  [0x0d, { quantity: "current", function: "current.ac", unit: "A", factor: 1e-6, confidence: "unverified" }],
-  [0x0e, { quantity: "current", function: "current.dc", unit: "A", factor: 1e-3 }],
-  [0x0f, { quantity: "current", function: "current.ac", unit: "A", factor: 1e-3, confidence: "unverified" }],
+  [
+    0x09,
+    {
+      quantity: "capacitance",
+      function: "capacitance",
+      unit: "F",
+      prefix: true,
+    },
+  ],
+  [
+    0x0c,
+    { quantity: "current", function: "current.dc", unit: "A", factor: 1e-6 },
+  ],
+  [
+    0x0d,
+    {
+      quantity: "current",
+      function: "current.ac",
+      unit: "A",
+      factor: 1e-6,
+      confidence: "unverified",
+    },
+  ],
+  [
+    0x0e,
+    { quantity: "current", function: "current.dc", unit: "A", factor: 1e-3 },
+  ],
+  [
+    0x0f,
+    {
+      quantity: "current",
+      function: "current.ac",
+      unit: "A",
+      factor: 1e-3,
+      confidence: "unverified",
+    },
+  ],
   [0x10, { quantity: "current", function: "current.dc", unit: "A" }],
   [0x11, { quantity: "current", function: "current.ac", unit: "A" }],
   [0x12, { quantity: "unknown", function: "unknown", unit: "1", prefix: true }],
-  [0x13, { quantity: "unknown", function: "unknown", unit: "1", prefix: true, confidence: "unverified" }],
+  [
+    0x13,
+    {
+      quantity: "unknown",
+      function: "unknown",
+      unit: "1",
+      prefix: true,
+      confidence: "unverified",
+    },
+  ],
   [0x14, { quantity: "unknown", function: "unknown", unit: "1", prefix: true }],
-  [0x18, { quantity: "voltage", function: "voltage.ac", unit: "V", lowPassFilter: true }],
+  [
+    0x18,
+    {
+      quantity: "voltage",
+      function: "voltage.ac",
+      unit: "V",
+      lowPassFilter: true,
+    },
+  ],
   [0x19, { quantity: "voltage", function: "voltage.acdc", unit: "V" }],
 ]);
 
@@ -90,11 +160,7 @@ export function buildUt61EPlusCommand(command) {
   }
   const bytes = [0xab, 0xcd, 0x03, command];
   const checksum = bytes.reduce((sum, byte) => sum + byte, 0) & 0xffff;
-  return Uint8Array.from([
-    ...bytes,
-    (checksum >> 8) & 0xff,
-    checksum & 0xff,
-  ]);
+  return Uint8Array.from([...bytes, (checksum >> 8) & 0xff, checksum & 0xff]);
 }
 
 export function parseUt61EPlusFrame(input) {
@@ -108,9 +174,8 @@ export function parseUt61EPlusFrame(input) {
   ) {
     return invalid("UNI_T_UT61E_PLUS_FRAME_INVALID");
   }
-  const checksum = frame
-    .subarray(0, 17)
-    .reduce((sum, byte) => sum + byte, 0) & 0xffff;
+  const checksum =
+    frame.subarray(0, 17).reduce((sum, byte) => sum + byte, 0) & 0xffff;
   const receivedChecksum = (frame[17] << 8) | frame[18];
   if (checksum !== receivedChecksum) {
     return invalid("UNI_T_UT61E_PLUS_CHECKSUM_INVALID", {
@@ -137,31 +202,21 @@ export function parseUt61EPlusFrame(input) {
     Number.isInteger(rangeIndex) && rangeIndex >= 0
       ? PREFIX_FACTORS[rangeIndex]
       : undefined;
-  const factor = mode?.prefix
-    ? prefixFactor
-    : (mode?.factor ?? 1);
+  const factor = mode?.prefix ? prefixFactor : (mode?.factor ?? 1);
   const validRange =
     Number.isInteger(rangeIndex) &&
     rangeIndex >= 0 &&
     rangeIndex < PREFIX_FACTORS.length;
-  const supported =
-    Boolean(mode) && validRange && Number.isFinite(factor);
+  const supported = Boolean(mode) && validRange && Number.isFinite(factor);
   const state = overload ? "overload" : supported ? "valid" : "unknown";
   const value = state === "valid" ? parsedValue * factor : null;
   const bargraphMagnitude = frame[12] * 10 + frame[13];
-  const bargraphValue = (flags3 & 0x01) !== 0
-    ? -bargraphMagnitude
-    : bargraphMagnitude;
-  const peak = (flags3 & 0x04) !== 0
-    ? "max"
-    : (flags3 & 0x02) !== 0
-      ? "min"
-      : null;
-  const statistic = (flags1 & 0x08) !== 0
-    ? "max"
-    : (flags1 & 0x04) !== 0
-      ? "min"
-      : null;
+  const bargraphValue =
+    (flags3 & 0x01) !== 0 ? -bargraphMagnitude : bargraphMagnitude;
+  const peak =
+    (flags3 & 0x04) !== 0 ? "max" : (flags3 & 0x02) !== 0 ? "min" : null;
+  const statistic =
+    (flags1 & 0x08) !== 0 ? "max" : (flags1 & 0x04) !== 0 ? "min" : null;
 
   return {
     ok: true,
@@ -270,7 +325,9 @@ export class UniTUt61EPlusDriver extends InstrumentDriver {
     const request = buildUt61EPlusCommand(0x5e);
     await this.writeTransport(request);
     this._pollTimer = setInterval(() => {
-      void this.writeTransport(request).catch((error) => this.publish("error", error));
+      void this.writeTransport(request).catch((error) =>
+        this.publish("error", error),
+      );
     }, this._pollIntervalMs);
   }
 

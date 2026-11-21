@@ -42,9 +42,8 @@ function frame({
     ],
     56,
   );
-  const checksum = bytes
-    .subarray(0, 64)
-    .reduce((sum, byte) => sum + byte, 0) & 0xffff;
+  const checksum =
+    bytes.subarray(0, 64).reduce((sum, byte) => sum + byte, 0) & 0xffff;
   bytes[64] = (checksum >> 8) & 0xff;
   bytes[65] = checksum & 0xff;
   return bytes;

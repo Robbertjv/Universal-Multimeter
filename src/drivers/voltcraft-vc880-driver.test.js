@@ -28,9 +28,8 @@ function frame({
     [status1, status2, status3, status4, status5, status6, status7],
     30,
   );
-  const checksum = bytes
-    .subarray(0, 37)
-    .reduce((sum, byte) => sum + byte, 0) & 0xffff;
+  const checksum =
+    bytes.subarray(0, 37).reduce((sum, byte) => sum + byte, 0) & 0xffff;
   bytes[37] = (checksum >> 8) & 0xff;
   bytes[38] = checksum & 0xff;
   return bytes;
@@ -45,7 +44,12 @@ describe("Voltcraft VC880 CP2110 protocol", () => {
 
   it("decodes signed DC voltage and device status", () => {
     const result = parseVc880Frame(
-      frame({ display: " 1.234 ", status1: 0x04, status4: 0x08, status7: 0x08 }),
+      frame({
+        display: " 1.234 ",
+        status1: 0x04,
+        status4: 0x08,
+        status7: 0x08,
+      }),
     );
 
     expect(result.measurements[0]).toMatchObject({

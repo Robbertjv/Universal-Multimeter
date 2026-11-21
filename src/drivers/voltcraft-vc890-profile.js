@@ -19,7 +19,8 @@ export const VOLTCRAFT_VC890_DEVICE_PROFILE = Object.freeze({
   evidence: {
     interface: "Silicon Labs CP2110 HID-to-UART bridge",
     uart: "9600 baud, 8N1",
-    liveData: "66-byte AB CD frame, message type 0x01, 16-bit additive checksum",
+    liveData:
+      "66-byte AB CD frame, message type 0x01, 16-bit additive checksum",
     activation: "Press the PC button to enable live data streaming.",
     polling: "PC requests live data with command 0x5E; 200 ms poll interval",
     hardwareValidated: false,

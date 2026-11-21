@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  parseUt612Frame,
-  Es51919StreamParser,
-} from "./uni-t-ut612-driver.js";
+import { parseUt612Frame, Es51919StreamParser } from "./uni-t-ut612-driver.js";
 
 function measurementInfo(decimalMultiplier, unitCode) {
   return (unitCode << 3) | decimalMultiplier;
@@ -130,7 +127,10 @@ describe("UNI-T UT612 ES51919 protocol parser", () => {
   it("reassembles fragmented and concatenated 17-byte frames", () => {
     const parser = new Es51919StreamParser();
     const first = frame();
-    const second = frame({ primaryCode: 2, primaryInfo: measurementInfo(2, 11) });
+    const second = frame({
+      primaryCode: 2,
+      primaryInfo: measurementInfo(2, 11),
+    });
 
     expect(parser.push(first.slice(0, 8)).frames).toHaveLength(0);
     expect(

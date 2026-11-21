@@ -68,7 +68,15 @@ const RANGE_FACTORS = {
 
 const MODES = new Map([
   [0x00, { quantity: "voltage", function: "voltage.ac", unit: "V" }],
-  [0x01, { quantity: "voltage", function: "voltage.ac", unit: "V", lowPassFilter: true }],
+  [
+    0x01,
+    {
+      quantity: "voltage",
+      function: "voltage.ac",
+      unit: "V",
+      lowPassFilter: true,
+    },
+  ],
   [0x02, { quantity: "voltage", function: "voltage.dc", unit: "V" }],
   [0x03, { quantity: "voltage", function: "voltage.acdc", unit: "V" }],
   [0x04, { quantity: "voltage", function: "voltage.dc", unit: "V" }],
@@ -98,11 +106,7 @@ export function buildVc890Command(command) {
   }
   const message = [0xab, 0xcd, 0x03, command];
   const checksum = message.reduce((sum, byte) => sum + byte, 0) & 0xffff;
-  return Uint8Array.from([
-    ...message,
-    (checksum >> 8) & 0xff,
-    checksum & 0xff,
-  ]);
+  return Uint8Array.from([...message, (checksum >> 8) & 0xff, checksum & 0xff]);
 }
 
 export function parseVc890Frame(input) {
@@ -117,9 +121,8 @@ export function parseVc890Frame(input) {
   ) {
     return invalid("VOLTCRAFT_VC890_FRAME_INVALID");
   }
-  const checksum = frame
-    .subarray(0, 64)
-    .reduce((sum, byte) => sum + byte, 0) & 0xffff;
+  const checksum =
+    frame.subarray(0, 64).reduce((sum, byte) => sum + byte, 0) & 0xffff;
   const receivedChecksum = (frame[64] << 8) | frame[65];
   if (checksum !== receivedChecksum) {
     return invalid("VOLTCRAFT_VC890_CHECKSUM_INVALID", {
@@ -152,9 +155,7 @@ export function parseVc890Frame(input) {
   const state = overload ? "overload" : supported ? "valid" : "unknown";
   const sign = (status1 & 0x04) !== 0;
   const value =
-    state === "valid"
-      ? (sign ? -1 : 1) * parsedValue * rangeFactor
-      : null;
+    state === "valid" ? (sign ? -1 : 1) * parsedValue * rangeFactor : null;
   const bargraphRaw = String.fromCharCode(frame[54], frame[55]);
   const bargraphDigits = Number(bargraphRaw);
   const bargraphValue = Number.isFinite(bargraphDigits)
@@ -184,7 +185,9 @@ export function parseVc890Frame(input) {
         dateDisplay: String.fromCharCode(...frame.subarray(21, 31)).trim(),
         maximumDisplay: String.fromCharCode(...frame.subarray(31, 39)).trim(),
         minimumDisplay: String.fromCharCode(...frame.subarray(39, 47)).trim(),
-        frequencyUnitDisplay: String.fromCharCode(...frame.subarray(47, 50)).trim(),
+        frequencyUnitDisplay: String.fromCharCode(
+          ...frame.subarray(47, 50),
+        ).trim(),
         loggerDisplay: String.fromCharCode(...frame.subarray(50, 54)).trim(),
         bargraphValue,
         bargraphMax: null,
@@ -286,7 +289,9 @@ export class VoltcraftVc890Driver extends InstrumentDriver {
     const request = buildVc890Command(0x5e);
     await this.writeTransport(request);
     this._pollTimer = setInterval(() => {
-      void this.writeTransport(request).catch((error) => this.publish("error", error));
+      void this.writeTransport(request).catch((error) =>
+        this.publish("error", error),
+      );
     }, this._pollIntervalMs);
   }
 

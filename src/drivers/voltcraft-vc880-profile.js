@@ -18,7 +18,8 @@ export const VOLTCRAFT_VC880_DEVICE_PROFILE = Object.freeze({
   evidence: {
     interface: "Silicon Labs CP2110 HID-to-UART bridge",
     uart: "9600 baud, 8N1",
-    liveData: "39-byte AB CD frame, message type 0x01, 16-bit additive checksum",
+    liveData:
+      "39-byte AB CD frame, message type 0x01, 16-bit additive checksum",
     activation: "Press the PC button after powering on the meter.",
     hardwareValidated: false,
     knownLimitations: [

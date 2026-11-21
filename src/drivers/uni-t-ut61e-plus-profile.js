@@ -19,10 +19,13 @@ export const UNI_T_UT61E_PLUS_DEVICE_PROFILE = Object.freeze({
   evidence: {
     interface: "Silicon Labs CP2110 HID-to-UART bridge",
     uart: "9600 baud, 8N1; CP2110 UART enabled/configured by feature reports",
-    applicationProtocol: "AB CD framed command/response, 19-byte measurement response with 16-bit additive checksum",
-    polling: "Host polls GetMeasurement (0x5E); nominal 200 ms interval, hardware limit approximately 10 Hz",
+    applicationProtocol:
+      "AB CD framed command/response, 19-byte measurement response with 16-bit additive checksum",
+    polling:
+      "Host polls GetMeasurement (0x5E); nominal 200 ms interval, hardware limit approximately 10 Hz",
     hardwareValidated: false,
-    variantScope: "UT61E+ only; UT61B+/UT61D+ require separate model-mode verification",
+    variantScope:
+      "UT61E+ only; UT61B+/UT61D+ require separate model-mode verification",
   },
 });
 

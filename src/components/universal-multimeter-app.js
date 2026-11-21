@@ -665,9 +665,7 @@ export class UniversalMultimeterApp extends HTMLElement {
         : null,
       metadata.highVoltageWarning === true ? "Hoge spanning" : null,
       metadata.lowImpedance === true ? "LoZ" : null,
-      metadata.misplugWarning
-        ? "Controleer meetsnoeren"
-        : null,
+      metadata.misplugWarning ? "Controleer meetsnoeren" : null,
       metadata.autoRange === false ? "Handmatig bereik" : null,
       metadata.hold === true ? "HOLD" : null,
       metadata.relative === true ? "REL" : null,

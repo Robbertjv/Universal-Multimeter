@@ -23,14 +23,8 @@ function frame({
   bytes[13] = 0x20;
   bytes[14] = 0x20;
   bytes[15] = secondarySign.charCodeAt(0);
-  bytes.set(
-    new TextEncoder().encode(secondaryValue.padEnd(5).slice(0, 5)),
-    16,
-  );
-  bytes.set(
-    new TextEncoder().encode(secondaryUnit.padEnd(4).slice(0, 4)),
-    21,
-  );
+  bytes.set(new TextEncoder().encode(secondaryValue.padEnd(5).slice(0, 5)), 16);
+  bytes.set(new TextEncoder().encode(secondaryUnit.padEnd(4).slice(0, 4)), 21);
   bytes[25] = 0x03;
   return bytes;
 }

@@ -289,7 +289,8 @@ export class UniTUt61BcdDriver extends InstrumentDriver {
     for (const warning of warnings) this.publish("warning", warning);
     for (const frame of frames) {
       const result = parseFs9922Frame(frame, {
-        diodeUsesAdp: this._deviceProfile.protocolOptions?.diodeUsesAdp === true,
+        diodeUsesAdp:
+          this._deviceProfile.protocolOptions?.diodeUsesAdp === true,
       });
       if (!result.ok) {
         this.publish("warning", result.error);

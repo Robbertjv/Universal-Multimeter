@@ -19,9 +19,8 @@ function frame({
   bytes.set(new TextEncoder().encode(display.padStart(7).slice(-7)), 5);
   bytes.set(bargraph, 12);
   bytes.set([flags1, flags2, flags3], 14);
-  const checksum = bytes
-    .subarray(0, 17)
-    .reduce((sum, byte) => sum + byte, 0) & 0xffff;
+  const checksum =
+    bytes.subarray(0, 17).reduce((sum, byte) => sum + byte, 0) & 0xffff;
   bytes[17] = (checksum >> 8) & 0xff;
   bytes[18] = checksum & 0xff;
   return bytes;
@@ -51,9 +50,7 @@ describe("UNI-T UT61E+ polled protocol", () => {
     const resistance = parseUt61EPlusFrame(
       frame({ mode: 0x06, range: 0x33, display: "  2.200" }),
     );
-    const overload = parseUt61EPlusFrame(
-      frame({ display: "    OL " }),
-    );
+    const overload = parseUt61EPlusFrame(frame({ display: "    OL " }));
 
     expect(resistance.measurement.value).toBeCloseTo(2200, 8);
     expect(overload.measurement).toMatchObject({

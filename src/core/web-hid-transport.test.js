@@ -138,7 +138,13 @@ describe("WebHIDTransport", () => {
           profile: {
             hid: {
               vendorId: 0x10c4,
-              cp2110: { baudRate: 9600, dataBits: 9, parity: "none", flowControl: "none", stopBits: 1 },
+              cp2110: {
+                baudRate: 9600,
+                dataBits: 9,
+                parity: "none",
+                flowControl: "none",
+                stopBits: 1,
+              },
             },
           },
           hid: f.hid,

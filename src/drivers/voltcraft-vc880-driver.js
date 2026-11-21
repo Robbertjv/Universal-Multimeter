@@ -88,7 +88,15 @@ const MODES = new Map([
   [0x0f, { quantity: "current", function: "current.ac", unit: "A" }],
   [0x10, { quantity: "current", function: "current.dc", unit: "A" }],
   [0x11, { quantity: "current", function: "current.ac", unit: "A" }],
-  [0x12, { quantity: "voltage", function: "voltage.ac", unit: "V", lowPassFilter: true }],
+  [
+    0x12,
+    {
+      quantity: "voltage",
+      function: "voltage.ac",
+      unit: "V",
+      lowPassFilter: true,
+    },
+  ],
 ]);
 
 function invalid(code, details = {}) {
@@ -113,11 +121,7 @@ export function buildVc880Command(command) {
   }
   const message = [0xab, 0xcd, 0x03, command];
   const checksum = message.reduce((sum, byte) => sum + byte, 0) & 0xffff;
-  return Uint8Array.from([
-    ...message,
-    (checksum >> 8) & 0xff,
-    checksum & 0xff,
-  ]);
+  return Uint8Array.from([...message, (checksum >> 8) & 0xff, checksum & 0xff]);
 }
 
 export function parseVc880Frame(input) {
@@ -132,9 +136,8 @@ export function parseVc880Frame(input) {
   ) {
     return invalid("VOLTCRAFT_VC880_FRAME_INVALID");
   }
-  const checksum = frame
-    .subarray(0, 37)
-    .reduce((sum, byte) => sum + byte, 0) & 0xffff;
+  const checksum =
+    frame.subarray(0, 37).reduce((sum, byte) => sum + byte, 0) & 0xffff;
   const receivedChecksum = (frame[37] << 8) | frame[38];
   if (checksum !== receivedChecksum) {
     return invalid("VOLTCRAFT_VC880_CHECKSUM_INVALID", {
@@ -165,15 +168,16 @@ export function parseVc880Frame(input) {
   const sign = (status1 & 0x04) !== 0;
   const value =
     state === "valid" ? (sign ? -1 : 1) * primary.value * rangeFactor : null;
-  const statistic = (status2 & 0x08) !== 0
-    ? "max"
-    : (status2 & 0x04) !== 0
-      ? "min"
-      : (status2 & 0x02) !== 0
-        ? "average"
-        : (status2 & 0x01) !== 0
-          ? "relative"
-          : null;
+  const statistic =
+    (status2 & 0x08) !== 0
+      ? "max"
+      : (status2 & 0x04) !== 0
+        ? "min"
+        : (status2 & 0x02) !== 0
+          ? "average"
+          : (status2 & 0x01) !== 0
+            ? "relative"
+            : null;
   const bargraphRaw = String.fromCharCode(...frame.subarray(27, 30)).trim();
   const parsedBargraph = Number(bargraphRaw);
   const bargraphValue = Number.isFinite(parsedBargraph)
@@ -236,12 +240,11 @@ export function parseVc880Frame(input) {
         channelId: "secondary",
         quantity: mode?.quantity ?? "unknown",
         function: mode?.function ?? "unknown",
-        value:
-          !secondaryOverload
-            ? ((status1 & 0x08) !== 0 ? -1 : 1) *
-              secondary.value *
-              (Number.isFinite(rangeFactor) ? rangeFactor : 1)
-            : null,
+        value: !secondaryOverload
+          ? ((status1 & 0x08) !== 0 ? -1 : 1) *
+            secondary.value *
+            (Number.isFinite(rangeFactor) ? rangeFactor : 1)
+          : null,
         unit: mode?.unit ?? "1",
         state: secondaryOverload ? "overload" : secondary.state,
         quality: "good",

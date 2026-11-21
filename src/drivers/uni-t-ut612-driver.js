@@ -27,14 +27,7 @@ export const UNI_T_UT612_DRIVER_DESCRIPTOR = Object.freeze({
   },
 });
 
-const TEST_FREQUENCIES = [
-  100,
-  120,
-  1000,
-  10000,
-  100000,
-  0,
-];
+const TEST_FREQUENCIES = [100, 120, 1000, 10000, 100000, 0];
 
 const UNIT_DEFINITIONS = new Map([
   [0, { unit: "1", factor: 1 }],
@@ -55,13 +48,27 @@ const UNIT_DEFINITIONS = new Map([
 
 const PRIMARY_QUANTITIES = new Map([
   [1, { quantity: "inductance", function: "inductance", units: [5, 6, 7, 8] }],
-  [2, { quantity: "capacitance", function: "capacitance", units: [9, 10, 11, 12] }],
+  [
+    2,
+    {
+      quantity: "capacitance",
+      function: "capacitance",
+      units: [9, 10, 11, 12],
+    },
+  ],
   [3, { quantity: "resistance", function: "resistance", units: [1, 2, 3] }],
   [4, { quantity: "resistance", function: "resistance", units: [1, 2, 3] }],
 ]);
 
 const SECONDARY_QUANTITIES = new Map([
-  [1, { quantity: "dissipation-factor", function: "dissipation-factor", units: [13] }],
+  [
+    1,
+    {
+      quantity: "dissipation-factor",
+      function: "dissipation-factor",
+      units: [13],
+    },
+  ],
   [2, { quantity: "quality-factor", function: "quality-factor", units: [0] }],
   [3, { quantity: "resistance", function: "resistance", units: [1, 2, 3] }],
   [4, { quantity: "phase-angle", function: "phase-angle", units: [14] }],
@@ -84,15 +91,16 @@ function decodeMeasurement({
   const decimalMultiplier = info & 0x07;
   const unit = UNIT_DEFINITIONS.get(unitCode);
   const statusCode = statusByte & 0x0f;
-  const status = rawValue === 0x4e20 || statusCode === 3
-    ? "overload"
-    : statusCode === 9
-      ? "open-circuit"
-      : statusCode === 10
-        ? "short-circuit"
-        : [0, 7, 8].includes(statusCode)
-          ? "valid"
-          : "unknown";
+  const status =
+    rawValue === 0x4e20 || statusCode === 3
+      ? "overload"
+      : statusCode === 9
+        ? "open-circuit"
+        : statusCode === 10
+          ? "short-circuit"
+          : [0, 7, 8].includes(statusCode)
+            ? "valid"
+            : "unknown";
   const unitMatches =
     definition?.units.includes(unitCode) === true && unit !== undefined;
   const state = status === "valid" && !unitMatches ? "unknown" : status;
@@ -116,7 +124,8 @@ function decodeMeasurement({
       unitCode,
       decimalMultiplier,
       statusCode,
-      sortingResult: statusCode === 7 ? "pass" : statusCode === 8 ? "fail" : null,
+      sortingResult:
+        statusCode === 7 ? "pass" : statusCode === 8 ? "fail" : null,
       unitCompatible: unitMatches,
     },
   };
@@ -174,8 +183,7 @@ export function parseUt612Frame(input) {
       lcrMode: (flags & 0x20) !== 0,
       autoMode: (flags & 0x40) !== 0,
       parallelMeasurement: (flags & 0x80) !== 0,
-      testFrequency:
-        TEST_FREQUENCIES[testFrequencyIndex] ?? null,
+      testFrequency: TEST_FREQUENCIES[testFrequencyIndex] ?? null,
       toleranceCode,
     };
   }
