@@ -124,6 +124,53 @@ describe("UniversalMultimeterApp", () => {
     app.remove();
   });
 
+  it("keeps multiple connected instrument instances independent", () => {
+    const runtime = createRuntime();
+    const app = document.createElement(tag);
+    app.setRuntime(runtime);
+    document.body.append(app);
+
+    runtime.emit("device-connected", {
+      device: {
+        deviceId: "meter-a",
+        manufacturer: "Demo",
+        model: "Meter A",
+        state: "connected",
+      },
+    });
+    runtime.emit("device-connected", {
+      device: {
+        deviceId: "meter-b",
+        manufacturer: "Demo",
+        model: "Meter B",
+        state: "connected",
+      },
+    });
+
+    expect(app.querySelectorAll("[data-devices] li")).toHaveLength(2);
+    expect(app.querySelector("[data-connect]").disabled).toBe(false);
+    expect(app.querySelector("[data-disconnect]").disabled).toBe(false);
+
+    runtime.emit("measurement", {
+      measurements: [
+        {
+          deviceId: "meter-a",
+          channelId: "primary",
+          value: 12,
+          unit: "V",
+          quantity: "voltage",
+          function: "voltage.dc",
+          quality: "good",
+          state: "valid",
+          receivedAt: new Date().toISOString(),
+        },
+      ],
+    });
+
+    expect(app.querySelector(".reading-value").textContent).toBe("12");
+    app.remove();
+  });
+
   it("renders connection state and normalized measurement events", () => {
     const runtime = createRuntime();
     const app = document.createElement(tag);
