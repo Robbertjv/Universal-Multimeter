@@ -156,7 +156,17 @@ export function decodeEevblog121gwFrame(frame) {
   const overload = (frame[6] & 0x80) !== 0;
   const negative = (frame[6] & 0x40) !== 0;
   const temperatureFahrenheit = modeCode === 5 && (frame[6] & 0x10) !== 0;
-  const unit = temperatureFahrenheit ? "degF" : range.unit;
+  const temperatureCelsius = modeCode === 5 && (frame[6] & 0x20) !== 0;
+  const temperatureUnitKnown =
+    modeCode !== 5 || temperatureFahrenheit !== temperatureCelsius;
+  const unit =
+    modeCode === 5
+      ? temperatureUnitKnown
+        ? temperatureFahrenheit
+          ? "degF"
+          : "degC"
+        : "unknown"
+      : range.unit;
   const value = overload ? null : (negative ? -1 : 1) * count * range.resolution;
 
   return {
@@ -178,7 +188,11 @@ export function decodeEevblog121gwFrame(frame) {
           rawCount: count,
           negative,
           overload,
-          temperatureUnitFlag: temperatureFahrenheit ? "fahrenheit" : "celsius",
+          temperatureUnitFlag: temperatureFahrenheit
+            ? "fahrenheit"
+            : temperatureCelsius
+              ? "celsius"
+              : "unknown",
           packetFormat: "binary-v2",
         },
       },
