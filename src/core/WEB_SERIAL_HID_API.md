@@ -8,7 +8,7 @@ Both adapters implement the shared `TransportAdapter` contract and are registere
 
 Module: `src/core/web-serial-transport.js`; transport ID: `web.serial`.
 
-A profile uses `serial` options: `baudRate` (default 9600), `dataBits` (8), `stopBits` (1), `parity` (none/even/odd), `flowControl` (none/hardware), `bufferSize` (4096), and optional browser `filters`.
+A profile uses `serial` options: `baudRate` (default 9600), `dataBits` (8), `stopBits` (1), `parity` (none/even/odd), `flowControl` (none/hardware), `bufferSize` (4096), and optional browser `filters` containing `usbVendorId` and/or `usbProductId`.
 
 ```js
 {
@@ -18,13 +18,13 @@ A profile uses `serial` options: `baudRate` (default 9600), `dataBits` (8), `sto
 }
 ```
 
-The adapter opens the selected port, acquires readable/writable stream locks, forwards each read as an independent copied `Uint8Array`, serializes writes through the base contract, and cancels/releases/closes resources on disconnect. Read chunks are arbitrary; they are not protocol frames. A stream close or read failure reports an unexpected disconnect. Browser stream operations are not universally abortable; the shared timeout signal is checked at operation boundaries and cleanup cancels readers where possible.
+The adapter opens the selected port, acquires readable/writable stream locks, forwards each read as an independent copied `Uint8Array`, serializes writes through the base contract, and cancels/releases/closes resources on disconnect. Read chunks are arbitrary; they are not protocol frames. A stream close or read failure reports an unexpected disconnect. Browser stream operations are not universally abortable; the shared timeout signal is checked at operation boundaries and cleanup cancels readers, waits for pending reads to settle, releases stream locks, and closes the port where possible.
 
 ## WebHID
 
 Module: `src/core/web-hid-transport.js`; transport ID: `web.hid`.
 
-Profiles may configure browser `filters`, `vendorId`, `productId`, `inputReportId`, and `outputReportId`. IDs are numeric USB/HID identifiers, not strings.
+Profiles may configure browser `filters` (vendor/product IDs or usage page/usage), `vendorId`, `productId`, `inputReportId`, and `outputReportId`. IDs are numeric USB/HID identifiers, not strings. Device selection must be constrained by a filter, vendor ID, or product ID; report IDs alone do not constrain the chooser.
 
 ```js
 {
