@@ -166,7 +166,9 @@ export class UniversalMultimeterApp extends HTMLElement {
     for (const profile of profiles) {
       const option = document.createElement("option");
       option.value = profile.profileId;
-      option.textContent = `${profile.manufacturer} ${profile.model} · ${profile.supportLevel ?? "status onbekend"}`;
+      option.textContent = `${profile.manufacturer} ${profile.model} · ${
+        profile.supportLevel ?? "status onbekend"
+      }`;
       select.append(option);
     }
     if (!profiles.length) {
@@ -265,7 +267,9 @@ export class UniversalMultimeterApp extends HTMLElement {
       case "measurement":
         for (const measurement of event.measurements ?? []) {
           this._latestMeasurements.set(
-            `${measurement.deviceId}\u0000${measurement.channelId ?? "primary"}`,
+            `${measurement.deviceId}\u0000${
+              measurement.channelId ?? "primary"
+            }`,
             measurement,
           );
           this._measurementHistory.push(measurement);
@@ -393,7 +397,11 @@ export class UniversalMultimeterApp extends HTMLElement {
         !key.startsWith(`${this._currentDeviceId}\u0000`)
       ) continue;
       const item = document.createElement("li");
-      item.textContent = `${measurement.channelId}: ${measurement.value ?? "OL"} ${measurement.unit ?? ""} · ${measurement.function ?? "onbekend"}`;
+      item.textContent = `${measurement.channelId}: ${
+        measurement.value ?? "OL"
+      } ${measurement.unit ?? ""} · ${
+        measurement.function ?? "onbekend"
+      }`;
       list.append(item);
     }
   }
@@ -435,7 +443,9 @@ export class UniversalMultimeterApp extends HTMLElement {
       empty.setAttribute("class", "graph-empty");
       empty.textContent = "Minimaal twee geldige meetpunten nodig";
       graph.append(empty);
-      detail.textContent = `Kanaal ${measurement.channelId} · ${measurement.unit ?? "eenheid onbekend"} · ${points.length} punt(en)`;
+      detail.textContent = `Kanaal ${measurement.channelId} · ${
+        measurement.unit ?? "eenheid onbekend"
+      } · ${points.length} punt(en)`;
       return;
     }
     const values = points.map((entry) => entry.value);
@@ -467,7 +477,9 @@ export class UniversalMultimeterApp extends HTMLElement {
     line.setAttribute("stroke-linecap", "round");
     line.setAttribute("stroke-linejoin", "round");
     graph.append(line);
-    detail.textContent = `${measurement.function ?? "Meting"} · ${measurement.unit} · min ${min} · max ${max} · ${points.length} punten`;
+    detail.textContent = `${measurement.function ?? "Meting"} · ${
+      measurement.unit
+    } · min ${min} · max ${max} · ${points.length} punten`;
   }
 
   _renderAll() {
