@@ -425,7 +425,10 @@ export class UniversalMultimeterApp extends HTMLElement {
       now - new Date(entry.receivedAt).valueOf() <= windowMs,
     );
     if (points.length < 2) {
-      const empty = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      const empty = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text",
+      );
       empty.setAttribute("x", "400");
       empty.setAttribute("y", "110");
       empty.setAttribute("text-anchor", "middle");
@@ -439,15 +442,24 @@ export class UniversalMultimeterApp extends HTMLElement {
     const min = Math.min(...values);
     const max = Math.max(...values);
     const span = max - min || Math.max(Math.abs(max) * 0.02, 1);
-    const start = Math.min(...points.map((entry) => new Date(entry.receivedAt).valueOf()));
-    const end = Math.max(...points.map((entry) => new Date(entry.receivedAt).valueOf()));
+    const start = Math.min(
+      ...points.map((entry) => new Date(entry.receivedAt).valueOf()),
+    );
+    const end = Math.max(
+      ...points.map((entry) => new Date(entry.receivedAt).valueOf()),
+    );
     const duration = end - start || 1;
     const coordinates = points.map((entry) => {
-      const x = 48 + ((new Date(entry.receivedAt).valueOf() - start) / duration) * 704;
+      const x =
+        48 +
+        ((new Date(entry.receivedAt).valueOf() - start) / duration) * 704;
       const y = 184 - ((entry.value - min) / span) * 148;
       return `${x.toFixed(1)},${y.toFixed(1)}`;
     });
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    const line = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "polyline",
+    );
     line.setAttribute("points", coordinates.join(" "));
     line.setAttribute("fill", "none");
     line.setAttribute("stroke", "currentColor");
