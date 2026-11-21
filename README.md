@@ -63,6 +63,7 @@ The repository also maintains the development process and current project state:
 - [Transport Contract](docs/TRANSPORT_CONTRACT.md) — common transport interface and adapter requirements.
 - [Web Bluetooth Runtime API](src/core/WEB_BLUETOOTH_API.md) — profile configuration, GATT lifecycle, permissions, and current validation limits.
 - [Web Serial and WebHID Runtime API](src/core/WEB_SERIAL_HID_API.md) — serial framing, HID report handling, lifecycle, and validation limits.
+- [EEVblog 121GW protocol research](docs/research/121gw-protocol-notes.md) — evidence, V2 packet layout, decoding scope, and hardware validation requirements.
 - [Device Manager and Measurement Engine](docs/DEVICE_MANAGER_AND_ENGINE.md) — service responsibilities and lifecycle.
 - [Device Manager Runtime API](docs/DEVICE_MANAGER_API.md) — implemented registry, connection, measurement ingestion, and current limitations.
 - [Test Strategy](docs/TEST_STRATEGY.md) — unit, fixture, integration, browser, and hardware validation.
