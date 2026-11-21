@@ -1,0 +1,64 @@
+# Transport Runtime API
+
+The transport-independent runtime lives in `src/core`.
+
+## Lifecycle and errors
+
+`TransportAdapter` exposes `state`, `getDescriptor()`, `on()/off()`,
+`connect(options)`, `write(bytes, options)`, `disconnect(options)`, and
+`dispose()`. Implementations override `onConnect`, `onDisconnect`,
+`onWrite`, and optionally `onDispose`.
+
+States: `disconnected`, `connecting`, `connected`, `disconnecting`,
+`error`, and `disposed`. Lifecycle calls are serialized. Concurrent
+identical calls are coalesced; a connect followed immediately by disconnect
+completes in that order. Disposal waits behind pending lifecycle work.
+
+Each operation accepts an optional `timeoutMs`; otherwise the adapter default
+is 10 seconds. Set the default to `0` to disable timeouts. A timeout rejects
+with `TransportError` code `TRANSPORT_TIMEOUT`. The relevant hook receives an
+`AbortSignal` in its options (`onConnect(options)`, `onDisconnect(options)`,
+and `onWrite(bytes, options)`). Concrete adapters should abort platform work
+where supported and release resources if a completion arrives after timeout.
+
+Other stable errors include `TRANSPORT_NOT_CONNECTED`,
+`TRANSPORT_CONNECT_FAILED`, `TRANSPORT_DISCONNECT_FAILED`,
+`TRANSPORT_READ_FAILED`, `TRANSPORT_WRITE_FAILED`,
+`TRANSPORT_WRITE_QUEUE_FULL`, `TRANSPORT_UNAVAILABLE`, and
+`TRANSPORT_DISPOSED`.
+
+## Data, buffering, and backpressure
+
+The contract is a byte stream: each `data` event contains an independent
+`Uint8Array` chunk, not a protocol frame. Chunk boundaries may split or
+combine protocol messages. Listeners are invoked synchronously and exceptions
+are isolated; the base class does not retain received chunks. A chunk larger
+than `maxBufferedBytes` is dropped and emits `TRANSPORT_READ_FAILED`.
+The driver boundary also applies bounded asynchronous processing: by default
+it accepts at most 128 pending chunks and 256 KiB of pending bytes, processes
+accepted chunks serially, and emits `DRIVER_RECEIVE_QUEUE_FULL` while dropping
+new chunks that would exceed either limit. Drivers can tune these limits with
+`maxPendingTransportChunks` and `maxPendingTransportBytes`; both must be positive safe integers. This is an
+explicit bounded drop policy, not lossless flow control; concrete adapters
+should additionally pause/resume their source when the platform supports it,
+or use their own bounded queue and report overflow.
+
+Writes copy caller-owned bytes and are serialized in order. The outstanding
+write count, including the active write, is bounded by `maxQueuedWrites`.
+Overflow rejects with `TRANSPORT_WRITE_QUEUE_FULL`. A timed-out write rejects
+to its caller promptly, but retains its queue slot until the underlying
+platform operation settles; later writes remain serialized behind it. A
+disconnect drains already-accepted writes before closing the connection.
+
+## Ownership
+
+The Device Manager owns adapter construction, discovery/permission prompts,
+connect/disconnect, and disposal. Drivers only consume an injected adapter;
+they must not invoke browser APIs or initiate permission prompts. Web Bluetooth,
+Web Serial, and WebHID implementations belong in separate adapter modules.
+
+## Mock fixture
+
+`MockTransport` records writes, injects arbitrary data chunks, and supports
+failure injection plus stalled hooks for deterministic timeout tests. It is a
+test fixture, not a real transport implementation.

@@ -75,6 +75,8 @@ export class InstrumentDriver {
     deviceProfile = {},
     clock = () => new Date(),
     logger = null,
+    maxPendingTransportChunks = 128,
+    maxPendingTransportBytes = 262_144,
   } = {}) {
     assertValidDriverDescriptor(descriptor);
     this._descriptor = structuredClone(descriptor);
@@ -86,6 +88,22 @@ export class InstrumentDriver {
     this._state = "new";
     this._initialized = false;
     this._lifecycleQueue = Promise.resolve();
+    if (
+      !Number.isSafeInteger(maxPendingTransportChunks) ||
+      maxPendingTransportChunks < 1 ||
+      !Number.isSafeInteger(maxPendingTransportBytes) ||
+      maxPendingTransportBytes < 1
+    ) {
+      throw new TypeError(
+        "Transport receive queue limits must be positive safe integers.",
+      );
+    }
+    this._maxPendingTransportChunks = maxPendingTransportChunks;
+    this._maxPendingTransportBytes = maxPendingTransportBytes;
+    this._pendingTransportChunks = 0;
+    this._pendingTransportBytes = 0;
+    this._transportDataQueue = Promise.resolve();
+    this._transportUnsubscribers = [];
   }
 
   get state() {
@@ -132,6 +150,7 @@ export class InstrumentDriver {
       this._emitState();
       try {
         await this.onInitialize();
+        this._attachTransport();
         this._initialized = true;
         this._state = "initialized";
         this._emitState();
@@ -164,6 +183,7 @@ export class InstrumentDriver {
       this._state = "starting";
       this._emitState();
       try {
+        this._attachTransport();
         await this.onStart();
         this._state = "running";
         this._emitState();
@@ -180,11 +200,15 @@ export class InstrumentDriver {
 
   async stop() {
     return this._enqueue(async () => {
-      if (["new", "initialized", "stopped"].includes(this._state)) return this;
+      if (["new", "initialized", "stopped"].includes(this._state)) {
+        this._detachTransport();
+        return this;
+      }
       this._state = "stopping";
       this._emitState();
       try {
         await this.onStop();
+        this._detachTransport();
         this._state = "stopped";
         this._emitState();
         return this;
@@ -266,11 +290,71 @@ export class InstrumentDriver {
     );
   }
 
+  _attachTransport() {
+    if (!this._transport || this._transportUnsubscribers.length) return;
+    if (typeof this._transport.on !== "function")
+      throw new DriverError(
+        "DRIVER_TRANSPORT_INVALID",
+        "Injected transport must expose on().",
+      );
+    this._transportUnsubscribers.push(
+      this._transport.on("data", (chunk) => {
+        const bytes = chunk instanceof Uint8Array ? chunk.slice() : chunk;
+        const byteLength = bytes?.byteLength ?? 0;
+        if (
+          this._pendingTransportChunks >= this._maxPendingTransportChunks ||
+          this._pendingTransportBytes + byteLength >
+            this._maxPendingTransportBytes
+        ) {
+          this.publish(
+            "error",
+            new DriverError(
+              "DRIVER_RECEIVE_QUEUE_FULL",
+              "Driver receive queue is full; incoming data was dropped.",
+              {
+                pendingChunks: this._pendingTransportChunks,
+                pendingBytes: this._pendingTransportBytes,
+                incomingBytes: byteLength,
+                maxPendingChunks: this._maxPendingTransportChunks,
+                maxPendingBytes: this._maxPendingTransportBytes,
+              },
+            ),
+          );
+          return;
+        }
+        this._pendingTransportChunks += 1;
+        this._pendingTransportBytes += byteLength;
+        const processing = this._transportDataQueue.then(() =>
+          this.onTransportData(bytes),
+        );
+        this._transportDataQueue = processing.catch((error) =>
+          this.publish("error", error),
+        );
+        processing
+          .finally(() => {
+            this._pendingTransportChunks -= 1;
+            this._pendingTransportBytes -= byteLength;
+          })
+          .catch(() => {});
+      }),
+      this._transport.on("error", (error) => this.publish("error", error)),
+      this._transport.on("state", (event) =>
+        this.publish("transport-state", event),
+      ),
+    );
+  }
+
+  _detachTransport() {
+    for (const unsubscribe of this._transportUnsubscribers.splice(0))
+      unsubscribe();
+  }
+
   publish(eventName, payload) {
     this._events.emit(eventName, payload);
   }
 
   async onInitialize() {}
+  async onTransportData() {}
   async onStart() {}
   async onStop() {}
   async onExecuteControl() {

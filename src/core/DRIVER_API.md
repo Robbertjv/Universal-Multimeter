@@ -10,6 +10,7 @@ The runtime implementation lives in `src/core` and follows `docs/DRIVER_CONTRACT
 - `DriverError`: stable machine-readable error codes.
 - `DRIVER_EVENTS`: supported event names.
 - `MockInstrumentDriver` / `MOCK_DRIVER_DESCRIPTOR`: contract-test fixture.
+- `TransportAdapter`, `TransportError`, and `MockTransport`: transport-independent byte-stream contract and test fixture (see `TRANSPORT_API.md`).
 
 ## Driver descriptor
 
@@ -29,7 +30,7 @@ await driver.stop();
 - Constructor injection does not connect, request browser permissions, or open the transport.
 - Repeated initialize/start/stop calls are safe and concurrent lifecycle calls are serialized.
 - Start requires successful initialization. A stopped driver can be started again.
-- Device Manager owns transport lifetime; a driver only consumes the injected transport.
+- Device Manager owns transport lifetime; a driver only consumes the injected transport. Drivers subscribe to injected `data`, `error`, and `state` events; `onTransportData(chunk)` is the hook for arbitrary byte chunks. The driver never connects/disconnects the transport or invokes browser APIs.
 - Lifecycle failures reject with `DriverError` and stable `code` values.
 
 Subclasses override `onInitialize`, `onStart`, `onStop`, and optionally `onExecuteControl`.
