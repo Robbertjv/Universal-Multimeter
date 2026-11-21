@@ -213,9 +213,9 @@ describe("UniversalMultimeterApp", () => {
     document.body.append(app);
 
     await vi.waitFor(() => {
-      expect(
-        app.querySelector("[data-history-session]").value,
-      ).toBe("saved-session");
+      expect(app.querySelector("[data-history-session]").value).toBe(
+        "saved-session",
+      );
     });
     expect(app.querySelector("[data-log-export]").disabled).toBe(false);
     expect(app.querySelector("[data-history-session]").textContent).toContain(
