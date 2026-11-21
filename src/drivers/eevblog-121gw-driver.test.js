@@ -7,7 +7,10 @@ import { Eevblog121gwStreamParser } from "./eevblog-121gw-parser.js";
 import { MockTransport } from "../core/mock-transport.js";
 import { DriverRegistry } from "../core/driver-registry.js";
 import { validateDriverDescriptor } from "../core/driver-validation.js";
-import { EEVBLOG_121GW_DRIVER_DESCRIPTOR, registerEevblog121gwDriver } from "./eevblog-121gw-driver.js";
+import {
+  EEVBLOG_121GW_DRIVER_DESCRIPTOR,
+  registerEevblog121gwDriver,
+} from "./eevblog-121gw-driver.js";
 import { EEVBLOG_121GW_DEVICE_PROFILE } from "./eevblog-121gw-profile.js";
 import { DeviceProfileRegistry } from "../core/device-profile-registry.js";
 
@@ -94,7 +97,9 @@ describe("EEVblog 121GW decoder", () => {
   });
 
   it("uses unknown function for Low-Z until its coupling is confirmed", () => {
-    expect(decodeEevblog121gwFrame(packet({ mode: 0 })).measurement).toMatchObject({
+    expect(
+      decodeEevblog121gwFrame(packet({ mode: 0 })).measurement,
+    ).toMatchObject({
       quantity: "voltage",
       function: "unknown",
     });
@@ -193,7 +198,9 @@ describe("EEVblog 121GW driver lifecycle", () => {
 
 describe("EEVblog 121GW registration and profile", () => {
   it("has a valid experimental descriptor and registers a driver factory", () => {
-    expect(validateDriverDescriptor(EEVBLOG_121GW_DRIVER_DESCRIPTOR).valid).toBe(true);
+    expect(
+      validateDriverDescriptor(EEVBLOG_121GW_DRIVER_DESCRIPTOR).valid,
+    ).toBe(true);
     const registry = registerEevblog121gwDriver(new DriverRegistry());
     expect(registry.has("eevblog.121gw")).toBe(true);
     expect(registry.create("eevblog.121gw")).toBeInstanceOf(Eevblog121gwDriver);
