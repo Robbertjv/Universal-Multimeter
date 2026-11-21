@@ -10,6 +10,8 @@ import { registerEevblog121gwDriver } from "../drivers/eevblog-121gw-driver.js";
 import { registerEevblog121gwProfile } from "../drivers/eevblog-121gw-profile.js";
 import { registerFluke187Driver } from "../drivers/fluke-187-driver.js";
 import { registerFluke187Profile } from "../drivers/fluke-187-profile.js";
+import { MeasurementHistoryStore } from "../data/measurement-history-store.js";
+import { measurementsToCsv } from "../data/measurement-csv.js";
 
 const RUNTIME_EVENTS = new Set([
   "device-state",
@@ -22,6 +24,7 @@ const RUNTIME_EVENTS = new Set([
   "capabilities",
   "measurement",
   "measurement-error",
+  "history-error",
 ]);
 
 /**
@@ -38,6 +41,7 @@ export function createApplicationRuntime({
   profiles = [],
   drivers = [],
   transports = [],
+  historyStoreFactory = () => new MeasurementHistoryStore(),
 } = {}) {
   const profileRegistry = new DeviceProfileRegistry();
   const driverRegistry = new DriverRegistry();
@@ -87,6 +91,13 @@ export function createApplicationRuntime({
   const listeners = new Map();
   let nextListenerId = 1;
   const managerUnsubscribers = [];
+  const loggingSessions = new Map();
+  let historyStore = null;
+
+  function getHistoryStore() {
+    historyStore ??= historyStoreFactory();
+    return historyStore;
+  }
 
   function emit(type, payload) {
     const event = { type, ...payload };
@@ -103,10 +114,37 @@ export function createApplicationRuntime({
   for (const type of RUNTIME_EVENTS) {
     if (type === "measurement" || type === "measurement-error") continue;
     managerUnsubscribers.push(
-      deviceManager.on(type, (event) => emit(type, event)),
+      deviceManager.on(type, (event) => {
+        if (type === "device-disconnected") {
+          loggingSessions.delete(event.deviceId);
+        }
+        emit(type, event);
+      }),
     );
   }
   const measurementSubscription = measurementEngine.subscribe((event) => {
+    if (event.type === "measurement") {
+      const recordsBySession = new Map();
+      for (const measurement of event.measurements) {
+        const session = loggingSessions.get(measurement.deviceId);
+        if (!session) continue;
+        const records = recordsBySession.get(session.sessionId) ?? [];
+        records.push(measurement);
+        recordsBySession.set(session.sessionId, records);
+      }
+      for (const [sessionId, records] of recordsBySession) {
+        const device = deviceManager.getDevice(records[0].deviceId);
+        void getHistoryStore()
+          .append(records, { sessionId, device })
+          .catch((error) =>
+            emit("history-error", {
+              sessionId,
+              deviceId: records[0].deviceId,
+              error,
+            }),
+          );
+      }
+    }
     emit(event.type === "error" ? "measurement-error" : "measurement", event);
   });
 
@@ -125,6 +163,42 @@ export function createApplicationRuntime({
     },
     getLatest(deviceId, channelId) {
       return measurementEngine.getLatest(deviceId, channelId);
+    },
+    startLogging(deviceId) {
+      const device = deviceManager.getDevice(deviceId);
+      if (!device || device.state !== "connected") {
+        throw new Error("A connected device is required to start logging.");
+      }
+      const existing = loggingSessions.get(deviceId);
+      if (existing) return existing;
+      const session = Object.freeze({
+        sessionId:
+          globalThis.crypto?.randomUUID?.() ??
+          `session-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        deviceId,
+        startedAt: new Date().toISOString(),
+      });
+      loggingSessions.set(deviceId, session);
+      return session;
+    },
+    stopLogging(deviceId) {
+      const session = loggingSessions.get(deviceId);
+      if (!session) return null;
+      loggingSessions.delete(deviceId);
+      return Object.freeze({ ...session, stoppedAt: new Date().toISOString() });
+    },
+    listLoggingSessions() {
+      return [...loggingSessions.values()];
+    },
+    async getHistory(filters) {
+      return historyStore ? historyStore.query(filters) : [];
+    },
+    async exportHistoryCsv(filters) {
+      const records = await this.getHistory(filters);
+      return measurementsToCsv(records);
+    },
+    async clearHistory(filters) {
+      return historyStore ? historyStore.clear(filters) : 0;
     },
     on(type, listener) {
       if (!RUNTIME_EVENTS.has(type) && type !== "*") {
@@ -157,7 +231,9 @@ export function createApplicationRuntime({
       for (const unsubscribe of managerUnsubscribers.splice(0)) unsubscribe();
       measurementEngine.unsubscribe(measurementSubscription);
       listeners.clear();
+      loggingSessions.clear();
       await deviceManager.disconnectAll("application-shutdown");
+      if (historyStore) await historyStore.close?.();
     },
     get isDisposed() {
       return disposed;
