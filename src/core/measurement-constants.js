@@ -4,6 +4,7 @@ export const READING_STATES = Object.freeze([
   "valid",
   "overload",
   "open-circuit",
+  "short-circuit",
   "invalid",
   "warming-up",
   "disconnected",
