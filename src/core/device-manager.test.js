@@ -7,7 +7,12 @@ import { MeasurementEngine } from "./measurement-engine.js";
 import { MockTransport, MOCK_TRANSPORT_DESCRIPTOR } from "./mock-transport.js";
 import { TransportRegistry } from "./transport-registry.js";
 
-function setup({ failConnect = false, failInitialize = false, failStart = false, clock } = {}) {
+function setup({
+  failConnect = false,
+  failInitialize = false,
+  failStart = false,
+  clock,
+} = {}) {
   const profiles = new DeviceProfileRegistry().register({
     profileId: "mock.profile",
     manufacturer: "Test",
@@ -28,8 +33,16 @@ function setup({ failConnect = false, failInitialize = false, failStart = false,
     MOCK_DRIVER_DESCRIPTOR,
     (dependencies) => {
       const driver = createMockDriver(dependencies);
-      if (failInitialize) driver.onInitialize = async () => { throw new Error('initialize failed'); };
-      if (failStart) driver.onStart = async () => { throw new Error('start failed'); };
+      if (failInitialize) {
+        driver.onInitialize = async () => {
+          throw new Error("initialize failed");
+        };
+      }
+      if (failStart) {
+        driver.onStart = async () => {
+          throw new Error("start failed");
+        };
+      }
       setup.lastDriver = driver;
       return driver;
     },
