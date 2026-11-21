@@ -50,7 +50,7 @@ Public methods:
 - `listDeviceProfiles()` — defensive list of registered profiles.
 - `listConnectedDevices()` — public snapshots for connected sessions.
 - `getDevice(deviceId)` — a public session snapshot or `null`.
-- `connect(profileId, options)` — creates the transport, connects it, creates/initializes/starts the driver, and registers the device with the measurement engine. Concurrent calls for the same profile and explicit device ID are coalesced.
+- `connect(profileId, options)` — creates the transport, connects it, creates/initializes/starts the driver, and registers the device with the measurement engine. Concurrent calls for the same profile and explicit device ID are coalesced. Calls without a `deviceId` each create a new independently identified session.
 - `disconnect(deviceId, reason)` — stops the driver before disposing the transport; safe to repeat.
 - `disconnectAll(reason)` — disconnects all active sessions and reports aggregate cleanup failures.
 - `executeControl(deviceId, controlId, parameters, authorization)` — delegates to the driver's capability/authorization gate.
