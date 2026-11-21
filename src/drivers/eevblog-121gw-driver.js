@@ -149,10 +149,7 @@ export function decodeEevblog121gwFrame(frame) {
     };
   }
 
-  const count =
-    (((frame[5] >> 6) & 0x03) << 16) |
-    (frame[7] << 8) |
-    frame[8];
+  const count = (((frame[5] >> 6) & 0x03) << 16) | (frame[7] << 8) | frame[8];
   const overload = (frame[6] & 0x80) !== 0;
   const negative = (frame[6] & 0x40) !== 0;
   const temperatureFahrenheit = modeCode === 5 && (frame[6] & 0x10) !== 0;
@@ -167,7 +164,9 @@ export function decodeEevblog121gwFrame(frame) {
           : "degC"
         : "unknown"
       : range.unit;
-  const value = overload ? null : (negative ? -1 : 1) * count * range.resolution;
+  const value = overload
+    ? null
+    : (negative ? -1 : 1) * count * range.resolution;
 
   return {
     ok: true,
@@ -248,8 +247,9 @@ export class Eevblog121gwDriver extends InstrumentDriver {
 }
 
 export function registerEevblog121gwDriver(driverRegistry) {
-  driverRegistry.register(EEVBLOG_121GW_DRIVER_DESCRIPTOR, (dependencies) =>
-    new Eevblog121gwDriver(dependencies),
+  driverRegistry.register(
+    EEVBLOG_121GW_DRIVER_DESCRIPTOR,
+    (dependencies) => new Eevblog121gwDriver(dependencies),
   );
   return driverRegistry;
 }
