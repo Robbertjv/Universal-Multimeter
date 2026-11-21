@@ -38,6 +38,7 @@ function createRuntime() {
       stoppedAt: new Date().toISOString(),
     })),
     exportHistoryCsv: vi.fn(async () => "receivedAt,value\\r\\nnow,1"),
+    listHistorySessions: vi.fn(async () => []),
     emit(type, event) {
       for (const listener of listeners.get(type) ?? [])
         listener({ type, ...event });
@@ -193,6 +194,33 @@ describe("UniversalMultimeterApp", () => {
     activeDevice.value = "meter-a";
     activeDevice.dispatchEvent(new Event("change", { bubbles: true }));
     expect(app.querySelector(".reading-value").textContent).toBe("12");
+    app.remove();
+  });
+
+  it("restores saved logging sessions after an application reload", async () => {
+    const runtime = createRuntime();
+    runtime.listHistorySessions.mockResolvedValue([
+      {
+        sessionId: "saved-session",
+        deviceId: "old-meter",
+        device: { manufacturer: "Demo", model: "Old Meter" },
+        startedAt: "2026-11-21T10:00:00.000Z",
+        measurementCount: 42,
+      },
+    ]);
+    const app = document.createElement(tag);
+    app.setRuntime(runtime);
+    document.body.append(app);
+
+    await vi.waitFor(() => {
+      expect(
+        app.querySelector("[data-history-session]").value,
+      ).toBe("saved-session");
+    });
+    expect(app.querySelector("[data-log-export]").disabled).toBe(false);
+    expect(app.querySelector("[data-history-session]").textContent).toContain(
+      "42 metingen",
+    );
     app.remove();
   });
 
