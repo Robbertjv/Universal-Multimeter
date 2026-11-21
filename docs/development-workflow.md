@@ -37,3 +37,38 @@ Software completion comes before physical hardware validation. For every explici
 - PR #27 (dedicated Fluke 187 application) has been superseded by the universal runtime/UI: Fluke 187 remains registered as a normal profile/driver; parser improvements and regression tests were ported; PR closed, source branch retained.
 - PR #1 (standalone EEVblog 121GW prototype) remains under audit. The current runtime registers the EEVblog 121GW driver/profile, but the old prototype's unique backend/docs are not being copied into the production architecture without a demonstrated requirement.
 - Historical feature branches remain untouched until their unique changes have been classified as integrated, intentionally superseded or still required.
+
+## Branch audit (2026-11-21)
+
+The repository currently has 18 branches. Only the integration branch is the active development line; all other historical branches are frozen pending this audit. Do not start new work on them.
+
+| Branch | Classification | Action |
+|---|---|---|
+| `main` | Release baseline | Keep stable; no direct development. |
+| `feat/issue-29-application-runtime` | Canonical integration | Continue all software work here until release promotion. |
+| `fix/fluke-187-spec-response-parsing` | Superseded parser branch | PR #26 is closed; parser work and tests are present in integration. Retain as history. |
+| `feat/fluke-187-app-integration` | Superseded app branch | PR #27 is closed; use the universal runtime path instead. Retain as history. |
+| `feature/121gw-web-application` | Parked unique functionality | PR #1 is draft. Audit and port MQTT, local Python bridge, MCP endpoint, PWA and logging only through the shared runtime; do not merge its standalone app. |
+| `feature/issue-21-fluke-187-driver` | Historical driver branch | Audit unique driver/parser/tests against integration before any retirement. |
+| `feature/issue-10-eevblog-121gw-driver` | Historical driver branch | Audit unique driver/parser/tests against integration before any retirement. |
+| `feature/issue-9-serial-hid-adapters` | Historical transport branch | Audit unique transport behavior and tests against integration. |
+| `feature/issue-9-web-serial-hid` | Historical transport branch | Compare with current Web Serial/WebHID implementations; retire only after proof of parity. |
+| `feature/issue-8-web-bluetooth` | Historical transport branch | Compare with current BLE transport and tests. |
+| `feature/issue-7-device-manager` | Historical core branch | Compare with current DeviceManager and lifecycle tests. |
+| `feature/issue-6-transport-contract` | Historical core branch | Compare with current transport contracts and adapters. |
+| `feature/issue-5-driver-contract` | Historical core branch | Compare with current driver contract and registry. |
+| `feature/issue-4-measurement-model` | Historical core branch | Compare with current normalized measurement model and tests. |
+| `feature/issue-3-app-foundation` | Historical app branch | Compare with current bootstrap and application shell. |
+| `docs/delta-register-and-roadmap` | Historical documentation branch | Port any still-current requirements; otherwise archive after audit. |
+| `docs/delta-register-and-roadmap-main` | Historical documentation branch | Compare with current docs; avoid parallel roadmap sources. |
+| `docs/development-baseline-2026-11-21` | Historical documentation branch | Use only as historical evidence; current workflow doc is canonical. |
+
+### Consolidation order
+
+1. Stabilize CI on the exact integration head; no merge to `main` until lint, format, tests and production build all pass.
+2. Audit the parked 121GW branch and port only required backend capabilities into the modular runtime with tests. Keep PR #1 draft until that work is complete or explicitly descoped.
+3. Audit the historical driver, transport and core branches one at a time. Record each unique file/behavior as integrated, intentionally superseded, or still required.
+4. Once each branch has no unique required work, close any remaining PR and delete the obsolete branch. Branch deletion is intentionally deferred until this evidence exists.
+5. Resume new meter/feature development only after the branch audit and software release gates are complete.
+
+This audit is deliberately non-destructive: no historical branch is force-updated or deleted, and no unverified branch is merged wholesale.
