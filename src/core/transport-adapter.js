@@ -92,10 +92,7 @@ export class TransportAdapter {
         }),
       ]);
     } catch (cause) {
-      if (
-        cause instanceof TransportError &&
-        cause.code === "TRANSPORT_TIMEOUT"
-      ) {
+      if (cause instanceof TransportError) {
         throw cause;
       }
       throw this._wrap(code, message, cause);
