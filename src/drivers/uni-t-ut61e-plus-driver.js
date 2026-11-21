@@ -39,6 +39,8 @@ export const UNI_T_UT61E_PLUS_DRIVER_DESCRIPTOR = Object.freeze({
     "status.battery": { availability: "supported" },
     "status.hold": { availability: "supported" },
     "status.relative": { availability: "supported" },
+    "status.peak-hold": { availability: "supported" },
+    "status.ncv": { availability: "supported" },
     "display.bargraph": { availability: "supported" },
   },
   controls: Object.fromEntries(
@@ -371,6 +373,7 @@ export class UniTUt61EPlusDriver extends InstrumentDriver {
     if (!eVariant) delete capabilities["measurement.acdc-voltage"];
     if (!dVariant) delete capabilities["measurement.temperature"];
     if (!dVariant) delete capabilities["measurement.low-impedance-voltage"];
+    if (!dVariant && !eVariant) delete capabilities["status.peak-hold"];
     return capabilities;
   }
 
