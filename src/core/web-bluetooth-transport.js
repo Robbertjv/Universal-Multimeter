@@ -39,17 +39,28 @@ function validateBleProfile(profile) {
   }
   if (
     config.optionalServices !== undefined &&
-    !Array.isArray(config.optionalServices)
+    (!Array.isArray(config.optionalServices) ||
+      config.optionalServices.some(
+        (service) =>
+          typeof service !== "string" && typeof service !== "number",
+      ))
   ) {
     throw new TransportError(
       "TRANSPORT_INVALID_DESCRIPTOR",
-      "optionalServices must be an array when provided.",
+      "optionalServices must contain only service UUID strings or numbers.",
     );
   }
-  if (config.filters !== undefined && !Array.isArray(config.filters)) {
+  if (
+    config.filters !== undefined &&
+    (!Array.isArray(config.filters) ||
+      config.filters.some(
+        (filter) =>
+          !filter || typeof filter !== "object" || Array.isArray(filter),
+      ))
+  ) {
     throw new TransportError(
       "TRANSPORT_INVALID_DESCRIPTOR",
-      "BLE filters must be an array.",
+      "BLE filters must be an array of filter objects.",
     );
   }
   if (config.filters?.length && config.acceptAllDevices) {
@@ -253,6 +264,7 @@ export class WebBluetoothTransport extends TransportAdapter {
         "characteristicvaluechanged",
         this._onValueChanged,
       );
+      stage = "start-notifications";
       await this._notifyCharacteristic.startNotifications();
       if (signal?.aborted) {
         device.gatt.disconnect();
