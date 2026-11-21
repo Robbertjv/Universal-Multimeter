@@ -118,6 +118,10 @@ export class InstrumentDriver {
     return structuredClone(this._descriptor.capabilities ?? {});
   }
 
+  getControls() {
+    return structuredClone(this._descriptor.controls ?? {});
+  }
+
   on(eventName, listener) {
     return this._events.on(eventName, listener);
   }
