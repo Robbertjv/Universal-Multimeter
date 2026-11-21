@@ -349,6 +349,29 @@ describe("UniversalMultimeterApp", () => {
       "Batterij laag",
     );
 
+    runtime.emit("measurement", {
+      measurements: [
+        {
+          deviceId: "demo-1",
+          channelId: "primary",
+          value: 12.4,
+          unit: "V",
+          quantity: "voltage",
+          function: "voltage.dc",
+          quality: "good",
+          state: "valid",
+          metadata: { bargraphValue: -10, bargraphMax: 46 },
+          receivedAt: new Date().toISOString(),
+        },
+      ],
+    });
+    expect(app.querySelector("[data-bargraph-container]").hidden).toBe(false);
+    expect(app.querySelector("[data-bargraph]").max).toBe(46);
+    expect(app.querySelector("[data-bargraph]").value).toBe(10);
+    expect(app.querySelector("[data-bargraph-value]").textContent).toBe(
+      "−10 / 46",
+    );
+
     app.remove();
   });
 });
