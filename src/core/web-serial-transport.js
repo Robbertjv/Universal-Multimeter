@@ -131,7 +131,9 @@ export class WebSerialTransport extends TransportAdapter {
     try {
       // requestPort must be the first platform call in this user-gesture path.
       port = await this._serial.requestPort(
-        this._config.filters ? { filters: this._config.filters } : undefined,
+        this._config.filters?.length
+          ? { filters: this._config.filters }
+          : undefined,
       );
     } catch (error) {
       throw mapError(error, "select");
