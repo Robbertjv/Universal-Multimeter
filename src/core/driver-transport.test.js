@@ -5,7 +5,11 @@ import { MockTransport } from "./mock-transport.js";
 describe("driver and injected transport boundary", () => {
   it("serializes receive processing and drops chunks when the bounded queue is full", async () => {
     const transport = new MockTransport();
-    const driver = createMockDriver({ transport, maxPendingTransportChunks: 1, maxPendingTransportBytes: 8 });
+    const driver = createMockDriver({
+      transport,
+      maxPendingTransportChunks: 1,
+      maxPendingTransportBytes: 8,
+    });
     let release;
     const processed = [];
     const errors = [];
