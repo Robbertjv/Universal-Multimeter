@@ -113,7 +113,6 @@ export class Fluke187Driver extends InstrumentDriver {
   }
 }
 
-
 export function registerFluke187Driver(driverRegistry) {
   driverRegistry.register(
     FLUKE_187_DRIVER_DESCRIPTOR,
