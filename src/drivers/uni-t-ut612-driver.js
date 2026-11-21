@@ -84,7 +84,7 @@ function decodeMeasurement({
   const decimalMultiplier = info & 0x07;
   const unit = UNIT_DEFINITIONS.get(unitCode);
   const statusCode = statusByte & 0x0f;
-  const status = statusCode === 3
+  const status = rawValue === 0x4e20 || statusCode === 3
     ? "overload"
     : statusCode === 9
       ? "open-circuit"
