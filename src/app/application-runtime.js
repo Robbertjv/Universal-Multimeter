@@ -1,4 +1,6 @@
 import { DeviceManager } from "../core/device-manager.js";
+import { MqttConnectionManager } from "../integrations/mqtt/mqtt-connection-manager.js";
+import { McpToolService } from "../integrations/mcp/mcp-tool-service.js";
 import { DeviceProfileRegistry } from "../core/device-profile-registry.js";
 import { DriverRegistry } from "../core/driver-registry.js";
 import { MeasurementEngine } from "../core/measurement-engine.js";
@@ -64,6 +66,7 @@ export function createApplicationRuntime({
   drivers = [],
   transports = [],
   historyStoreFactory = () => new MeasurementHistoryStore(),
+  mqttClientFactory = null,
 } = {}) {
   const profileRegistry = new DeviceProfileRegistry();
   const driverRegistry = new DriverRegistry();
@@ -132,6 +135,11 @@ export function createApplicationRuntime({
   });
 
   let disposed = false;
+  const mqttManager = mqttClientFactory ? new MqttConnectionManager({ clientFactory: mqttClientFactory }) : null;
+  const mcpService = new McpToolService({ runtime: {
+    listConnectedDevices: () => deviceManager.listConnectedDevices(),
+    getSnapshot: (options) => measurementEngine.getSnapshot(options),
+  } });
   const listeners = new Map();
   let nextListenerId = 1;
   const managerUnsubscribers = [];
@@ -193,6 +201,9 @@ export function createApplicationRuntime({
   });
 
   const runtime = {
+    get integrations() {
+      return Object.freeze({ mqtt: mqttManager ? "available" : "not-configured", mcp: "available" });
+    },
     listProfiles() {
       return deviceManager.listDeviceProfiles();
     },
@@ -207,6 +218,32 @@ export function createApplicationRuntime({
     },
     getLatest(deviceId, channelId) {
       return measurementEngine.getLatest(deviceId, channelId);
+    },
+    connectMqtt(connectionId, config) {
+      if (disposed) return Promise.reject(new Error("Application runtime is disposed."));
+      if (!mqttManager) return Promise.reject(new Error("MQTT clientFactory is not configured."));
+      return mqttManager.connect(connectionId, config);
+    },
+    publishMqtt(connectionId, topic, payload, options = {}) {
+      if (!mqttManager) return Promise.reject(new Error("MQTT clientFactory is not configured."));
+      return mqttManager.publish(connectionId, topic, payload, options);
+    },
+    subscribeMqtt(connectionId, topic, handler, options = {}) {
+      if (!mqttManager) return Promise.reject(new Error("MQTT clientFactory is not configured."));
+      return mqttManager.subscribe(connectionId, topic, handler, options);
+    },
+    disconnectMqtt(connectionId) {
+      return mqttManager ? mqttManager.disconnect(connectionId) : Promise.resolve(false);
+    },
+    listMqttConnections() {
+      return mqttManager ? mqttManager.listConnections() : [];
+    },
+    onMqtt(listener) {
+      if (!mqttManager) throw new Error("MQTT clientFactory is not configured.");
+      return mqttManager.on(listener);
+    },
+    handleMcpMessage(message) {
+      return mcpService.handleMessage(message);
     },
     executeControl(deviceId, controlId, parameters = {}, authorization = {}) {
       if (disposed) {
@@ -292,6 +329,7 @@ export function createApplicationRuntime({
       listeners.clear();
       loggingSessions.clear();
       await deviceManager.disconnectAll("application-shutdown");
+      await mqttManager?.disconnectAll();
       if (historyStore) await historyStore.close?.();
     },
     get isDisposed() {
