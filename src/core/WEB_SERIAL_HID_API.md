@@ -24,7 +24,7 @@ The adapter opens the selected port, acquires readable/writable stream locks, fo
 
 Module: `src/core/web-hid-transport.js`; transport ID: `web.hid`.
 
-Profiles may configure browser `filters` (vendor/product IDs or usage page/usage), `vendorId`, `productId`, `inputReportId`, and `outputReportId`. IDs are numeric USB/HID identifiers, not strings. Device selection must be constrained by a filter, vendor ID, or product ID; report IDs alone do not constrain the chooser.
+Profiles may configure browser `filters` (vendor/product IDs or usage page/usage), `vendorId`, `productId`, `inputReportId`, and `outputReportId`. IDs are numeric USB/HID identifiers, not strings. Per the WebHID specification, `productId` requires `vendorId`, and `usage` requires `usagePage`. Device selection must be constrained by a filter, vendor ID, or product ID; report IDs alone do not constrain the chooser.
 
 ```js
 {
