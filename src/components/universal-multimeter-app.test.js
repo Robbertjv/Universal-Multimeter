@@ -63,6 +63,67 @@ describe("UniversalMultimeterApp", () => {
     expect(runtime.shutdown).toHaveBeenCalledOnce();
   });
 
+  it("plots only compatible measurements and exposes secondary channels", () => {
+    const runtime = createRuntime();
+    const app = document.createElement(tag);
+    app.setRuntime(runtime);
+    document.body.append(app);
+    runtime.emit("device-state", {
+      deviceId: "demo-1",
+      state: "connected",
+    });
+    const now = Date.now();
+    runtime.emit("measurement", {
+      measurements: [
+        {
+          deviceId: "demo-1",
+          channelId: "primary",
+          value: 230,
+          unit: "V",
+          quantity: "voltage",
+          function: "voltage.ac",
+          quality: "good",
+          state: "valid",
+          receivedAt: new Date(now - 1000).toISOString(),
+        },
+        {
+          deviceId: "demo-1",
+          channelId: "secondary",
+          value: 5,
+          unit: "A",
+          quantity: "current",
+          function: "current.ac",
+          quality: "good",
+          state: "valid",
+          receivedAt: new Date(now - 500).toISOString(),
+        },
+        {
+          deviceId: "demo-1",
+          channelId: "primary",
+          value: 231,
+          unit: "V",
+          quantity: "voltage",
+          function: "voltage.ac",
+          quality: "good",
+          state: "valid",
+          receivedAt: new Date(now).toISOString(),
+        },
+      ],
+    });
+
+    expect(app.querySelector("[data-graph] polyline")).not.toBeNull();
+    expect(app.querySelector("[data-channels]").textContent).toContain(
+      "secondary: 5 A",
+    );
+    expect(app.querySelector("[data-graph-detail]").textContent).toContain(
+      "2 punten",
+    );
+
+    app.querySelector("[data-clear-graph]").click();
+    expect(app.querySelector("[data-graph] polyline")).toBeNull();
+    app.remove();
+  });
+
   it("renders connection state and normalized measurement events", () => {
     const runtime = createRuntime();
     const app = document.createElement(tag);
