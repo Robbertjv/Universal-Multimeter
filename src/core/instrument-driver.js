@@ -75,6 +75,8 @@ export class InstrumentDriver {
     deviceProfile = {},
     clock = () => new Date(),
     logger = null,
+    maxPendingTransportChunks = 128,
+    maxPendingTransportBytes = 262_144,
   } = {}) {
     assertValidDriverDescriptor(descriptor);
     this._descriptor = structuredClone(descriptor);
@@ -86,6 +88,21 @@ export class InstrumentDriver {
     this._state = "new";
     this._initialized = false;
     this._lifecycleQueue = Promise.resolve();
+    if (
+      !Number.isSafeInteger(maxPendingTransportChunks) ||
+      maxPendingTransportChunks < 1 ||
+      !Number.isSafeInteger(maxPendingTransportBytes) ||
+      maxPendingTransportBytes < 1
+    ) {
+      throw new TypeError(
+        "Transport receive queue limits must be positive safe integers.",
+      );
+    }
+    this._maxPendingTransportChunks = maxPendingTransportChunks;
+    this._maxPendingTransportBytes = maxPendingTransportBytes;
+    this._pendingTransportChunks = 0;
+    this._pendingTransportBytes = 0;
+    this._transportDataQueue = Promise.resolve();
     this._transportUnsubscribers = [];
   }
 
@@ -282,9 +299,43 @@ export class InstrumentDriver {
       );
     this._transportUnsubscribers.push(
       this._transport.on("data", (chunk) => {
-        Promise.resolve()
-          .then(() => this.onTransportData(chunk))
-          .catch((error) => this.publish("error", error));
+        const bytes = chunk instanceof Uint8Array ? chunk.slice() : chunk;
+        const byteLength = bytes?.byteLength ?? 0;
+        if (
+          this._pendingTransportChunks >= this._maxPendingTransportChunks ||
+          this._pendingTransportBytes + byteLength >
+            this._maxPendingTransportBytes
+        ) {
+          this.publish(
+            "error",
+            new DriverError(
+              "DRIVER_RECEIVE_QUEUE_FULL",
+              "Driver receive queue is full; incoming data was dropped.",
+              {
+                pendingChunks: this._pendingTransportChunks,
+                pendingBytes: this._pendingTransportBytes,
+                incomingBytes: byteLength,
+                maxPendingChunks: this._maxPendingTransportChunks,
+                maxPendingBytes: this._maxPendingTransportBytes,
+              },
+            ),
+          );
+          return;
+        }
+        this._pendingTransportChunks += 1;
+        this._pendingTransportBytes += byteLength;
+        const processing = this._transportDataQueue.then(() =>
+          this.onTransportData(bytes),
+        );
+        this._transportDataQueue = processing.catch((error) =>
+          this.publish("error", error),
+        );
+        processing
+          .finally(() => {
+            this._pendingTransportChunks -= 1;
+            this._pendingTransportBytes -= byteLength;
+          })
+          .catch(() => {});
       }),
       this._transport.on("error", (error) => this.publish("error", error)),
       this._transport.on("state", (event) =>
