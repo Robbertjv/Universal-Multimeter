@@ -175,34 +175,38 @@ export class UniversalMultimeterApp extends HTMLElement {
     this.querySelector("[data-log-stop]").addEventListener("click", () => {
       if (!this._currentDeviceId || !this._runtime) return;
       const session = this._runtime.stopLogging(this._currentDeviceId);
-      if (session) this._lastLoggingSessions.set(this._currentDeviceId, session);
+      if (session)
+        this._lastLoggingSessions.set(this._currentDeviceId, session);
       this._activeLoggingSessions.delete(this._currentDeviceId);
       this._renderLogging();
       this._setMessage("Lokale meetlogging gestopt.");
     });
-    this.querySelector("[data-log-export]").addEventListener("click", async () => {
-      const session = this._lastLoggingSessions.get(this._currentDeviceId);
-      if (!session || !this._runtime) return;
-      try {
-        const csv = await this._runtime.exportHistoryCsv({
-          sessionId: session.sessionId,
-        });
-        if (csv.trim().split(/\r?\n/).length < 2) {
-          this._setMessage("Geen meetgegevens om te exporteren.");
-          return;
+    this.querySelector("[data-log-export]").addEventListener(
+      "click",
+      async () => {
+        const session = this._lastLoggingSessions.get(this._currentDeviceId);
+        if (!session || !this._runtime) return;
+        try {
+          const csv = await this._runtime.exportHistoryCsv({
+            sessionId: session.sessionId,
+          });
+          if (csv.trim().split(/\r?\n/).length < 2) {
+            this._setMessage("Geen meetgegevens om te exporteren.");
+            return;
+          }
+          const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `universal-multimeter-${session.sessionId}.csv`;
+          link.click();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          this._setMessage("CSV-export is aangemaakt.");
+        } catch (error) {
+          this._setMessage(this._friendlyError(error));
         }
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `universal-multimeter-${session.sessionId}.csv`;
-        link.click();
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-        this._setMessage("CSV-export is aangemaakt.");
-      } catch (error) {
-        this._setMessage(this._friendlyError(error));
-      }
-    });
+      },
+    );
 
     this.querySelector("[data-graph-window]").addEventListener("change", () => {
       this._renderGraph();
@@ -506,10 +510,12 @@ export class UniversalMultimeterApp extends HTMLElement {
     const windowMs = Number(this.querySelector("[data-graph-window]").value);
     const now = Date.now();
     const measurement = this._currentDeviceId
-      ? this._latestMeasurements.get(`${this._currentDeviceId}\u0000primary`) ??
+      ? (this._latestMeasurements.get(
+          `${this._currentDeviceId}\u0000primary`,
+        ) ??
         [...this._latestMeasurements.entries()].find(([key]) =>
           key.startsWith(`${this._currentDeviceId}\u0000`),
-        )?.[1]
+        )?.[1])
       : null;
     if (!measurement) {
       detail.textContent = "Verbind een instrument om een trend op te bouwen.";
