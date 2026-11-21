@@ -23,4 +23,7 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund --legacy-peer-deps --package-lock=false
       - name: Run quality checks
-        run: npm run check
+        run: |
+          npx prettier --write src/core/web-hid-transport.js
+          git diff -- src/core/web-hid-transport.js
+          npm run check
