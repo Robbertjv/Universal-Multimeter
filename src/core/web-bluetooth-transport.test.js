@@ -150,38 +150,41 @@ describe("WebBluetoothTransport", () => {
     await characteristicTransport.dispose();
   });
 
-  it("passes profile discovery filters and authorized optional services", async () => {
-    const fixture = createFixture();
-    const configuredProfile = {
-      ...profile,
-      ble: {
-        ...profile.ble,
-        filters: [{ namePrefix: "Meter" }],
-        optionalServices: ["battery_service"],
-      },
-    };
-    const transport = new WebBluetoothTransport({
-      profile: configuredProfile,
-      bluetooth: fixture.bluetooth,
-    });
+  it(
+    "passes profile discovery filters and authorized optional services",
+    async () => {
+      const fixture = createFixture();
+      const configuredProfile = {
+        ...profile,
+        ble: {
+          ...profile.ble,
+          filters: [{ namePrefix: "Meter" }],
+          optionalServices: ["battery_service"],
+        },
+      };
+      const transport = new WebBluetoothTransport({
+        profile: configuredProfile,
+        bluetooth: fixture.bluetooth,
+    },
+  );
 
     await transport.connect();
 
     expect(fixture.bluetooth.requestDevice).toHaveBeenCalledWith({
       filters: [{ namePrefix: "Meter" }],
-      optionalServices: [
-        profile.ble.serviceUuid,
-        "battery_service",
-      ],
+      optionalServices: [profile.ble.serviceUuid, "battery_service"],
     });
     await transport.dispose();
   });
 
-  it("cleans up listeners and the GATT link when notification setup fails", async () => {
-    const fixture = createFixture();
-    fixture.characteristic.startNotifications = vi.fn(async () => {
-      throw new Error("notification setup failed");
-    });
+  it(
+    "cleans up listeners and the GATT link when notification setup fails",
+    async () => {
+      const fixture = createFixture();
+      fixture.characteristic.startNotifications = vi.fn(async () => {
+        throw new Error("notification setup failed");
+    },
+  );
     const removeCharacteristicListener = vi.spyOn(
       fixture.characteristic,
       "removeEventListener",
