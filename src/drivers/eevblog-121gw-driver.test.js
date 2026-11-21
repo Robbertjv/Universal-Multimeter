@@ -5,6 +5,11 @@ import {
 } from "./eevblog-121gw-driver.js";
 import { Eevblog121gwStreamParser } from "./eevblog-121gw-parser.js";
 import { MockTransport } from "../core/mock-transport.js";
+import { DriverRegistry } from "../core/driver-registry.js";
+import { validateDriverDescriptor } from "../core/driver-validation.js";
+import { EEVBLOG_121GW_DRIVER_DESCRIPTOR, registerEevblog121gwDriver } from "./eevblog-121gw-driver.js";
+import { EEVBLOG_121GW_DEVICE_PROFILE } from "./eevblog-121gw-profile.js";
+import { DeviceProfileRegistry } from "../core/device-profile-registry.js";
 
 function packet({
   mode = 1,
@@ -80,6 +85,18 @@ describe("EEVblog 121GW decoder", () => {
       value: -1.2345,
       unit: "V",
       state: "valid",
+    });
+  });
+
+  it("decodes the extended 18-bit main count", () => {
+    const decoded = decodeEevblog121gwFrame(packet({ count: 70000 }));
+    expect(decoded.measurement.value).toBe(7);
+  });
+
+  it("uses unknown function for Low-Z until its coupling is confirmed", () => {
+    expect(decodeEevblog121gwFrame(packet({ mode: 0 })).measurement).toMatchObject({
+      quantity: "voltage",
+      function: "unknown",
     });
   });
 
@@ -170,5 +187,24 @@ describe("EEVblog 121GW driver lifecycle", () => {
     await driver.stop();
     await transport.disconnect();
     await transport.dispose();
+  });
+});
+
+describe("EEVblog 121GW registration and profile", () => {
+  it("has a valid experimental descriptor and registers a driver factory", () => {
+    expect(validateDriverDescriptor(EEVBLOG_121GW_DRIVER_DESCRIPTOR).valid).toBe(true);
+    const registry = registerEevblog121gwDriver(new DriverRegistry());
+    expect(registry.has("eevblog.121gw")).toBe(true);
+    expect(registry.create("eevblog.121gw")).toBeInstanceOf(Eevblog121gwDriver);
+  });
+
+  it("registers the evidence-labelled BLE profile", () => {
+    const registry = new DeviceProfileRegistry();
+    registry.register(EEVBLOG_121GW_DEVICE_PROFILE);
+    expect(registry.get("eevblog.121gw.ble")).toMatchObject({
+      driverId: "eevblog.121gw",
+      transportId: "web.bluetooth.le",
+      supportLevel: "experimental",
+    });
   });
 });
