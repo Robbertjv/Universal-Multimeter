@@ -353,6 +353,19 @@ export class InstrumentDriver {
     this._events.emit(eventName, payload);
   }
 
+  async writeTransport(bytes, options = {}) {
+    if (!this._transport || typeof this._transport.write !== "function") {
+      throw new DriverError(
+        "DRIVER_TRANSPORT_NOT_WRITABLE",
+        "The injected transport does not support writes.",
+      );
+    }
+    if (!(bytes instanceof Uint8Array)) {
+      throw new TypeError("Transport writes require Uint8Array data.");
+    }
+    return this._transport.write(bytes, options);
+  }
+
   async onInitialize() {}
   async onTransportData() {}
   async onStart() {}
