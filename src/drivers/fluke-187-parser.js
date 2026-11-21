@@ -8,11 +8,13 @@ export class Fluke187ResponseParser {
     this.maxLineBytes = maxLineBytes;
     this._buffer = "";
     this._decoder = new TextDecoder("utf-8");
+    this._discardingLine = false;
   }
 
   reset() {
     this._buffer = "";
     this._decoder = new TextDecoder("utf-8");
+    this._discardingLine = false;
   }
 
   push(chunk) {
@@ -30,15 +32,18 @@ export class Fluke187ResponseParser {
     for (const character of text) {
       const byte = character.charCodeAt(0);
       if (character === "\r" || character === "\n") {
-        if (this._buffer.length) {
+        if (!this._discardingLine && this._buffer.length) {
           lines.push(this._buffer);
-          this._buffer = "";
         }
+        this._buffer = "";
+        this._discardingLine = false;
         continue;
       }
+      if (this._discardingLine) continue;
       if (byte < 0x20 || byte === 0x7f) {
         warnings.push({ code: "FLUKE_187_CONTROL_CHARACTER", byte });
         this._buffer = "";
+        this._discardingLine = true;
         continue;
       }
       this._buffer += character;
@@ -48,6 +53,7 @@ export class Fluke187ResponseParser {
           maxLineBytes: this.maxLineBytes,
         });
         this._buffer = "";
+        this._discardingLine = true;
       }
     }
     return { lines, warnings, bufferedBytes: this._buffer.length };
