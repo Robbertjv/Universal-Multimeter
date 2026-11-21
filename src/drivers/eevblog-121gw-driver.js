@@ -109,7 +109,7 @@ const RANGE = {
 };
 
 const MODES = {
-  0: { quantity: "voltage", function: "voltage.dc" },
+  0: { quantity: "voltage", function: "unknown" },
   1: { quantity: "voltage", function: "voltage.dc" },
   2: { quantity: "voltage", function: "voltage.ac" },
   3: { quantity: "voltage", function: "voltage.dc" },
