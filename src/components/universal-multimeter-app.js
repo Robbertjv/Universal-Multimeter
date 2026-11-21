@@ -93,7 +93,14 @@ template.innerHTML = `
     </section>
 
     <section class="device-list-panel" aria-labelledby="devices-title">
-      <h2 id="devices-title">Verbonden instrumenten</h2>
+      <div class="section-heading">
+        <h2 id="devices-title">Verbonden instrumenten</h2>
+        <label for="active-device">Actief instrument
+          <select id="active-device" data-active-device disabled>
+            <option value="">Geen instrument verbonden</option>
+          </select>
+        </label>
+      </div>
       <ul data-devices><li class="empty-state">Geen instrument verbonden</li></ul>
     </section>
 
@@ -158,6 +165,12 @@ export class UniversalMultimeterApp extends HTMLElement {
         this.querySelector("[data-connect]").disabled = false;
         this._renderStatus();
       });
+    });
+
+    this.querySelector("[data-active-device]").addEventListener("change", (event) => {
+      this._currentDeviceId = event.target.value || null;
+      this._renderMeasurement();
+      this._renderLogging();
     });
 
     this.querySelector("[data-log-start]").addEventListener("click", () => {
@@ -420,21 +433,41 @@ export class UniversalMultimeterApp extends HTMLElement {
 
   _renderDevices() {
     const list = this.querySelector("[data-devices]");
+    const activeDevice = this.querySelector("[data-active-device]");
     list.replaceChildren();
+    activeDevice.replaceChildren();
+
     if (!this._deviceStates.size) {
+      this._currentDeviceId = null;
+      activeDevice.disabled = true;
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "Geen instrument verbonden";
+      activeDevice.append(option);
       const item = document.createElement("li");
       item.className = "empty-state";
       item.textContent = "Geen instrument verbonden";
       list.append(item);
       return;
     }
+
+    if (!this._deviceStates.has(this._currentDeviceId)) {
+      this._currentDeviceId = [...this._deviceStates.keys()].at(-1);
+    }
+    activeDevice.disabled = false;
     for (const device of this._deviceStates.values()) {
-      const item = document.createElement("li");
-      const name = document.createElement("strong");
-      name.textContent =
+      const option = document.createElement("option");
+      option.value = device.deviceId;
+      option.textContent =
         [device.manufacturer, device.model].filter(Boolean).join(" ") ||
         device.profileId ||
         device.deviceId;
+      option.selected = device.deviceId === this._currentDeviceId;
+      activeDevice.append(option);
+
+      const item = document.createElement("li");
+      const name = document.createElement("strong");
+      name.textContent = option.textContent;
       const state = document.createElement("span");
       state.textContent =
         STATE_LABELS[device.state] ?? device.state ?? "Status onbekend";
