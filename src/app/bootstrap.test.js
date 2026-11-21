@@ -90,7 +90,9 @@ describe("production application bootstrap", () => {
 
     app.remove();
     mountedApp = undefined;
-    await vi.waitFor(() => expect(runtime.isDisposed).toBe(true));
-    expect(runtime.listConnectedDevices()).toEqual([]);
+    await vi.waitFor(() => {
+      expect(runtime.isDisposed).toBe(true);
+      expect(runtime.listConnectedDevices()).toEqual([]);
+    });
   });
 });
