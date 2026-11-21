@@ -219,9 +219,7 @@ export function parseFluke187ResponseLine(line) {
   if (overload) return overload;
 
   const match =
-    /^([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(.*?)$/.exec(
-      payload,
-    );
+    /^([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(.*?)$/.exec(payload);
   if (!match || !match[2]) {
     return {
       ok: false,
