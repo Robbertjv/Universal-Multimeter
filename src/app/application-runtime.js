@@ -12,6 +12,8 @@ import { registerFluke187Driver } from "../drivers/fluke-187-driver.js";
 import { registerFluke187Profile } from "../drivers/fluke-187-profile.js";
 import { MeasurementHistoryStore } from "../data/measurement-history-store.js";
 import { measurementsToCsv } from "../data/measurement-csv.js";
+import { registerUniTUt71xDriver } from "../drivers/uni-t-ut71x-driver.js";
+import { registerUniTUt71xProfiles } from "../drivers/uni-t-ut71x-profile.js";
 
 const RUNTIME_EVENTS = new Set([
   "device-state",
@@ -68,6 +70,8 @@ export function createApplicationRuntime({
     registerFluke187Profile(profileRegistry);
     registerEevblog121gwDriver(driverRegistry);
     registerFluke187Driver(driverRegistry);
+    registerUniTUt71xDriver(driverRegistry);
+    registerUniTUt71xProfiles(profileRegistry);
   }
 
   for (const entry of transports) {
