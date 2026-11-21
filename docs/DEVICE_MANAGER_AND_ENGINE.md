@@ -2,6 +2,8 @@
 
 **Status:** Reviewed v1.0 implementation baseline (2026-11-20).
 
+See [DEVICE_MANAGER_API.md](DEVICE_MANAGER_API.md) for the initial runtime API and current implementation limitations.
+
 ## 1. Device Manager responsibilities
 
 Device Manager coordinates device profiles, transport factories, driver factories, connection lifecycle, and active device sessions. It is the sole application service that owns the association between a driver instance and its transport instance.

@@ -4,7 +4,7 @@ A modular, browser-based interface for reading measurements from different multi
 
 ## Project status
 
-**Application foundation integrated; universal measurement model in progress.** The Vite/Web Components app shell, JavaScript quality tooling, smoke test, and CI workflow are in `main`. The shared measurement model is under review. No device drivers or hardware-validated support are claimed.
+**Core foundation integrated; transport and Device Manager work under review.** The Vite/Web Components app shell, universal measurement model, and driver runtime are integrated. The transport base is under review in PR #15; Device Manager and Measurement Engine are under review in PR #16. No concrete hardware adapter or hardware-validated meter support is claimed.
 
 ## Initial target
 
@@ -62,6 +62,7 @@ The repository also maintains the development process and current project state:
 - [Driver Contract](docs/DRIVER_CONTRACT.md) — driver lifecycle, parser boundary, and capability rules.
 - [Transport Contract](docs/TRANSPORT_CONTRACT.md) — common transport interface and adapter requirements.
 - [Device Manager and Measurement Engine](docs/DEVICE_MANAGER_AND_ENGINE.md) — service responsibilities and lifecycle.
+- [Device Manager Runtime API](docs/DEVICE_MANAGER_API.md) — implemented registry, connection, measurement ingestion, and current limitations.
 - [Test Strategy](docs/TEST_STRATEGY.md) — unit, fixture, integration, browser, and hardware validation.
 
 These documents are maintained as the project evolves. Driver implementation may proceed with incomplete protocol knowledge; unknowns are tracked explicitly and full support is only claimed after real-hardware validation.
