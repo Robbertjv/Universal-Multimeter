@@ -44,53 +44,50 @@ export class Eevblog121gwStreamParser {
 
     const frames = [];
     const warnings = [];
-    if (chunk.length) this._buffer = concat(this._buffer, chunk);
+    const segmentSize = this.maxBufferBytes - (EEVBLOG_121GW_PACKET_LENGTH - 1);
 
-    while (this._buffer.length >= EEVBLOG_121GW_PACKET_LENGTH) {
-      const start = this._buffer.indexOf(PACKET_START);
-      if (start < 0) {
-        warnings.push({
-          code: "EEVBLOG_121GW_UNFRAMED_BYTES",
-          droppedBytes: this._buffer.length,
-        });
-        this._buffer = new Uint8Array();
-        break;
+    // Process large transport chunks in bounded segments. The retained
+    // partial-frame buffer is at most 18 bytes between segments.
+    for (let offset = 0; offset < chunk.length; offset += segmentSize) {
+      const segment = chunk.subarray(offset, offset + segmentSize);
+      this._buffer = concat(this._buffer, segment);
+
+      while (this._buffer.length >= EEVBLOG_121GW_PACKET_LENGTH) {
+        const start = this._buffer.indexOf(PACKET_START);
+        if (start < 0) {
+          warnings.push({
+            code: "EEVBLOG_121GW_UNFRAMED_BYTES",
+            droppedBytes: this._buffer.length,
+          });
+          this._buffer = new Uint8Array();
+          break;
+        }
+        if (start > 0) {
+          warnings.push({
+            code: "EEVBLOG_121GW_DESYNC",
+            droppedBytes: start,
+          });
+          this._buffer = this._buffer.slice(start);
+        }
+        if (this._buffer.length < EEVBLOG_121GW_PACKET_LENGTH) break;
+
+        const candidate = this._buffer.slice(0, EEVBLOG_121GW_PACKET_LENGTH);
+        const expected = xor(
+          candidate.subarray(0, EEVBLOG_121GW_PACKET_LENGTH - 1),
+        );
+        if (expected !== candidate[EEVBLOG_121GW_PACKET_LENGTH - 1]) {
+          warnings.push({
+            code: "EEVBLOG_121GW_CHECKSUM_INVALID",
+            expected,
+            actual: candidate[EEVBLOG_121GW_PACKET_LENGTH - 1],
+          });
+          this._buffer = this._buffer.slice(1);
+          continue;
+        }
+
+        frames.push(candidate);
+        this._buffer = this._buffer.slice(EEVBLOG_121GW_PACKET_LENGTH);
       }
-      if (start > 0) {
-        warnings.push({
-          code: "EEVBLOG_121GW_DESYNC",
-          droppedBytes: start,
-        });
-        this._buffer = this._buffer.slice(start);
-      }
-      if (this._buffer.length < EEVBLOG_121GW_PACKET_LENGTH) break;
-
-      const candidate = this._buffer.slice(0, EEVBLOG_121GW_PACKET_LENGTH);
-      const expected = xor(
-        candidate.subarray(0, EEVBLOG_121GW_PACKET_LENGTH - 1),
-      );
-      if (expected !== candidate[EEVBLOG_121GW_PACKET_LENGTH - 1]) {
-        warnings.push({
-          code: "EEVBLOG_121GW_CHECKSUM_INVALID",
-          expected,
-          actual: candidate[EEVBLOG_121GW_PACKET_LENGTH - 1],
-        });
-        this._buffer = this._buffer.slice(1);
-        continue;
-      }
-
-      frames.push(candidate);
-      this._buffer = this._buffer.slice(EEVBLOG_121GW_PACKET_LENGTH);
-    }
-
-    if (this._buffer.length > this.maxBufferBytes) {
-      const droppedBytes =
-        this._buffer.length - (EEVBLOG_121GW_PACKET_LENGTH - 1);
-      this._buffer = this._buffer.slice(-(EEVBLOG_121GW_PACKET_LENGTH - 1));
-      warnings.push({
-        code: "EEVBLOG_121GW_BUFFER_LIMIT",
-        droppedBytes,
-      });
     }
 
     return { frames, warnings, bufferedBytes: this._buffer.length };
