@@ -200,6 +200,17 @@ export function createApplicationRuntime({
     getLatest(deviceId, channelId) {
       return measurementEngine.getLatest(deviceId, channelId);
     },
+    executeControl(deviceId, controlId, parameters = {}, authorization = {}) {
+      if (disposed) {
+        return Promise.reject(new Error("Application runtime is disposed."));
+      }
+      return deviceManager.executeControl(
+        deviceId,
+        controlId,
+        parameters,
+        authorization,
+      );
+    },
     startLogging(deviceId) {
       const device = deviceManager.getDevice(deviceId);
       if (!device || device.state !== "connected") {
