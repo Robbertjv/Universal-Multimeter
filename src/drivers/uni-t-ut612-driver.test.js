@@ -86,7 +86,7 @@ describe("UNI-T UT612 ES51919 protocol parser", () => {
     expect(capacitance.measurements[0].unit).toBe("F");
     expect(resistance.measurements[0]).toMatchObject({
       quantity: "resistance",
-      value: 123.4,
+      value: 123400,
       unit: "ohm",
     });
   });
