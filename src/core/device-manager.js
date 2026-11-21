@@ -135,7 +135,7 @@ export class DeviceManager {
     // each call represents a request for a new independently identified device.
     if (options.deviceId == null) return this._connect(profileId, options);
 
-    const connectionKey = `${profileId}\\u0000${options.deviceId}`;
+    const connectionKey = JSON.stringify([profileId, options.deviceId]);
     if (this._connecting.has(connectionKey)) {
       return this._connecting.get(connectionKey);
     }
