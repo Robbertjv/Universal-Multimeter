@@ -11,7 +11,10 @@ import {
   EEVBLOG_121GW_DRIVER_DESCRIPTOR,
   registerEevblog121gwDriver,
 } from "./eevblog-121gw-driver.js";
-import { EEVBLOG_121GW_DEVICE_PROFILE } from "./eevblog-121gw-profile.js";
+import {
+  EEVBLOG_121GW_DEVICE_PROFILE,
+  registerEevblog121gwProfile,
+} from "./eevblog-121gw-profile.js";
 import { DeviceProfileRegistry } from "../core/device-profile-registry.js";
 
 function packet({
@@ -73,6 +76,16 @@ describe("EEVblog 121GW V2 stream parser", () => {
         (warning) => warning.code === "EEVBLOG_121GW_UNFRAMED_BYTES",
       ),
     ).toBe(true);
+  });
+
+  it("processes a large chunk in bounded segments without dropping valid frames", () => {
+    const parser = new Eevblog121gwStreamParser({ maxBufferBytes: 32 });
+    const frames = Array.from({ length: 20 }, (_, index) =>
+      packet({ count: index + 1 }),
+    );
+    const result = parser.push(new Uint8Array(frames.flatMap((frame) => [...frame])));
+    expect(result.frames).toHaveLength(20);
+    expect(result.bufferedBytes).toBe(0);
   });
 });
 
@@ -207,8 +220,7 @@ describe("EEVblog 121GW registration and profile", () => {
   });
 
   it("registers the evidence-labelled BLE profile", () => {
-    const registry = new DeviceProfileRegistry();
-    registry.register(EEVBLOG_121GW_DEVICE_PROFILE);
+    const registry = registerEevblog121gwProfile(new DeviceProfileRegistry());
     expect(registry.get("eevblog.121gw.ble")).toMatchObject({
       driverId: "eevblog.121gw",
       transportId: "web.bluetooth.le",
