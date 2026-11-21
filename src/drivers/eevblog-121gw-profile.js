@@ -18,3 +18,8 @@ export const EEVBLOG_121GW_DEVICE_PROFILE = Object.freeze({
     hardwareValidated: false,
   },
 });
+
+export function registerEevblog121gwProfile(profileRegistry) {
+  profileRegistry.register(EEVBLOG_121GW_DEVICE_PROFILE);
+  return profileRegistry;
+}
