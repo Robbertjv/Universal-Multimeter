@@ -1,5 +1,6 @@
 export const DRIVER_EVENTS = Object.freeze([
   "measurement",
+  "identification",
   "capabilities",
   "warning",
   "error",

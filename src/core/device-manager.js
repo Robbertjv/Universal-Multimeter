@@ -197,6 +197,9 @@ export class DeviceManager {
         session.driver.on("measurement", (measurement) =>
           this._engine.ingest(deviceId, measurement),
         ),
+        session.driver.on("identification", (identification) =>
+          this._emit("device-identification", { deviceId, identification }),
+        ),
         session.driver.on("warning", (warning) =>
           this._emit("device-warning", { deviceId, warning }),
         ),

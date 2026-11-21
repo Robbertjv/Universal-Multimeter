@@ -27,26 +27,53 @@ body {
   margin: 0;
 }
 
+button {
+  border: 0;
+  border-radius: 9px;
+  padding: 11px 16px;
+  color: #102029;
+  background: #70c1b3;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+button.secondary {
+  border: 1px solid #52616d;
+  color: #d5dfe7;
+  background: transparent;
+}
+
 .app-shell {
   display: flex;
   width: min(1100px, calc(100% - 48px));
   min-height: 100vh;
   flex-direction: column;
+  gap: 28px;
   margin: 0 auto;
-  padding: 64px 0 28px;
+  padding: 56px 0 28px;
 }
 
-.app-header {
+.app-header,
+.section-heading {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 32px;
-  padding-bottom: 48px;
+  gap: 24px;
+}
+
+.app-header {
+  padding-bottom: 28px;
   border-bottom: 1px solid #2c3945;
 }
 
 .eyebrow {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   color: #70c1b3;
   font-size: 0.72rem;
   font-weight: 700;
@@ -60,20 +87,27 @@ p {
 }
 
 h1 {
-  margin-bottom: 12px;
-  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin-bottom: 10px;
+  font-size: clamp(2rem, 5vw, 3.3rem);
   letter-spacing: -0.045em;
+}
+
+h2 {
+  margin-bottom: 8px;
+  font-size: 1.45rem;
+}
+
+.intro,
+.muted {
+  color: #aab7c2;
 }
 
 .intro {
   margin-bottom: 0;
-  color: #aab7c2;
-  font-size: 1.05rem;
 }
 
 .connection-badge {
   display: inline-flex;
-  flex: 0 0 auto;
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
@@ -90,30 +124,57 @@ h1 {
   background: #e3ae61;
 }
 
-.welcome-card {
-  max-width: 680px;
-  margin: auto 0;
-  padding: 32px;
+.instrument-card,
+.measurement-card {
+  padding: 26px;
   border: 1px solid #2c3945;
-  border-radius: 18px;
+  border-radius: 16px;
   background: #17232d;
 }
 
-.welcome-card h2 {
-  margin-bottom: 12px;
-  font-size: 1.8rem;
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-.welcome-card p:last-child {
+.notice {
+  margin: 22px 0 8px;
+  color: #c3ced7;
+  line-height: 1.6;
+}
+
+.notice.error {
+  color: #ff9e91;
+}
+
+.instrument-card .muted,
+.measurement-meta {
   margin-bottom: 0;
-  color: #aab7c2;
-  line-height: 1.7;
+}
+
+.measurement-value {
+  display: block;
+  margin: 16px 0 8px;
+  font-size: clamp(2.8rem, 8vw, 5rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  letter-spacing: -0.05em;
+}
+
+.measurement-state {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #263743;
+  color: #b8d8d1;
+  font-size: 0.8rem;
 }
 
 .app-footer {
   display: flex;
   justify-content: space-between;
   gap: 16px;
+  margin-top: auto;
   padding-top: 20px;
   border-top: 1px solid #2c3945;
   color: #82919d;
@@ -123,17 +184,21 @@ h1 {
 @media (max-width: 720px) {
   .app-shell {
     width: min(100% - 32px, 1100px);
-    padding-top: 36px;
+    padding-top: 32px;
   }
 
-  .app-header {
+  .app-header,
+  .section-heading {
     flex-direction: column;
-    padding-bottom: 32px;
   }
 
-  .welcome-card {
-    margin: 48px 0;
-    padding: 24px;
+  .connection-badge {
+    align-self: flex-start;
+  }
+
+  .instrument-card,
+  .measurement-card {
+    padding: 20px;
   }
 
   .app-footer {
