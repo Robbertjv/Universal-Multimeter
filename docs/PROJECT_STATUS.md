@@ -1,6 +1,6 @@
 # Project Status
 
-**Last reviewed:** 2026-11-20  
+**Last reviewed:** 2026-11-21  
 **Overall phase:** Phase 2 — transport adapters in progress; application foundation, measurement model, driver runtime, and Device Manager implemented on review branches  
 **Application implementation:** Foundation merged; core measurement model implemented  
 **Overall health:** On track for foundational work; protocol and hardware validation remain open across several devices.
@@ -107,7 +107,7 @@ The initial implementation work packages are tracked as issues:
 | [#5](https://github.com/Robbertjv/Universal-Multimeter/issues/5) | Driver base contract, registry, capabilities | Closed — PR #14 merged |
 | [#6](https://github.com/Robbertjv/Universal-Multimeter/issues/6) | Transport base contract and mock transport | In review — PR pending |
 | [#7](https://github.com/Robbertjv/Universal-Multimeter/issues/7) | Device Manager and Measurement Engine | In review — PR #16 |
-| [#8](https://github.com/Robbertjv/Universal-Multimeter/issues/8) | Web Bluetooth LE adapter | In review — PR #17 |
+| [#8](https://github.com/Robbertjv/Universal-Multimeter/issues/8) | Web Bluetooth LE adapter | Closed — PR #17 merged |
 | [#9](https://github.com/Robbertjv/Universal-Multimeter/issues/9) | Web Serial and WebHID adapters | In review — PR #18 |
 | [#10](https://github.com/Robbertjv/Universal-Multimeter/issues/10) | First driver wave: 121GW, Fluke 187, UT61E, UT71 | Open |
 | [#11](https://github.com/Robbertjv/Universal-Multimeter/issues/11) | Remaining driver skeletons and protocol research | Open |
@@ -146,3 +146,6 @@ Review clarifications:
 - 2026-11-20 — Started issue #8 on `feature/issue-8-web-bluetooth`: profile-driven Web Bluetooth LE transport, GATT notification/write handling, permission/error mapping, disconnect cleanup, registry integration, and mock tests. Browser/platform and physical 121GW validation remain outstanding.
 
 - 2026-11-20 — Started issue #9 on `feature/issue-9-serial-hid-adapters`: profile-driven Web Serial and WebHID adapters, registry helpers, stable unavailable-API errors, HID report-ID-preserving chunks, mock tests, and runtime documentation. CP2110 mapping and real browser/OS/hardware validation remain outstanding; PR #18 opened for review. CI passed (66 tests, lint, formatting, and production build).
+
+- 2026-11-21 — PR #17 merged: initial profile-driven Web Bluetooth LE adapter integrated into main. Browser/platform and physical meter validation remain outstanding.
+- 2026-11-21 — PR #18 review: initial Web Serial and WebHID adapters, chooser filter validation, cleanup hardening, and mock tests; browser/platform/hardware validation outstanding.
