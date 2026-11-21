@@ -103,6 +103,8 @@ const MODES = new Map([
       prefix: true,
     },
   ],
+  [0x0a, { quantity: "temperature", function: "temperature", unit: "degC" }],
+  [0x0b, { quantity: "temperature", function: "temperature", unit: "degF" }],
   [
     0x0c,
     { quantity: "current", function: "current.dc", unit: "A", factor: 1e-6 },
