@@ -11,9 +11,7 @@ import {
   EEVBLOG_121GW_DRIVER_DESCRIPTOR,
   registerEevblog121gwDriver,
 } from "./eevblog-121gw-driver.js";
-import {
-  registerEevblog121gwProfile,
-} from "./eevblog-121gw-profile.js";
+import { registerEevblog121gwProfile } from "./eevblog-121gw-profile.js";
 import { DeviceProfileRegistry } from "../core/device-profile-registry.js";
 
 function packet({
@@ -82,7 +80,9 @@ describe("EEVblog 121GW V2 stream parser", () => {
     const frames = Array.from({ length: 20 }, (_, index) =>
       packet({ count: index + 1 }),
     );
-    const result = parser.push(new Uint8Array(frames.flatMap((frame) => [...frame])));
+    const result = parser.push(
+      new Uint8Array(frames.flatMap((frame) => [...frame])),
+    );
     expect(result.frames).toHaveLength(20);
     expect(result.bufferedBytes).toBe(0);
   });
