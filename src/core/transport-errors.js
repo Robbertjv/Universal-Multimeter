@@ -15,7 +15,10 @@ export const TRANSPORT_ERROR_CODES = Object.freeze([
   "TRANSPORT_PERMISSION_DENIED",
   "TRANSPORT_GATT_SERVICE_NOT_FOUND",
   "TRANSPORT_GATT_CHARACTERISTIC_NOT_FOUND",
+  "TRANSPORT_SERIAL_UNAVAILABLE",
+  "TRANSPORT_HID_UNAVAILABLE",
 ]);
+
 export class TransportError extends Error {
   constructor(code, message, details = {}) {
     super(message);

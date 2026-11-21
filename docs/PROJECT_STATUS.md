@@ -1,6 +1,6 @@
 # Project Status
 
-**Last reviewed:** 2026-11-20  
+**Last reviewed:** 2026-11-21  
 **Overall phase:** Phase 2 — transport adapters in progress; application foundation, measurement model, transport base, and Device Manager integrated  
 **Application implementation:** Foundation merged; core measurement model implemented  
 **Overall health:** On track for foundational work; protocol and hardware validation remain open across several devices.
@@ -41,9 +41,9 @@ These labels are independent. For example, a driver can be *in progress* and *ex
 | Driver contract and capability model | Done | Highest | Merged via PR #14; runtime base class, descriptor validation, stable-ID registry, capability/control gate, events, mock driver, and 15 contract tests. CI passes with 30 total tests. |
 | Transport base contract and mock | Done | Highest | Merged via PR #15; runtime, mock fixture, stable errors, timeouts, serialized writes, bounded queues, and contract tests integrated. |
 | Device Manager / Measurement Engine | Done | Highest | Merged via PR #16; registries, lifecycle orchestration, measurement ingestion/cache/staleness, rollback and mock integration tests integrated. No hardware validation. |
-| Web Bluetooth LE adapter | In review | Highest | Profile-driven GATT adapter, notification byte chunks, optional writes, disconnect/cleanup, stable diagnostics, registry helper, and mock tests implemented in PR #17. Browser/platform and 121GW validation outstanding. |
-| Serial transport | Ready | High | Base contract available; concrete Web Serial adapter not started. |
-| WebHID transport | Ready | High | Base contract available; concrete WebHID adapter not started. |
+| Web Bluetooth LE adapter | Done | Highest | Initial profile-driven GATT adapter merged via PR #17; mock tests pass. Browser/platform and 121GW validation outstanding. |
+| Serial transport | In review | High | Initial profile-driven Web Serial adapter in PR #18; chooser filters, stream lifecycle, arbitrary byte chunks, writes, cleanup, and mock tests. Browser/OS validation outstanding. |
+| WebHID transport | In review | High | Initial profile-driven WebHID adapter in PR #18; USB/usage filters, report-ID-preserving chunks, writes, cleanup, and mock tests. CP2110 report mapping and hardware validation outstanding. |
 | MQTT / WebSocket / REST | Backlog | Medium | Planned integrations. |
 | Dashboard / charting | Backlog | High | Depends on universal measurement model. |
 | Logging / IndexedDB / CSV | Backlog | High | Depends on stable measurement model. |
@@ -79,15 +79,16 @@ No application drivers have been implemented or hardware-validated yet. The entr
 - [Device Driver Contract](DRIVER_CONTRACT.md)
 - [Transport Adapter Contract](TRANSPORT_CONTRACT.md)
 - [Device Manager and Measurement Engine](DEVICE_MANAGER_AND_ENGINE.md)
+- [Web Serial and WebHID Runtime API](../src/core/WEB_SERIAL_HID_API.md)
 - [Test Strategy](TEST_STRATEGY.md)
 
 These v1 technical contracts are the reviewed implementation baseline. Runtime implementation is tracked separately.
 
 ## Current priorities
 
-1. Complete review of the initial Web Bluetooth LE adapter and validate it in a real browser.
-2. Implement Web Serial and WebHID transport foundations.
-3. Begin device drivers incrementally; research unknown protocol fields in parallel.
+1. Complete review of the initial Web Serial and WebHID adapters; validate browser/platform behavior.
+2. Begin device drivers incrementally; research unknown protocol fields in parallel.
+3. Capture real device data and convert tentative protocol assumptions into verified behavior.
 5. Begin all requested drivers incrementally; research unknown protocol fields in parallel.
 6. Capture real device data and convert tentative protocol assumptions into verified behavior.
 7. Add dashboard, charting, logging, and export against the stable measurement contract.
@@ -104,8 +105,8 @@ The initial implementation work packages are tracked as issues:
 | [#5](https://github.com/Robbertjv/Universal-Multimeter/issues/5) | Driver base contract, registry, capabilities | Closed — PR #14 merged |
 | [#6](https://github.com/Robbertjv/Universal-Multimeter/issues/6) | Transport base contract and mock transport | Closed — PR #15 merged |
 | [#7](https://github.com/Robbertjv/Universal-Multimeter/issues/7) | Device Manager and Measurement Engine | Closed — PR #16 merged |
-| [#8](https://github.com/Robbertjv/Universal-Multimeter/issues/8) | Web Bluetooth LE adapter | In review — PR #17 |
-| [#9](https://github.com/Robbertjv/Universal-Multimeter/issues/9) | Web Serial and WebHID adapters | Open |
+| [#8](https://github.com/Robbertjv/Universal-Multimeter/issues/8) | Web Bluetooth LE adapter | Closed — PR #17 merged |
+| [#9](https://github.com/Robbertjv/Universal-Multimeter/issues/9) | Web Serial and WebHID adapters | In review — PR #18 |
 | [#10](https://github.com/Robbertjv/Universal-Multimeter/issues/10) | First driver wave: 121GW, Fluke 187, UT61E, UT71 | Open |
 | [#11](https://github.com/Robbertjv/Universal-Multimeter/issues/11) | Remaining driver skeletons and protocol research | Open |
 
@@ -142,3 +143,6 @@ Review clarifications:
 
 - 2026-11-21 — PR #15 (transport base) and PR #16 (Device Manager / Measurement Engine) merged into main.
 - 2026-11-21 — PR #17 adds the initial profile-driven Web Bluetooth LE adapter; review and browser/hardware validation pending.
+
+- 2026-11-21 — PR #17 merged: initial profile-driven Web Bluetooth LE adapter integrated into main. Browser/platform and physical meter validation remain outstanding.
+- 2026-11-21 — PR #18 review: initial Web Serial and WebHID adapters, chooser filter validation, cleanup hardening, and mock tests; browser/platform/hardware validation outstanding.
