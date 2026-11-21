@@ -427,3 +427,32 @@ button:disabled {
     max-width: none;
   }
 }
+
+
+.controls-panel {
+  margin-top: 28px;
+  padding: 28px;
+  border: 1px solid #2c3945;
+  border-radius: 16px;
+  background: #17232d;
+}
+
+.control-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 720px) {
+  .controls-panel {
+    padding: 20px;
+  }
+
+  .control-actions {
+    flex-direction: column;
+  }
+
+  .control-actions button {
+    width: 100%;
+  }
+}
