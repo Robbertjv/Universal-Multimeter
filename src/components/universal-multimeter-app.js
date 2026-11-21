@@ -7,7 +7,9 @@ template.innerHTML = `
       <div>
         <p class="eyebrow">MEETINSTRUMENTEN · UNIVERSELE INTERFACE</p>
         <h1>Universal Multimeter</h1>
-        <p class="intro">Eén werkplek voor multimeters en andere meetinstrumenten.</p>
+        <p class="intro">
+          Eén werkplek voor multimeters en andere meetinstrumenten.
+        </p>
       </div>
       <span class="connection-badge" role="status" aria-live="polite">
         <span class="status-dot" aria-hidden="true"></span>
@@ -19,25 +21,50 @@ template.innerHTML = `
         <div>
           <p class="eyebrow">INSTRUMENT</p>
           <h2 id="instrument-title">Fluke 187</h2>
-          <p class="muted">Optische IR-verbinding via Web Serial · experimenteel</p>
+          <p class="muted">
+            Optische IR-verbinding via Web Serial · experimenteel
+          </p>
         </div>
         <div class="actions">
-          <button type="button" data-action="connect">Verbind Fluke 187</button>
-          <button type="button" data-action="disconnect" class="secondary" disabled>Verbreek</button>
+          <button type="button" data-action="connect">
+            Verbind Fluke 187
+          </button>
+          <button
+            type="button"
+            data-action="disconnect"
+            class="secondary"
+            disabled
+          >
+            Verbreek
+          </button>
         </div>
       </div>
-      <p class="notice" data-role="message" role="status" aria-live="polite">Kies Verbind om in de browser een seriële poort te selecteren.</p>
+      <p class="notice" data-role="message" role="status" aria-live="polite">
+        Kies Verbind om in de browser een seriële poort te selecteren.
+      </p>
       <p class="muted" data-role="identity"></p>
     </section>
     <section class="measurement-card" aria-labelledby="measurement-title">
       <div class="section-heading">
-        <div><p class="eyebrow">LIVE METING</p><h2 id="measurement-title">Primaire uitlezing</h2></div>
-        <span class="measurement-state" data-role="measurement-state">Nog geen meting</span>
+        <div>
+          <p class="eyebrow">LIVE METING</p>
+          <h2 id="measurement-title">Primaire uitlezing</h2>
+        </div>
+        <span class="measurement-state" data-role="measurement-state">
+          Nog geen meting
+        </span>
       </div>
-      <output class="measurement-value" data-role="measurement-value">—</output>
-      <p class="muted" data-role="measurement-meta">Wacht op een meetwaarde van het instrument.</p>
+      <output class="measurement-value" data-role="measurement-value">
+        —
+      </output>
+      <p class="muted" data-role="measurement-meta">
+        Wacht op een meetwaarde van het instrument.
+      </p>
     </section>
-    <footer class="app-footer"><span>Universal Multimeter Web Interface</span><span>Fluke 187 · experimentele ondersteuning</span></footer>
+    <footer class="app-footer">
+      <span>Universal Multimeter Web Interface</span>
+      <span>Fluke 187 · experimentele ondersteuning</span>
+    </footer>
   </main>
 `;
 
@@ -50,12 +77,20 @@ function formatValue(record) {
 function describeError(error) {
   const code = error?.code ?? error?.cause?.code;
   const messages = {
-    TRANSPORT_SERIAL_UNAVAILABLE: "Web Serial is niet beschikbaar. Gebruik een ondersteunde Chromium-browser via HTTPS of localhost.",
-    TRANSPORT_PERMISSION_DENIED: "Toegang tot de seriële poort is geweigerd.",
-    TRANSPORT_DEVICE_SELECTION_CANCELLED: "Selectie van de seriële poort is geannuleerd.",
-    DEVICE_CONNECT_FAILED: "Verbinden is mislukt. Controleer de adapter en probeer opnieuw.",
+    TRANSPORT_SERIAL_UNAVAILABLE:
+      "Web Serial is niet beschikbaar. Gebruik een ondersteunde Chromium-browser via HTTPS of localhost.",
+    TRANSPORT_PERMISSION_DENIED:
+      "Toegang tot de seriële poort is geweigerd.",
+    TRANSPORT_DEVICE_SELECTION_CANCELLED:
+      "Selectie van de seriële poort is geannuleerd.",
+    DEVICE_CONNECT_FAILED:
+      "Verbinden is mislukt. Controleer de adapter en probeer opnieuw.",
   };
-  return messages[code] ?? error?.message ?? "Er is een onbekende verbindingsfout opgetreden.";
+  return (
+    messages[code] ??
+    error?.message ??
+    "Er is een onbekende verbindingsfout opgetreden."
+  );
 }
 
 export class UniversalMultimeterApp extends HTMLElement {
@@ -74,40 +109,73 @@ export class UniversalMultimeterApp extends HTMLElement {
     this._connectButton = this.querySelector('[data-action="connect"]');
     this._disconnectButton = this.querySelector('[data-action="disconnect"]');
     this._message = this.querySelector('[data-role="message"]');
-    this._connectionLabel = this.querySelector('[data-role="connection-label"]');
-    this._measurementValue = this.querySelector('[data-role="measurement-value"]');
-    this._measurementState = this.querySelector('[data-role="measurement-state"]');
-    this._measurementMeta = this.querySelector('[data-role="measurement-meta"]');
+    this._connectionLabel = this.querySelector(
+      '[data-role="connection-label"]',
+    );
+    this._measurementValue = this.querySelector(
+      '[data-role="measurement-value"]',
+    );
+    this._measurementState = this.querySelector(
+      '[data-role="measurement-state"]',
+    );
+    this._measurementMeta = this.querySelector(
+      '[data-role="measurement-meta"]',
+    );
     this._identity = this.querySelector('[data-role="identity"]');
-    this._connectButton.addEventListener("click", () => void this._connect());
-    this._disconnectButton.addEventListener("click", () => void this._disconnect());
+    this._connectButton.addEventListener("click", () =>
+      void this._connect(),
+    );
+    this._disconnectButton.addEventListener("click", () =>
+      void this._disconnect(),
+    );
 
     this._runtime = createFluke187Runtime();
     const { deviceManager, measurementEngine } = this._runtime;
     this._unsubscribers.push(
-      deviceManager.on("device-state", (event) => this._renderDeviceState(event.state)),
-      deviceManager.on("device-error", (event) => this._setMessage(describeError(event.error), true)),
+      deviceManager.on("device-state", (event) =>
+        this._renderDeviceState(event.state),
+      ),
+      deviceManager.on("device-error", (event) =>
+        this._setMessage(describeError(event.error), true),
+      ),
       deviceManager.on("device-identification", (event) => {
-        this._identity.textContent = event.identification?.reported ?? "Fluke 187";
+        this._identity.textContent =
+          event.identification?.reported ?? "Fluke 187";
       }),
-      deviceManager.on("device-warning", (event) => this._setMessage(`Instrumentwaarschuwing: ${event.warning?.code ?? "onbekend"}`, true)),
+      deviceManager.on("device-warning", (event) =>
+        this._setMessage(
+          `Instrumentwaarschuwing: ${event.warning?.code ?? "onbekend"}`,
+          true,
+        ),
+      ),
       deviceManager.on("device-disconnected", () => {
         this._deviceId = null;
         this._renderDeviceState("disconnected");
       }),
     );
     this._measurementSubscription = measurementEngine.subscribe((event) => {
-      for (const record of event.measurements ?? []) this._renderMeasurement(record);
+      for (const record of event.measurements ?? []) {
+        this._renderMeasurement(record);
+      }
     });
   }
 
   disconnectedCallback() {
-    for (const unsubscribe of this._unsubscribers.splice(0)) unsubscribe();
+    for (const unsubscribe of this._unsubscribers.splice(0)) {
+      unsubscribe();
+    }
     if (this._measurementSubscription !== null) {
-      this._runtime?.measurementEngine.unsubscribe(this._measurementSubscription);
+      this._runtime?.measurementEngine.unsubscribe(
+        this._measurementSubscription,
+      );
       this._measurementSubscription = null;
     }
-    if (this._deviceId) void this._runtime?.deviceManager.disconnect(this._deviceId, "view-removed");
+    if (this._deviceId) {
+      void this._runtime?.deviceManager.disconnect(
+        this._deviceId,
+        "view-removed",
+      );
+    }
   }
 
   _setMessage(message, isError = false) {
@@ -117,9 +185,12 @@ export class UniversalMultimeterApp extends HTMLElement {
 
   _renderDeviceState(state) {
     const labels = {
-      connecting: "Verbinden…", initializing: "Instrument initialiseren…",
-      connected: "Fluke 187 verbonden", disconnecting: "Verbinding verbreken…",
-      disconnected: "Geen instrument verbonden", error: "Verbindingsfout",
+      connecting: "Verbinden…",
+      initializing: "Instrument initialiseren…",
+      connected: "Fluke 187 verbonden",
+      disconnecting: "Verbinding verbreken…",
+      disconnected: "Geen instrument verbonden",
+      error: "Verbindingsfout",
     };
     this._connectionLabel.textContent = labels[state] ?? state;
     const connected = state === "connected";
@@ -129,8 +200,12 @@ export class UniversalMultimeterApp extends HTMLElement {
 
   _renderMeasurement(record) {
     this._measurementValue.textContent = formatValue(record);
-    this._measurementState.textContent = record.state === "overload"
-      ? "Overbelasting" : record.quality === "stale" ? "Verouderd" : record.state;
+    this._measurementState.textContent =
+      record.state === "overload"
+        ? "Overbelasting"
+        : record.quality === "stale"
+          ? "Verouderd"
+          : record.state;
     this._measurementMeta.textContent = `Kanaal: ${record.channelId} · ontvangen: ${new Date(record.receivedAt).toLocaleTimeString()}`;
   }
 
@@ -138,19 +213,28 @@ export class UniversalMultimeterApp extends HTMLElement {
     if (this._busy || this._deviceId) return;
     this._busy = true;
     this._renderDeviceState("connecting");
-    this._setMessage("Selecteer de seriële poort van de Fluke IR-adapter in de browser…");
+    this._setMessage(
+      "Selecteer de seriële poort van de Fluke IR-adapter in de browser…",
+    );
     try {
       // Called directly from the user's click gesture for Web Serial permission.
-      const device = await this._runtime.deviceManager.connect("fluke.187.ir-serial");
+      const device = await this._runtime.deviceManager.connect(
+        "fluke.187.ir-serial",
+      );
       this._deviceId = device.deviceId;
-      this._setMessage("Verbonden. De driver vraagt nu periodiek de actuele meting op.");
-      this._identity.textContent = "Fluke 187 · 9600 baud · 8N1 · alleen-lezen ID/QM-commando's";
+      this._setMessage(
+        "Verbonden. De driver vraagt nu periodiek de actuele meting op.",
+      );
+      this._identity.textContent =
+        "Fluke 187 · 9600 baud · 8N1 · alleen-lezen ID/QM-commando's";
     } catch (error) {
       this._setMessage(describeError(error), true);
       this._renderDeviceState("disconnected");
     } finally {
       this._busy = false;
-      this._renderDeviceState(this._deviceId ? "connected" : "disconnected");
+      this._renderDeviceState(
+        this._deviceId ? "connected" : "disconnected",
+      );
     }
   }
 
@@ -165,12 +249,15 @@ export class UniversalMultimeterApp extends HTMLElement {
       this._identity.textContent = "";
       this._measurementValue.textContent = "—";
       this._measurementState.textContent = "Geen verbinding";
-      this._measurementMeta.textContent = "Wacht op een meetwaarde van het instrument.";
+      this._measurementMeta.textContent =
+        "Wacht op een meetwaarde van het instrument.";
     } catch (error) {
       this._setMessage(describeError(error), true);
     } finally {
       this._busy = false;
-      this._renderDeviceState(this._deviceId ? "connected" : "disconnected");
+      this._renderDeviceState(
+        this._deviceId ? "connected" : "disconnected",
+      );
     }
   }
 }
