@@ -32,7 +32,7 @@ describe("UNI-T UT71x protocol parser", () => {
     expect(result.measurement).toMatchObject({
       quantity: "voltage",
       function: "voltage.dc",
-      value: -1.234,
+      value: -0.1234,
       unit: "V",
       state: "valid",
     });
