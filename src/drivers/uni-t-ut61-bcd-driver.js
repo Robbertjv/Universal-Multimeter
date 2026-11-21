@@ -167,7 +167,7 @@ export function parseFs9922Frame(input) {
 
   const digits = String.fromCharCode(...frame.subarray(1, 5));
   const overload = digits === "?0:?";
-  if (!overload && !/^\\d{4}$/.test(digits)) {
+  if (!overload && !/^\d{4}$/.test(digits)) {
     return invalid("FS9922_DIGITS_INVALID");
   }
   const decimalExponent = DECIMAL_EXPONENTS.get(
