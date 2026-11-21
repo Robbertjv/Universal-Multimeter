@@ -1,148 +1,57 @@
 # Project Status
 
 **Last reviewed:** 2026-11-21  
-**Overall phase:** Phase 3 — first instrument drivers in progress; application foundation and initial browser transport adapters integrated  
-**Application implementation:** Foundation merged; core measurement model implemented  
-**Overall health:** On track for foundational work; protocol and hardware validation remain open across several devices.
+**Source of truth:** [Development baseline](DEVELOPMENT_BASELINE_2026-11-21.md)  
+**Overall phase:** Project baseline frozen; delta analysis and backlog normalization next  
+**Main implementation:** Shared architecture and browser transport foundations, plus experimental EEVblog 121GW and Fluke 187 drivers  
+**Product state:** Not yet a complete live multimeter application  
+**Hardware validation:** Deferred / outstanding; no physical instrument validation is claimed
 
-This page is the current project dashboard. Update it when meaningful work is completed, priorities change, or a dependency becomes blocked.
+This page is a concise dashboard. The baseline document records the exact distinction between merged `main`, open pull requests, open issues, synthetic evidence and deferred hardware work. Update this page and the baseline when the repository state changes materially.
 
-## Status vocabulary
+## Current state in one view
 
-### Work status
-- **Backlog** — not yet scheduled.
-- **Ready** — can be started.
-- **In progress** — active work.
-- **Blocked** — an external dependency currently prevents progress; explain it.
-- **In review** — awaiting review.
-- **Testing** — validation underway.
-- **Done** — acceptance criteria met.
-- **Deferred** — intentionally postponed.
-
-### Driver maturity
-- **Not started** — no driver implementation yet.
-- **Scaffold planned** — driver is in scope; skeleton not yet implemented.
-- **Experimental** — implementation exists but is not validated sufficiently.
-- **Partially supported** — a defined subset works; limitations are documented.
-- **Fully supported** — documented acceptance criteria pass on real hardware and target platform combinations.
-- **Research needed** — protocol or interface investigation is still needed. This does not prevent creating a driver skeleton or implementing known portions.
-
-These labels are independent. For example, a driver can be *in progress* and *experimental* at the same time.
-
-## Project work packages
-
-| Work package | Status | Priority | Notes |
-|---|---|---:|---|
-| Project specification and scope | Done | High | Initial scope and architecture documented. |
-| Device protocol research | In progress | High | Consolidated reference exists; several models need captures and clarification. |
-| Workflow and roadmap | Done | High | Defined in repository. |
-| Application skeleton and tooling | Done | Highest | Vite entry point, Web Component shell, Vitest smoke test, ESLint, Prettier, and CI added; GitHub Actions lint, format, test, and production build checks pass on PR #12. |
-| Universal measurement model | Done | Highest | Merged via PR #13; core model, validation, constants, unit metadata, API documentation; 15 tests pass with lint, formatting, and production build. |
-| Driver contract and capability model | Done | Highest | Merged via PR #14; runtime base class, descriptor validation, stable-ID registry, capability/control gate, events, mock driver, and 15 contract tests. CI passes with 30 total tests. |
-| Transport base contract and mock | Done | Highest | Merged via PR #15; runtime, mock fixture, stable errors, timeouts, serialized writes, bounded queues, and contract tests integrated. |
-| Device Manager / Measurement Engine | Done | Highest | Merged via PR #16; registries, lifecycle orchestration, measurement ingestion/cache/staleness, rollback and mock integration tests integrated. No hardware validation. |
-| Web Bluetooth LE adapter | Done | Highest | Initial profile-driven GATT adapter merged via PR #17; mock tests pass. Browser/platform and 121GW validation outstanding. |
-| Serial transport | Done | High | Initial profile-driven Web Serial adapter merged via PR #18; chooser filters, stream lifecycle, arbitrary byte chunks, writes, cleanup, and mock tests. Browser/OS validation outstanding. |
-| WebHID transport | Done | High | Initial profile-driven WebHID adapter merged via PR #18; USB/usage filters, report-ID-preserving chunks, writes, cleanup, and mock tests. CP2110 report mapping and hardware validation outstanding. |
-| MQTT / WebSocket / REST | Backlog | Medium | Planned integrations. |
-| Dashboard / charting | Backlog | High | Depends on universal measurement model. |
-| Logging / IndexedDB / CSV | Backlog | High | Depends on stable measurement model. |
-| Cross-platform validation | Backlog | High | Windows, Android, Ubuntu/Linux; API support differs. |
-| PWA and optional backend | Backlog | Medium | Later phases. |
-| MCP integration | Backlog | Medium | Permission-controlled integration with a running instance. |
-
-## Driver status register
-
-Initial experimental EEVblog 121GW and Fluke 187 drivers are implemented; neither has been validated against physical hardware. The entries below distinguish implementation progress from support maturity.
-
-| Instrument | Work status | Driver maturity | Next useful action |
-|---|---|---|---|
-| EEVblog 121GW | Done | Experimental | Initial BLE V2 parser, primary-display decoder, profile and synthetic tests merged via PR #19; hardware validation tracked in #20. |
-| Fluke 187 | In progress | Experimental | Read-only ID/QM ASCII driver, bounded CR/LF parser, 9600 8N1 profile and synthetic tests in PR for #21; physical adapter/meter validation outstanding. |
-| Voltcraft VC850 | Ready | Research needed | Create driver skeleton; obtain raw captures and establish packet format. |
-| Voltcraft VC870 | Ready | Scaffold planned | Implement 23-byte parser; validate frame mapping. |
-| Voltcraft VC880 | Ready | Scaffold planned | Implement message types, checksum, and live-frame parser. |
-| Voltcraft VC890 | Ready | Scaffold planned | Implement separate protocol and 66-byte frame parser. |
-| Voltcraft GDM-704 | Ready | Scaffold planned | Implement WENS98A frame parser and validate field mapping. |
-| UNI-T UT61B | Ready | Research needed | Establish exact variant/chip/cable protocol. |
-| UNI-T UT61C | Ready | Research needed | Establish exact variant/chip/cable protocol. |
-| UNI-T UT61D | Ready | Research needed | Establish exact variant/chip/cable protocol. |
-| UNI-T UT61E | Ready | Scaffold planned | Implement ES51922-family decoder; validate framing and cable variants. |
-| UNI-T UT61E+ and later variants | Ready | Research needed | Identify exact suffix variants before sharing decoder logic. |
-| UNI-T UT71 series | Ready | Scaffold planned | Implement 11-byte parser; test 7O1/8N1 discrepancy on hardware. |
-| UNI-T UT612 | Ready | Research needed | Implement known frame parser; add WebHID/CP2110 transport path. |
-
-## Architecture documents
-
-- [System Architecture](ARCHITECTURE.md)
-- [Universal Measurement Data Model](MEASUREMENT_DATA_MODEL.md)
-- [Device Driver Contract](DRIVER_CONTRACT.md)
-- [Transport Adapter Contract](TRANSPORT_CONTRACT.md)
-- [Device Manager and Measurement Engine](DEVICE_MANAGER_AND_ENGINE.md)
-- [Web Serial and WebHID Runtime API](../src/core/WEB_SERIAL_HID_API.md)
-- [Test Strategy](TEST_STRATEGY.md)
-
-These v1 technical contracts are the reviewed implementation baseline. Runtime implementation is tracked separately.
-
-## Current priorities
-
-1. Complete physical validation of the EEVblog 121GW and Fluke 187 drivers; capture real meter data before raising maturity.
-2. Add parser fixtures and tests for partial, concatenated, malformed, and unknown frames.
-3. Record protocol assumptions and evidence; obtain real captures and hardware validation without blocking known-field implementation.
-4. Keep driver maturity marked experimental/partial until actual hardware validation is complete.
-5. Continue remaining driver skeletons and protocol research under issue #11.
-
-## GitHub implementation backlog
-
-The initial implementation work packages are tracked as issues:
-
-| Issue | Work package | Status |
+| Area | State in `main` | Important limitation |
 |---|---|---|
-| [#2](https://github.com/Robbertjv/Universal-Multimeter/issues/2) | Review and ratify v1 architecture/data/driver/transport contracts | Closed — completed |
-| [#3](https://github.com/Robbertjv/Universal-Multimeter/issues/3) | Application skeleton, JavaScript tooling, CI | Closed — PR #12 merged |
-| [#4](https://github.com/Robbertjv/Universal-Multimeter/issues/4) | Universal measurement model and validation | Closed — PR #13 merged |
-| [#5](https://github.com/Robbertjv/Universal-Multimeter/issues/5) | Driver base contract, registry, capabilities | Closed — PR #14 merged |
-| [#6](https://github.com/Robbertjv/Universal-Multimeter/issues/6) | Transport base contract and mock transport | Closed — PR #15 merged |
-| [#7](https://github.com/Robbertjv/Universal-Multimeter/issues/7) | Device Manager and Measurement Engine | Closed — PR #16 merged |
-| [#8](https://github.com/Robbertjv/Universal-Multimeter/issues/8) | Web Bluetooth LE adapter | Closed — PR #17 merged |
-| [#9](https://github.com/Robbertjv/Universal-Multimeter/issues/9) | Web Serial and WebHID adapters | Closed — PR #18 merged |
-| [#10](https://github.com/Robbertjv/Universal-Multimeter/issues/10) | First driver wave: 121GW, Fluke 187, UT61E, UT71 | In progress |
-| [#11](https://github.com/Robbertjv/Universal-Multimeter/issues/11) | Remaining driver skeletons and protocol research | Open |
+| Vite app shell and CI | Implemented | UI is still a placeholder. |
+| Universal measurement model | Implemented | Product workflows/UI consuming it are incomplete. |
+| Driver contract and registry | Implemented | Contracts do not imply complete instrument coverage. |
+| Transport contract and mock | Implemented | Real device paths are not hardware-validated. |
+| Device Manager / Measurement Engine | Implemented | App shell does not yet compose them in `main`. |
+| Web Bluetooth LE | Initial adapter implemented | Browser/platform and instrument validation outstanding. |
+| Web Serial | Initial adapter implemented | Browser/platform and cable validation outstanding. |
+| WebHID | Initial adapter implemented | CP2110/UT612 mapping and hardware validation outstanding. |
+| EEVblog 121GW | Experimental driver merged (#19) | Real GATT/packet/LCD validation outstanding (#20). |
+| Fluke 187 | Experimental driver merged (#24) | Parser correction and app integration are open PRs (#26, #27); physical validation deferred (#25). |
+| Dashboard, graphs, logging, export | Not established as complete in `main` | Must be assessed against the product specification. |
+| Additional meter drivers | Backlog | Issues #11, #22 and #23 track parts of this scope. |
 
-GitHub Issues are the execution-level task tracker. This document remains the project-level summary; update it when issue status or priorities materially change.
+## Open pull requests
 
-## Issue #2 review outcome
+- [PR #1](https://github.com/Robbertjv/Universal-Multimeter/pull/1) — older EEVblog 121GW web application; needs a scope/architecture comparison.
+- [PR #26](https://github.com/Robbertjv/Universal-Multimeter/pull/26) — Fluke 187 parser correction; latest recorded CI run succeeded; fixtures are synthetic/specification-derived.
+- [PR #27](https://github.com/Robbertjv/Universal-Multimeter/pull/27) — Fluke 187 app integration; latest recorded CI run failed at Prettier; not merged.
 
-**Completed 2026-11-20:** The six v1 technical contract documents have been reviewed and accepted as the implementation baseline. This marks documentation readiness only; it does not mean application code has been implemented.
+## Open issue groups
 
-Review clarifications:
-- Quantity, function, and unit identifier conventions are explicit.
-- Measurement state and data quality are distinct; stale readings retain their last instrument state/value.
-- Browser transport and optional native/helper bridge responsibilities are explicit, including Bluetooth Classic and conventional MQTT-TCP.
-- Device Manager owns driver/transport lifetime; drivers own parser state and their subscriptions.
-- Unknown protocol fields remain explicit unknowns and do not block driver scaffolding or known-field implementation.
+- Product/driver umbrella: [#10](https://github.com/Robbertjv/Universal-Multimeter/issues/10), [#11](https://github.com/Robbertjv/Universal-Multimeter/issues/11)
+- Hardware evidence: [#20](https://github.com/Robbertjv/Universal-Multimeter/issues/20), [#25](https://github.com/Robbertjv/Universal-Multimeter/issues/25)
+- Driver implementation: [#22](https://github.com/Robbertjv/Universal-Multimeter/issues/22), [#23](https://github.com/Robbertjv/Universal-Multimeter/issues/23)
 
-## Known project-wide risks
+Issue #21 (Fluke 187 driver implementation) is closed by merged PR #24.
 
-- Protocol descriptions are not equivalent to validation on the project's own hardware.
-- Cable variants may expose serial, USB HID, or vendor-specific bridges and may require different transports.
-- Web Bluetooth, Web Serial, and WebHID availability and permission behavior vary by browser and operating system.
-- Some protocols have incomplete or reverse-engineered field mappings.
-- Long-running BLE/serial streams may drop, fragment, or delay data; parsers must handle this.
-- Device controls must be opt-in and only implemented when command semantics are established.
+## Evidence and maturity
 
-## Update log
+- EEVblog 121GW and Fluke 187 drivers remain experimental.
+- Synthetic fixtures and mock transports are not physical device evidence.
+- No physical meter, adapter, browser/OS combination or live connection is claimed as tested.
+- Fluke 187 hardware validation is deliberately deferred until the first software implementation is complete.
 
-- 2026-11-20 — Added repository workflow, implementation roadmap, and initial project/driver status register.\n- 2026-11-20 — PR #12 merged: application foundation and CI integrated into main.\n- 2026-11-20 — PR #13 merged: universal measurement model, validation, unit registry, API documentation, and 15 passing tests integrated into main.
-- 2026-11-20 — PR #14 merged: driver runtime, registry, capability/control gate, mock driver, and 15 driver contract tests integrated into main; CI passes with 30 tests total.
-- 2026-11-20 — Started issue #6 on feature/issue-6-transport-contract: transport runtime, mock transport, stable errors, and reusable transport/driver integration tests; awaiting review.
-- 2026-11-20 — Started issue #3 on feature/issue-3-app-foundation: Vite app shell, Web Component, Vitest smoke test, ESLint/Prettier, and GitHub Actions. GitHub Actions quality gate passed on PR #12; awaiting review/merge.
+## Immediate next steps
 
-- 2026-11-20 — Started issue #7 on `feature/issue-7-device-manager`: implemented profile/transport registries, Device Manager connect/rollback/disconnect orchestration, Measurement Engine ingestion/cache/staleness, and mock integration tests; PR #16 opened for review. CI passed (ESLint, Prettier, 54 Vitest tests, Vite production build).
-
-- 2026-11-21 — PR #15 (transport base) and PR #16 (Device Manager / Measurement Engine) merged into main.
-- 2026-11-21 — PR #17 adds the initial profile-driven Web Bluetooth LE adapter; review and browser/hardware validation pending.
-
-- 2026-11-21 — PR #17 merged: initial profile-driven Web Bluetooth LE adapter integrated into main. Browser/platform and physical meter validation remain outstanding.
-- 2026-11-21 — PR #18 merged: initial Web Serial and WebHID adapters, chooser filter validation, cleanup hardening, and mock tests integrated into main; browser/platform/hardware validation outstanding.
-- 2026-11-21 — Project status advanced to Phase 3: first instrument driver implementation under issue #10.
+1. Review the product specification and architecture against `main`.
+2. Build a complete delta register.
+3. Map each actionable delta to existing or new GitHub issues without duplication.
+4. Add priorities, dependencies and testable acceptance criteria.
+5. Rebuild the roadmap from that issue set.
+6. Only then resume feature implementation.
