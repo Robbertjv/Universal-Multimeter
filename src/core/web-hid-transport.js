@@ -34,7 +34,18 @@ function validate(profile) {
             (!Number.isInteger(filter.productId) ||
               filter.productId < 0 ||
               filter.productId > 65535)) ||
-          (filter.vendorId === undefined && filter.productId === undefined),
+          (filter.usagePage !== undefined &&
+            (!Number.isInteger(filter.usagePage) ||
+              filter.usagePage < 0 ||
+              filter.usagePage > 65535)) ||
+          (filter.usage !== undefined &&
+            (!Number.isInteger(filter.usage) ||
+              filter.usage < 0 ||
+              filter.usage > 65535)) ||
+          (filter.vendorId === undefined &&
+            filter.productId === undefined &&
+            filter.usagePage === undefined &&
+            filter.usage === undefined),
       ))
   ) {
     throw new TransportError(
