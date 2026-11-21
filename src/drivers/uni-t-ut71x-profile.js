@@ -20,7 +20,8 @@ export const UNI_T_UT71X_DEVICE_PROFILES = Object.freeze(
       evidence: {
         interface: "UT71x 11-byte serial protocol",
         serialSettings: "2400 baud, 7O1",
-        protocol: "5 ASCII display digits, range, function, two status bytes, CRLF",
+        protocol:
+          "5 ASCII display digits, range, function, two status bytes, CRLF",
         hardwareValidated: false,
       },
     }),
