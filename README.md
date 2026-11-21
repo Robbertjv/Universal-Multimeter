@@ -55,7 +55,8 @@ The repository also maintains the development process and current project state:
 
 - [Development Workflow](docs/DEVELOPMENT_WORKFLOW.md) — lifecycle, driver workflow, testing, and contribution conventions.
 - [Roadmap](docs/ROADMAP.md) — implementation phases, dependencies, and priorities.
-- [Project Status](docs/PROJECT_STATUS.md) — current work packages and per-driver maturity.
+- [Project Status](docs/PROJECT_STATUS.md) — concise current dashboard.
+- [Development Baseline — 2026-11-21](docs/DEVELOPMENT_BASELINE_2026-11-21.md) — factual snapshot of merged code, open PRs/issues, validation evidence and deferred work.
 - [Architecture Decisions](docs/DECISIONS.md) — recorded decisions and their rationale.
 - [System Architecture](docs/ARCHITECTURE.md) — components, boundaries, data flow, errors, and security.
 - [Measurement Data Model](docs/MEASUREMENT_DATA_MODEL.md) — normalized reading and device schemas.
