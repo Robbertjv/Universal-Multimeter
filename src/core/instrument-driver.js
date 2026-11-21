@@ -303,17 +303,20 @@ export class InstrumentDriver {
           this._pendingTransportBytes + byteLength >
             this._maxPendingTransportBytes
         ) {
-          this.publish("error", new DriverError(
-            "DRIVER_RECEIVE_QUEUE_FULL",
-            "Driver receive queue is full; incoming transport data was dropped.",
-            {
-              pendingChunks: this._pendingTransportChunks,
-              pendingBytes: this._pendingTransportBytes,
-              incomingBytes: byteLength,
-              maxPendingChunks: this._maxPendingTransportChunks,
-              maxPendingBytes: this._maxPendingTransportBytes,
-            },
-          ));
+          this.publish(
+            "error",
+            new DriverError(
+              "DRIVER_RECEIVE_QUEUE_FULL",
+              "Driver receive queue is full; incoming transport data was dropped.",
+              {
+                pendingChunks: this._pendingTransportChunks,
+                pendingBytes: this._pendingTransportBytes,
+                incomingBytes: byteLength,
+                maxPendingChunks: this._maxPendingTransportChunks,
+                maxPendingBytes: this._maxPendingTransportBytes,
+              },
+            ),
+          );
           return;
         }
         this._pendingTransportChunks += 1;
