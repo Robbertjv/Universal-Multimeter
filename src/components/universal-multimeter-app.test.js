@@ -28,6 +28,16 @@ function createRuntime() {
     connect: vi.fn(async () => ({ deviceId: "demo-1" })),
     disconnect: vi.fn(async () => true),
     shutdown: vi.fn(async () => {}),
+    startLogging: vi.fn((deviceId) => ({
+      sessionId: "session-1",
+      deviceId,
+    })),
+    stopLogging: vi.fn((deviceId) => ({
+      sessionId: "session-1",
+      deviceId,
+      stoppedAt: new Date().toISOString(),
+    })),
+    exportHistoryCsv: vi.fn(async () => "receivedAt,value\\r\\nnow,1"),
     emit(type, event) {
       for (const listener of listeners.get(type) ?? [])
         listener({ type, ...event });
@@ -168,6 +178,35 @@ describe("UniversalMultimeterApp", () => {
     });
 
     expect(app.querySelector(".reading-value").textContent).toBe("12");
+    app.remove();
+  });
+
+  it("starts and stops local logging for the active instrument", () => {
+    const runtime = createRuntime();
+    const app = document.createElement(tag);
+    app.setRuntime(runtime);
+    document.body.append(app);
+    runtime.emit("device-connected", {
+      device: {
+        deviceId: "meter-log",
+        manufacturer: "Demo",
+        model: "Meter",
+        state: "connected",
+      },
+    });
+
+    expect(app.querySelector("[data-log-start]").disabled).toBe(false);
+    app.querySelector("[data-log-start]").click();
+    expect(runtime.startLogging).toHaveBeenCalledWith("meter-log");
+    expect(app.querySelector("[data-logging-status]").textContent).toContain(
+      "Logging actief",
+    );
+    app.querySelector("[data-log-stop]").click();
+    expect(runtime.stopLogging).toHaveBeenCalledWith("meter-log");
+    expect(app.querySelector("[data-log-export]").disabled).toBe(false);
+    expect(app.querySelector("[data-logging-status]").textContent).toContain(
+      "Logging gestopt",
+    );
     app.remove();
   });
 
