@@ -70,8 +70,8 @@ Drivers are developed in increments. The order below is a suggested sequence, no
 
 ### First implementation wave
 
-- [ ] EEVblog 121GW — initial experimental BLE V2 parser/primary-display decoder in [PR #19](https://github.com/Robbertjv/Universal-Multimeter/pull/19); hardware validation tracked in [#20](https://github.com/Robbertjv/Universal-Multimeter/issues/20).
-- [ ] Fluke 187 — optical serial protocol and command/response handling ([#21](https://github.com/Robbertjv/Universal-Multimeter/issues/21)).
+- [x] EEVblog 121GW — initial experimental BLE V2 parser/primary-display decoder merged in [PR #19](https://github.com/Robbertjv/Universal-Multimeter/pull/19); hardware validation tracked in [#20](https://github.com/Robbertjv/Universal-Multimeter/issues/20).
+- [ ] Fluke 187 — experimental read-only ID/QM serial driver in development for [#21](https://github.com/Robbertjv/Universal-Multimeter/issues/21); physical validation remains outstanding.
 - [ ] UNI-T UT61E — ES51922-family serial frame decoder and cable/transport variants ([#22](https://github.com/Robbertjv/Universal-Multimeter/issues/22)).
 - [ ] UNI-T UT71 series — 11-byte frame decoder; verify serial framing discrepancy on hardware ([#23](https://github.com/Robbertjv/Universal-Multimeter/issues/23)).
 
