@@ -465,18 +465,35 @@ export class UniversalMultimeterApp extends HTMLElement {
       return;
     }
     value.textContent =
-      measurement.value === null ? "OL" : String(measurement.value);
+      measurement.state === "overload"
+        ? "OL"
+        : measurement.state === "valid"
+          ? String(measurement.value)
+          : "—";
     unit.textContent = measurement.unit ?? "";
+    const stateLabels = {
+      overload: "Buiten bereik",
+      "open-circuit": "Open kring",
+      invalid: "Ongeldige meting",
+      "warming-up": "Opwarmen",
+      disconnected: "Niet verbonden",
+      unavailable: "Niet beschikbaar",
+      unknown: "Status onbekend",
+    };
     quality.textContent =
       measurement.quality === "stale"
         ? "Verouderde meting"
-        : measurement.state === "overload"
-          ? "Buiten bereik"
-          : (measurement.quality ?? "Status onbekend");
+        : (stateLabels[measurement.state] ??
+          (measurement.quality ?? "Status onbekend"));
+    const metadata = measurement.metadata ?? {};
     detail.textContent = [
       measurement.function,
       measurement.quantity,
       measurement.receivedAt,
+      metadata.batteryLow === true ? "Batterij laag" : null,
+      metadata.hold === true ? "HOLD" : null,
+      metadata.relative === true ? "REL" : null,
+      metadata.peak ? `PEAK ${metadata.peak.toUpperCase()}` : null,
     ]
       .filter(Boolean)
       .join(" · ");
