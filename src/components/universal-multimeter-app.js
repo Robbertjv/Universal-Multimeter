@@ -87,6 +87,9 @@ export class UniversalMultimeterApp extends HTMLElement {
     this._unsubscribers.push(
       deviceManager.on("device-state", (event) => this._renderDeviceState(event.state)),
       deviceManager.on("device-error", (event) => this._setMessage(describeError(event.error), true)),
+      deviceManager.on("device-identification", (event) => {
+        this._identity.textContent = event.identification?.reported ?? "Fluke 187";
+      }),
       deviceManager.on("device-warning", (event) => this._setMessage(`Instrumentwaarschuwing: ${event.warning?.code ?? "onbekend"}`, true)),
       deviceManager.on("device-disconnected", () => {
         this._deviceId = null;
