@@ -144,6 +144,27 @@ describe("WebHIDTransport", () => {
     await transport.dispose();
   });
 
+  it("closes a partially opened device when setup fails", async () => {
+    const f = fixture();
+    f.device.open = vi.fn(async () => {
+      f.device.opened = true;
+      throw new Error("post-open setup failure");
+    });
+    const removeListener = vi.spyOn(f.hid, "removeEventListener");
+    const transport = new WebHIDTransport({ profile, hid: f.hid });
+
+    await expect(transport.connect()).rejects.toMatchObject({
+      code: "TRANSPORT_CONNECT_FAILED",
+    });
+    expect(f.device.close).toHaveBeenCalledTimes(1);
+    expect(f.device.opened).toBe(false);
+    expect(removeListener).toHaveBeenCalledWith(
+      "inputreport",
+      expect.any(Function),
+    );
+    await transport.dispose();
+  });
+
   it("validates report ID before writing", async () => {
     const f = fixture();
     const transport = new WebHIDTransport({ profile, hid: f.hid });
