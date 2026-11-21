@@ -608,6 +608,23 @@ export class UniversalMultimeterApp extends HTMLElement {
           measurement.quality ??
           "Status onbekend");
     const metadata = measurement.metadata ?? {};
+    const bargraphContainer = this.querySelector("[data-bargraph-container]");
+    const bargraphMeter = this.querySelector("[data-bargraph]");
+    const bargraphText = this.querySelector("[data-bargraph-value]");
+    const hasBargraph =
+      Number.isFinite(metadata.bargraphValue) &&
+      Number.isFinite(metadata.bargraphMax) &&
+      metadata.bargraphMax > 0 &&
+      metadata.bargraphActive !== false;
+    bargraphContainer.hidden = !hasBargraph;
+    if (hasBargraph) {
+      bargraphMeter.max = metadata.bargraphMax;
+      bargraphMeter.value = Math.min(
+        metadata.bargraphMax,
+        Math.abs(metadata.bargraphValue),
+      );
+      bargraphText.textContent = `${metadata.bargraphValue < 0 ? "−" : "+"}${Math.abs(metadata.bargraphValue)} / ${metadata.bargraphMax}`;
+    }
     detail.textContent = [
       measurement.function,
       measurement.quantity,
@@ -616,6 +633,9 @@ export class UniversalMultimeterApp extends HTMLElement {
       metadata.hold === true ? "HOLD" : null,
       metadata.relative === true ? "REL" : null,
       metadata.peak ? `PEAK ${metadata.peak.toUpperCase()}` : null,
+      Number.isFinite(metadata.bargraphValue) && !hasBargraph
+        ? `Bargraph ${metadata.bargraphValue} (ruwe telling)`
+        : null,
     ]
       .filter(Boolean)
       .join(" · ");
