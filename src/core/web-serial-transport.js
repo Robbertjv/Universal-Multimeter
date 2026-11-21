@@ -19,6 +19,32 @@ function validate(profile) {
     );
   }
 
+  if (
+    config.filters !== undefined &&
+    (!Array.isArray(config.filters) ||
+      config.filters.some(
+        (filter) =>
+          !filter ||
+          typeof filter !== "object" ||
+          Array.isArray(filter) ||
+          (filter.usbVendorId !== undefined &&
+            (!Number.isInteger(filter.usbVendorId) ||
+              filter.usbVendorId < 0 ||
+              filter.usbVendorId > 65535)) ||
+          (filter.usbProductId !== undefined &&
+            (!Number.isInteger(filter.usbProductId) ||
+              filter.usbProductId < 0 ||
+              filter.usbProductId > 65535)) ||
+          (filter.usbVendorId === undefined &&
+            filter.usbProductId === undefined),
+      ))
+  ) {
+    throw new TransportError(
+      "TRANSPORT_INVALID_DESCRIPTOR",
+      "serial.filters must contain valid USB vendor or product ID filters.",
+    );
+  }
+
   const options = {
     baudRate: 9600,
     dataBits: 8,
@@ -206,11 +232,6 @@ export class WebSerialTransport extends TransportAdapter {
       } catch {
         /* best-effort cleanup */
       }
-      try {
-        reader.releaseLock();
-      } catch {
-        /* best-effort cleanup */
-      }
     }
     if (this._readTask) {
       try {
@@ -220,6 +241,12 @@ export class WebSerialTransport extends TransportAdapter {
       }
       this._readTask = null;
     }
+    if (reader) {
+      try {
+        reader.releaseLock();
+      } catch {
+        /* best-effort cleanup */
+      }
     if (writer) {
       try {
         await writer.close();
