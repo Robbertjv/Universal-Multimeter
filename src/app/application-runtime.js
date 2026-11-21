@@ -206,6 +206,9 @@ export function createApplicationRuntime({
     async getHistory(filters) {
       return getHistoryStore().query(filters);
     },
+    async listHistorySessions(filters) {
+      return getHistoryStore().listSessions(filters);
+    },
     async exportHistoryCsv(filters) {
       const records = await getHistoryStore().query(filters);
       return measurementsToCsv(records);
