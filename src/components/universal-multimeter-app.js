@@ -196,7 +196,10 @@ export class UniversalMultimeterApp extends HTMLElement {
       this._currentDeviceId ??= device.deviceId;
     }
     for (const measurement of this._runtime.getSnapshot()) {
-      this._latestMeasurements.set(measurement.deviceId, measurement);
+      this._latestMeasurements.set(
+        `${measurement.deviceId}\u0000${measurement.channelId ?? "primary"}`,
+        measurement,
+      );
     }
     this._renderAll();
   }
