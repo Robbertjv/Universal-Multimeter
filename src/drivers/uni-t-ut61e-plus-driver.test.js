@@ -77,9 +77,9 @@ describe("UNI-T UT61E+ polled protocol", () => {
     expect(current.measurement).toMatchObject({
       quantity: "current",
       function: "current.dc",
-      value: 12.34e-6,
       unit: "A",
     });
+    expect(current.measurement.value).toBeCloseTo(12.34e-6, 12);
     expect(frequency.measurement).toMatchObject({
       quantity: "frequency",
       value: 2200,
