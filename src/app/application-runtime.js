@@ -79,6 +79,9 @@ export function createApplicationRuntime({
     registerWebHIDTransport(transportRegistry, {
       hid: browserApis.hid ?? globalThis.navigator?.hid,
     });
+    registerCp2110HidTransport(transportRegistry, {
+      hid: browserApis.hid ?? globalThis.navigator?.hid,
+    });
   }
 
   if (registerBuiltInInstruments) {
