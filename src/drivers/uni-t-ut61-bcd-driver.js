@@ -2,9 +2,9 @@ import { InstrumentDriver } from "../core/instrument-driver.js";
 
 export const UNI_T_UT61_BCD_DRIVER_DESCRIPTOR = Object.freeze({
   driverId: "uni-t.ut61-bcd",
-  manufacturer: "UNI-T",
-  models: ["UT61B", "UT61C", "UT61D"],
-  protocolFamily: "fortune-fs9922-dmm3-dmm4-14-byte",
+  manufacturer: "UNI-T / Voltcraft",
+  models: ["UT61B", "UT61C", "UT61D", "VC850"],
+  protocolFamily: "fortune-fs9922-dmm4-14-byte",
   protocolVariants: ["serial-2400-8n1"],
   supportLevel: "experimental",
   capabilities: {
@@ -64,6 +64,7 @@ function parseFlags(frame) {
     minimum: (byte8 & 0x10) !== 0,
     batteryLow: (byte8 & 0x04) !== 0,
     diode: (byte9 & 0x04) !== 0,
+    adp: (byte8 & 0x01) !== 0,
     beep: (byte9 & 0x08) !== 0,
     percent: (byte9 & 0x02) !== 0,
     voltage: (byte10 & 0x80) !== 0,
@@ -103,7 +104,7 @@ function measurementMeaning(flags) {
   if (flags.percent) {
     return { quantity: "duty-cycle", function: "duty-cycle", unit: "%" };
   }
-  if (flags.diode) {
+  if (flags.diode || flags.adp) {
     return { quantity: "voltage", function: "diode", unit: "V" };
   }
   if (flags.voltage) {
@@ -145,7 +146,7 @@ function measurementMeaning(flags) {
   return null;
 }
 
-export function parseFs9922Frame(input) {
+export function parseFs9922Frame(input, { diodeUsesAdp = false } = {}) {
   const frame =
     input instanceof Uint8Array ? input : Uint8Array.from(input ?? []);
   if (
@@ -159,6 +160,7 @@ export function parseFs9922Frame(input) {
   }
 
   const flags = parseFlags(frame);
+  if (diodeUsesAdp && flags.adp) flags.diode = true;
   if (!flagsAreValid(flags)) {
     return invalid("FS9922_FLAGS_INVALID");
   }
@@ -286,7 +288,9 @@ export class UniTUt61BcdDriver extends InstrumentDriver {
     const { frames, warnings } = this._parser.push(chunk);
     for (const warning of warnings) this.publish("warning", warning);
     for (const frame of frames) {
-      const result = parseFs9922Frame(frame);
+      const result = parseFs9922Frame(frame, {
+        diodeUsesAdp: this._deviceProfile.protocolOptions?.diodeUsesAdp === true,
+      });
       if (!result.ok) {
         this.publish("warning", result.error);
         continue;
