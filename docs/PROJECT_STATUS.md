@@ -57,7 +57,7 @@ No application drivers have been implemented or hardware-validated yet. The entr
 
 | Instrument | Work status | Driver maturity | Next useful action |
 |---|---|---|---|
-| EEVblog 121GW | Ready | Scaffold planned | Define BLE service/characteristic handling and frame fixtures. |
+| EEVblog 121GW | In progress | Experimental target; scaffold next | Start the first BLE driver scaffold, define profile/descriptor identity, and establish version-aware frame fixtures. |
 | Fluke 187 | Ready | Scaffold planned | Implement serial parser and safe query/response state machine. |
 | Voltcraft VC850 | Ready | Research needed | Create driver skeleton; obtain raw captures and establish packet format. |
 | Voltcraft VC870 | Ready | Scaffold planned | Implement 23-byte parser; validate frame mapping. |
@@ -106,7 +106,7 @@ The initial implementation work packages are tracked as issues:
 | [#7](https://github.com/Robbertjv/Universal-Multimeter/issues/7) | Device Manager and Measurement Engine | Closed — PR #16 merged |
 | [#8](https://github.com/Robbertjv/Universal-Multimeter/issues/8) | Web Bluetooth LE adapter | Closed — PR #17 merged |
 | [#9](https://github.com/Robbertjv/Universal-Multimeter/issues/9) | Web Serial and WebHID adapters | Closed — PR #18 merged |
-| [#10](https://github.com/Robbertjv/Universal-Multimeter/issues/10) | First driver wave: 121GW, Fluke 187, UT61E, UT71 | Open |
+| [#10](https://github.com/Robbertjv/Universal-Multimeter/issues/10) | First driver wave: 121GW, Fluke 187, UT61E, UT71 | In progress |
 | [#11](https://github.com/Robbertjv/Universal-Multimeter/issues/11) | Remaining driver skeletons and protocol research | Open |
 
 GitHub Issues are the execution-level task tracker. This document remains the project-level summary; update it when issue status or priorities materially change.
