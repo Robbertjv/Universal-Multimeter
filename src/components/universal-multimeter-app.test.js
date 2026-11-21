@@ -174,9 +174,24 @@ describe("UniversalMultimeterApp", () => {
           state: "valid",
           receivedAt: new Date().toISOString(),
         },
+        {
+          deviceId: "meter-b",
+          channelId: "primary",
+          value: 24,
+          unit: "V",
+          quantity: "voltage",
+          function: "voltage.dc",
+          quality: "good",
+          state: "valid",
+          receivedAt: new Date().toISOString(),
+        },
       ],
     });
 
+    expect(app.querySelector(".reading-value").textContent).toBe("24");
+    const activeDevice = app.querySelector("[data-active-device]");
+    activeDevice.value = "meter-a";
+    activeDevice.dispatchEvent(new Event("change", { bubbles: true }));
     expect(app.querySelector(".reading-value").textContent).toBe("12");
     app.remove();
   });
