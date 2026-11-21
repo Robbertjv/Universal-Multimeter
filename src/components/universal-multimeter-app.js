@@ -303,7 +303,7 @@ export class UniversalMultimeterApp extends HTMLElement {
           `${event.device.manufacturer} ${event.device.model} is verbonden.`,
         );
         break;
-      case "device-disconnected":
+      case "device-disconnected": {
         const activeSession = this._activeLoggingSessions.get(event.deviceId);
         if (activeSession) {
           this._lastLoggingSessions.set(event.deviceId, activeSession);
@@ -321,6 +321,7 @@ export class UniversalMultimeterApp extends HTMLElement {
         }
         this._setMessage("Instrumentverbinding verbroken.");
         break;
+      }
       case "device-error":
       case "measurement-error":
       case "history-error":
