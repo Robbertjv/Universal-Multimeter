@@ -16,7 +16,7 @@ const CONTROL_COMMANDS = Object.freeze({
 export const UNI_T_UT61E_PLUS_DRIVER_DESCRIPTOR = Object.freeze({
   driverId: "uni-t.ut61e-plus",
   manufacturer: "UNI-T",
-  models: ["UT61E+"],
+  models: ["UT61B+", "UT61D+", "UT61E+", "UT161B", "UT161D", "UT161E"],
   protocolFamily: "uni-t-ut61-plus-19-byte-polled",
   protocolVariants: ["cp2110-hid-9600-8n1"],
   supportLevel: "experimental",
@@ -29,6 +29,10 @@ export const UNI_T_UT61E_PLUS_DRIVER_DESCRIPTOR = Object.freeze({
     "measurement.capacitance": { availability: "supported" },
     "measurement.frequency": { availability: "supported" },
     "measurement.duty-cycle": { availability: "supported" },
+    "measurement.temperature": { availability: "supported" },
+    "measurement.ncv": { availability: "supported" },
+    "measurement.hfe": { availability: "supported" },
+    "measurement.low-impedance-voltage": { availability: "supported" },
     "status.battery": { availability: "supported" },
     "status.hold": { availability: "supported" },
     "status.relative": { availability: "supported" },
@@ -138,6 +142,8 @@ const MODES = new Map([
     },
   ],
   [0x14, { quantity: "unknown", function: "unknown", unit: "1", prefix: true }],
+  [0x15, { quantity: "voltage", function: "voltage.ac", unit: "V", prefix: true, lowImpedance: true }],
+  [0x16, { quantity: "voltage", function: "voltage.ac", unit: "V", prefix: true, lowImpedance: true }],
   [
     0x18,
     {
@@ -149,6 +155,33 @@ const MODES = new Map([
   ],
   [0x19, { quantity: "voltage", function: "voltage.acdc", unit: "V" }],
 ]);
+
+const MODEL_MODES = Object.freeze({
+  "UT61B+": new Set([
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+    0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x14,
+  ]),
+  "UT61D+": new Set([
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+    0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x14, 0x15, 0x16,
+  ]),
+  "UT61E+": new Set([
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+    0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x18, 0x19,
+  ]),
+  UT161B: new Set([
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+    0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x14,
+  ]),
+  UT161D: new Set([
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+    0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x14, 0x15, 0x16,
+  ]),
+  UT161E: new Set([
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+    0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x18, 0x19,
+  ]),
+});
 
 function invalid(code, details = {}) {
   return { ok: false, error: { code, ...details } };
@@ -163,7 +196,7 @@ export function buildUt61EPlusCommand(command) {
   return Uint8Array.from([...bytes, (checksum >> 8) & 0xff, checksum & 0xff]);
 }
 
-export function parseUt61EPlusFrame(input) {
+export function parseUt61EPlusFrame(input, { model = "UT61E+" } = {}) {
   const frame =
     input instanceof Uint8Array ? input : Uint8Array.from(input ?? []);
   if (
@@ -186,7 +219,9 @@ export function parseUt61EPlusFrame(input) {
 
   const modeCode = frame[3];
   const rangeIndex = frame[4] - 0x30;
-  const mode = MODES.get(modeCode);
+  const mode = MODEL_MODES[model]?.has(modeCode)
+    ? MODES.get(modeCode)
+    : undefined;
   const rawDisplay = String.fromCharCode(...frame.subarray(5, 12));
   const overload = rawDisplay.includes("O") && rawDisplay.includes("L");
   const numericText = rawDisplay.replaceAll(" ", "");
@@ -230,6 +265,7 @@ export function parseUt61EPlusFrame(input) {
       quality: "good",
       metadata: {
         protocol: "uni-t-ut61-plus-19-byte-polled",
+        model,
         modeCode,
         rangeIndex,
         prefixFactor: mode?.prefix ? prefixFactor : 1,
@@ -240,6 +276,7 @@ export function parseUt61EPlusFrame(input) {
         relative: (flags1 & 0x01) !== 0,
         statistic: statistic ?? (peak ? `peak-${peak}` : null),
         lowPassFilter: mode?.lowPassFilter === true,
+        lowImpedance: mode?.lowImpedance === true,
         dcIndicator: (flags3 & 0x08) !== 0,
         bargraphValue,
         bargraphMax: 46,
@@ -316,6 +353,36 @@ export class UniTUt61EPlusDriver extends InstrumentDriver {
     this._pollIntervalMs = this._deviceProfile.pollIntervalMs ?? 200;
   }
 
+  getCapabilities() {
+    const model = this._deviceProfile.model ?? "UT61E+";
+    const capabilities = super.getCapabilities();
+    const eVariant = ["UT61E+", "UT161E"].includes(model);
+    const dVariant = ["UT61D+", "UT161D"].includes(model);
+    if (!eVariant) delete capabilities["measurement.hfe"];
+    if (!eVariant) delete capabilities["measurement.live"];
+    if (!eVariant) delete capabilities["measurement.lpf-voltage"];
+    if (!eVariant) delete capabilities["measurement.acdc-voltage"];
+    if (!dVariant) delete capabilities["measurement.temperature"];
+    if (!dVariant) delete capabilities["measurement.low-impedance-voltage"];
+    return capabilities;
+  }
+
+  getControls() {
+    const model = this._deviceProfile.model ?? "UT61E+";
+    const controls = super.getControls();
+    const peakAvailable = [
+      "UT61D+",
+      "UT61E+",
+      "UT161D",
+      "UT161E",
+    ].includes(model);
+    if (!peakAvailable) {
+      delete controls.peak;
+      delete controls.exitPeak;
+    }
+    return controls;
+  }
+
   async onInitialize() {
     this._parser.reset();
     this._sequence = 0;
@@ -350,7 +417,9 @@ export class UniTUt61EPlusDriver extends InstrumentDriver {
     const { frames, warnings } = this._parser.push(chunk);
     for (const warning of warnings) this.publish("warning", warning);
     for (const frame of frames) {
-      const result = parseUt61EPlusFrame(frame);
+      const result = parseUt61EPlusFrame(frame, {
+        model: this._deviceProfile.model ?? "UT61E+",
+      });
       if (!result.ok) {
         this.publish("warning", result.error);
         continue;
