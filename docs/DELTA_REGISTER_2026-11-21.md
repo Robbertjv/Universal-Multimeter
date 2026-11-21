@@ -28,8 +28,14 @@ The repository has a substantial shared technical foundation, but it does not ye
 - Universal live dashboard, graph/bargraph and capability-driven controls.
 - IndexedDB measurement history and CSV export.
 - Multi-instance UI, combined graphs and multi-device logging.
-- MQTT/WebSocket/REST transports and a justified Bluetooth Classic strategy.
-- Secure, instance-scoped MCP integration.
+- Production-wired MQTT/WebSocket client adapters, connection configuration UI and an optional secured TCP bridge.
+- A secured MCP host/HTTP adapter and user-facing access configuration.
+
+**Implemented on the integration branch (PR #42; not yet merged to main)**
+- Generic `MqttConnectionManager` with independent named northbound/southbound connections, injected transport client, direction checks, lifecycle events and unit tests.
+- Read-only `McpToolService` exposing universal device status, connected devices and normalized latest measurements, with JSON-RPC handling and unit tests.
+- Runtime composition exposes both services; MQTT remains unavailable in the default bootstrap until a concrete `mqttClientFactory` is supplied. MCP currently has an in-process service but no HTTP host, authentication or external transport.
+- These are reusable integration foundations, not yet production-ready end-user features. PR #42 must pass the complete CI gate before these changes can enter `main`.
 - Browser/OS validation evidence matrix.
 - PWA behavior.
 
@@ -51,12 +57,13 @@ The repository has a substantial shared technical foundation, but it does not ye
 | Web Bluetooth LE | Initial adapter in main | Mock tests exist; browser/platform and physical-device evidence absent | #36, #20 |
 | Web Serial | Initial adapter in main | Mock tests exist; browser/platform and physical-device evidence absent | #36, #25 |
 | WebHID | Initial adapter in main | Mock tests exist; CP2110/UT612 bridge behavior still needs exact validation | #36, #11 |
-| MQTT over WS/WSS | Not in main | Optional browser network transport | #34 |
-| Standard MQTT TCP | Not in main | Requires explicit native/local bridge; browser cannot open arbitrary raw TCP sockets | #34 |
+| MQTT connection manager | Present in PR #42 integration branch; not in main | Generic independent northbound/southbound service and tests exist; concrete client adapter, secure config handling and UI remain | #34 |
+| MQTT over WS/WSS | Not production-wired | Supply a browser MQTT client factory and verify TLS/auth/reconnect behavior | #34 |
+| Standard MQTT TCP | Not production-wired | Requires an explicit secured native/local bridge; browser cannot open arbitrary raw TCP sockets | #34 |
 | Generic WebSocket / REST | Not in main | Define narrow generic contracts and avoid assuming every meter has a REST API | #34 |
 | Bluetooth Classic | Not in main | Browser API gap; first establish whether a target instrument needs a native bridge | #38 |
-| MCP | Not in main | Secure read-only access to a specifically selected app/device instance | #35 |
-| PWA | Not in main | Manifest, static-asset service worker, installability and safe offline behavior | #39 |
+| MCP tool service | Present in PR #42 integration branch; not in main | Read-only universal JSON-RPC tool service and tests exist; authenticated HTTP/streamable host and access configuration remain | #35 |
+| PWA | Not in main | Manifest, static-asset service worker, installability and safe offline behavior; legacy standalone PWA is not being ported | #39 |
 | Platform compatibility | No recorded manual matrix | Verify supported Chrome/OS/API combinations and record evidence | #36 |
 | EEVblog 121GW driver | Experimental driver merged (#19) | Driver exists; real GATT/packet/LCD validation deferred | #20 |
 | Fluke 187 driver | Experimental driver merged (#24) | Parser correction and app integration PRs still open; hardware validation deferred | #25, PR #26, PR #27 |
@@ -73,9 +80,12 @@ The repository has a substantial shared technical foundation, but it does not ye
 - PR #27 attempts Fluke-specific runtime/UI integration. It is open, not merged, and its latest recorded CI run failed at formatting. Its partial scope is subsumed by the generic application integration goal in #29; review it before deciding whether to repair/rebase or supersede it.
 - Physical validation remains in #25 and deferred.
 
-### EEVblog 121GW
+### EEVblog 121GW and legacy application
 - PR #19 is merged. The driver remains experimental.
 - PR #1 contains an older end-to-end application with dashboard, controls, graph, logging, CSV, MQTT-over-WebSocket, local FastAPI/MQTT TCP bridge, MCP and PWA code. It is not in main and predates the modular contracts. Use it as a feature/requirements reference, not as a wholesale merge candidate.
+- Product decision confirmed 2026-11-21: retain MQTT and MCP as meter-independent modules in the universal runtime; do not port the standalone 121GW UI/app or its model-specific coupling.
+- The integration branch already contains generic MQTT/MCP service foundations and tests. Reuse those; do not duplicate them from PR #1.
+- Do not port the old Python backend wholesale. Add a small host/bridge only if a required transport (such as raw MQTT/TCP) cannot be provided by the browser, with explicit authentication, origin/loopback restrictions, lifecycle handling and tests. The old PWA is not part of this migration decision.
 - Issue #37 captures the reconciliation decision. Issue #20 remains deferred hardware work.
 
 ## 4. Ordered delivery plan
@@ -98,8 +108,8 @@ This is a dependency order, not a calendar commitment.
 
 ### Stage C — extend the product
 1. #33 — multi-instance UI, graph and logging.
-2. #34 — optional MQTT/WebSocket/REST integrations and standard MQTT local bridge.
-3. #35 — secure instance-scoped MCP.
+2. #34 — finish production MQTT adapters/configuration and only add a secured local TCP bridge if required; build on the existing generic manager.
+3. #35 — finish authenticated MCP hosting and access configuration; build on the existing read-only tool service.
 4. #36 — browser/OS validation matrix.
 5. #38 — Bluetooth Classic feasibility/bridge decision.
 6. #39 — PWA shell and installability.
