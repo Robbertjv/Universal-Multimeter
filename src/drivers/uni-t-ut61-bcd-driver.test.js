@@ -56,22 +56,17 @@ describe("FS9922 UNI-T UT61B/C/D protocol parser", () => {
     expect(result.measurement).toMatchObject({
       quantity: "current",
       function: "current.dc",
-      value: 0.001234,
+
       unit: "A",
       metadata: { multiplier: "milli" },
     });
+    expect(result.measurement.value).toBeCloseTo(0.001234, 12);
   });
 
   it("preserves overload, diode and temperature modes", () => {
-    const overload = parseFs9922Frame(
-      frame({ digits: "?0:?", byte10: 0x80 }),
-    );
-    const diode = parseFs9922Frame(
-      frame({ byte9: 0x04, byte10: 0x80 }),
-    );
-    const fahrenheit = parseFs9922Frame(
-      frame({ byte10: 0x01 }),
-    );
+    const overload = parseFs9922Frame(frame({ digits: "?0:?", byte10: 0x80 }));
+    const diode = parseFs9922Frame(frame({ byte9: 0x04, byte10: 0x80 }));
+    const fahrenheit = parseFs9922Frame(frame({ byte10: 0x01 }));
 
     expect(overload.measurement).toMatchObject({
       value: null,
@@ -109,8 +104,8 @@ describe("FS9922 UNI-T UT61B/C/D protocol parser", () => {
     expect(
       parser.push(Uint8Array.from([...first.slice(7), ...second])).frames,
     ).toHaveLength(2);
-    expect(
-      parseFs9922Frame(frame({ byte7: 0x18, byte10: 0x80 })).ok,
-    ).toBe(false);
+    expect(parseFs9922Frame(frame({ byte7: 0x18, byte10: 0x80 })).ok).toBe(
+      false,
+    );
   });
 });
