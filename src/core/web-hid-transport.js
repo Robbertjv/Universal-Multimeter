@@ -211,6 +211,13 @@ export class WebHIDTransport extends TransportAdapter {
       if (signal?.aborted) throw signal.reason;
     } catch (error) {
       this._removeListeners();
+      if (device.opened) {
+        try {
+          await device.close();
+        } catch {
+          /* best-effort rollback after a partial open */
+        }
+      }
       this._device = null;
       throw mapError(error, "open");
     }
