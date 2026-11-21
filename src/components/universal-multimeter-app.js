@@ -484,7 +484,8 @@ export class UniversalMultimeterApp extends HTMLElement {
       measurement.quality === "stale"
         ? "Verouderde meting"
         : (stateLabels[measurement.state] ??
-          (measurement.quality ?? "Status onbekend"));
+          measurement.quality ??
+          "Status onbekend");
     const metadata = measurement.metadata ?? {};
     detail.textContent = [
       measurement.function,
