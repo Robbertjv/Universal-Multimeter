@@ -57,7 +57,9 @@ export class Fluke187Driver extends InstrumentDriver {
     }
     await this._requestMeasurement();
     this._pollTimer = setInterval(() => {
-      void this._requestMeasurement().catch((error) => this.publish("error", error));
+      void this._requestMeasurement().catch((error) =>
+        this.publish("error", error),
+      );
     }, this.pollIntervalMs);
   }
 
