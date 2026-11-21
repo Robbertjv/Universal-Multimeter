@@ -388,3 +388,26 @@ button:disabled {
     width: 100%;
   }
 }
+
+
+.device-list-panel .section-heading label {
+  display: grid;
+  gap: 8px;
+  color: #c3ced7;
+  font-size: 0.88rem;
+}
+
+.device-list-panel .section-heading select {
+  min-width: 220px;
+}
+
+@media (max-width: 720px) {
+  .device-list-panel .section-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .device-list-panel .section-heading select {
+    width: 100%;
+  }
+}
