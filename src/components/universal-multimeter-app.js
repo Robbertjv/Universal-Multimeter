@@ -49,6 +49,17 @@ template.innerHTML = `
         <span class="reading-unit"></span>
       </div>
       <p class="measurement-detail" data-detail>Verbind een instrument om metingen te ontvangen.</p>
+      <div class="reading-bargraph" data-bargraph-container hidden>
+        <label for="reading-bargraph-meter">Bargraph</label>
+        <meter
+          id="reading-bargraph-meter"
+          data-bargraph
+          min="0"
+          max="100"
+          value="0"
+        ></meter>
+        <span data-bargraph-value></span>
+      </div>
     </section>
 
     <section
