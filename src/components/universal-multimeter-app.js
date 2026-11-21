@@ -318,7 +318,6 @@ export class UniversalMultimeterApp extends HTMLElement {
     connect.disabled = [
       "connecting",
       "initializing",
-      "connected",
       "disconnecting",
     ].includes(state);
     disconnect.disabled = state !== "connected";
