@@ -411,3 +411,21 @@ button:disabled {
     width: 100%;
   }
 }
+
+
+.history-panel > label {
+  display: grid;
+  max-width: 420px;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: #c3ced7;
+  font-size: 0.88rem;
+}
+
+@media (max-width: 720px) {
+  .history-panel > label,
+  .history-panel > label select {
+    width: 100%;
+    max-width: none;
+  }
+}
