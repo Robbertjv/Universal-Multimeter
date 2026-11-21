@@ -1,14 +1,14 @@
-import { afterEach, describe, expect, it } from "vitest";
-import { bootstrapApplication } from "./app/bootstrap.js";
-import { createApplicationRuntime } from "./app/application-runtime.js";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { bootstrapApplication } from "./bootstrap.js";
+import { createApplicationRuntime } from "./application-runtime.js";
 import {
   createMockDriver,
   MOCK_DRIVER_DESCRIPTOR,
-} from "./core/mock-driver.js";
+} from "../core/mock-driver.js";
 import {
   MockTransport,
   MOCK_TRANSPORT_DESCRIPTOR,
-} from "./core/mock-transport.js";
+} from "../core/mock-transport.js";
 
 const mockProfile = {
   profileId: "test.mock",
@@ -30,14 +30,13 @@ describe("production application bootstrap", () => {
   it("composes and injects the runtime, then connects and renders normalized measurements", async () => {
     let transport;
     let driver;
-    const documentRef = document.implementation.createHTMLDocument();
-    const appElement = documentRef.createElement("universal-multimeter-app");
-    documentRef.body.append(appElement);
+    const appElement = document.createElement("universal-multimeter-app");
+    document.body.append(appElement);
 
     // Use the real composition root with deterministic mock hardware. This
     // exercises the same bootstrap path as src/main.js without browser prompts.
     const { app, runtime } = bootstrapApplication({
-      documentRef,
+      documentRef: document,
       runtimeFactory: () =>
         createApplicationRuntime({
           registerBuiltInInstruments: false,
