@@ -137,6 +137,7 @@ describe("application runtime composition", () => {
       "uni-t.ut71c.serial",
       "uni-t.ut71d.serial",
       "uni-t.ut71e.serial",
+      "uni-t.ut61e.serial",
     ]);
   });
 
