@@ -16,8 +16,10 @@ export const VOLTCRAFT_VC870_DEVICE_PROFILE = Object.freeze({
   evidence: {
     interface: "Voltcraft VC870 RS232 / UNI-T UT-D02",
     serialSettings: "9600 baud, 8N1",
-    packet: "23 bytes; function/select, range, main and auxiliary display digits, status/options, CR/LF",
-    activation: "User must activate PC interface with the meter's REL/PC button.",
+    packet:
+      "23 bytes; function/select, range, main and auxiliary display digits, status/options, CR/LF",
+    activation:
+      "User must activate PC interface with the meter's REL/PC button.",
     hardwareValidated: false,
     knownLimitations: [
       "Frequency, loop-current and power-family scaling remain unknown.",
