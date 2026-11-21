@@ -81,10 +81,7 @@ function validate(profile) {
       );
     }
   }
-  if (
-    !config.filters?.length &&
-    config.vendorId === undefined
-  ) {
+  if (!config.filters?.length && config.vendorId === undefined) {
     throw new TransportError(
       "TRANSPORT_INVALID_DESCRIPTOR",
       "Configure a valid HID filter or vendorId to constrain device selection.",
