@@ -177,7 +177,9 @@ export function parseVc880Frame(input) {
   const bargraphRaw = String.fromCharCode(...frame.subarray(27, 30)).trim();
   const parsedBargraph = Number(bargraphRaw);
   const bargraphValue = Number.isFinite(parsedBargraph)
-    ? parsedBargraph
+    ? (status6 & 0x02) !== 0
+      ? -parsedBargraph
+      : parsedBargraph
     : null;
 
   const measurements = [
@@ -200,6 +202,8 @@ export function parseVc880Frame(input) {
         bargraphValue,
         bargraphMax: 40,
         bargraphActive: (status7 & 0x08) !== 0,
+        bargraphOverload: (status7 & 0x04) !== 0,
+        bargraphPolarityNegative: (status6 & 0x02) !== 0,
         batteryLow: (status4 & 0x08) !== 0,
         hold: (status3 & 0x01) !== 0,
         manualRange: (status3 & 0x02) !== 0,
@@ -225,19 +229,21 @@ export function parseVc880Frame(input) {
 
   if ((status7 & 0x01) !== 0) {
     const secondary = parseDisplay(frame.subarray(13, 20));
-    if (secondary.state === "valid" || secondary.state === "overload") {
+    const secondaryOverload =
+      (status3 & 0x08) !== 0 || secondary.state === "overload";
+    if (secondary.state === "valid" || secondaryOverload) {
       measurements.push({
         channelId: "secondary",
         quantity: mode?.quantity ?? "unknown",
         function: mode?.function ?? "unknown",
         value:
-          secondary.state === "valid"
+          !secondaryOverload
             ? ((status1 & 0x08) !== 0 ? -1 : 1) *
               secondary.value *
               (Number.isFinite(rangeFactor) ? rangeFactor : 1)
             : null,
         unit: mode?.unit ?? "1",
-        state: secondary.state,
+        state: secondaryOverload ? "overload" : secondary.state,
         quality: "good",
         metadata: {
           protocol: "vc880-cp2110-39-byte-live",
