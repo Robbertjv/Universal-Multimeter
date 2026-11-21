@@ -75,7 +75,7 @@ function parseUnit(token) {
     ua: ["current", "uA"],
     na: ["current", "nA"],
     ohm: ["resistance", "ohm"],
-    "ω": ["resistance", "ohm"],
+    ω: ["resistance", "ohm"],
     kohm: ["resistance", "kohm"],
     mohm: ["resistance", "Mohm"],
     gohm: ["resistance", "Gohm"],
