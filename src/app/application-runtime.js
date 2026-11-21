@@ -5,7 +5,10 @@ import { MeasurementEngine } from "../core/measurement-engine.js";
 import { TransportRegistry } from "../core/transport-registry.js";
 import { registerWebBluetoothTransport } from "../core/web-bluetooth-transport.js";
 import { registerWebSerialTransport } from "../core/web-serial-transport.js";
-import { registerWebHIDTransport } from "../core/web-hid-transport.js";
+import {
+  registerCp2110HidTransport,
+  registerWebHIDTransport,
+} from "../core/web-hid-transport.js";
 import { registerEevblog121gwDriver } from "../drivers/eevblog-121gw-driver.js";
 import { registerEevblog121gwProfile } from "../drivers/eevblog-121gw-profile.js";
 import { registerFluke187Driver } from "../drivers/fluke-187-driver.js";
