@@ -256,12 +256,6 @@ export class UniTUt61eDriver extends InstrumentDriver {
         ...result.measurement,
         sequence: this._sequence,
       });
-      this.publish("status", {
-        batteryLow: result.measurement.metadata.batteryLow,
-        hold: result.measurement.metadata.hold,
-        relative: result.measurement.metadata.relative,
-        peak: result.measurement.metadata.peak,
-      });
     }
   }
 }
