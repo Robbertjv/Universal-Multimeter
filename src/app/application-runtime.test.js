@@ -24,14 +24,18 @@ function createRuntime() {
     registerBuiltInInstruments: false,
     registerBuiltInTransports: false,
     profiles: [mockProfile],
-    transports: [{
-      descriptor: MOCK_TRANSPORT_DESCRIPTOR,
-      factory: () => (transport = new MockTransport()),
-    }],
-    drivers: [{
-      descriptor: MOCK_DRIVER_DESCRIPTOR,
-      factory: (dependencies) => (driver = createMockDriver(dependencies)),
-    }],
+    transports: [
+      {
+        descriptor: MOCK_TRANSPORT_DESCRIPTOR,
+        factory: () => (transport = new MockTransport()),
+      },
+    ],
+    drivers: [
+      {
+        descriptor: MOCK_DRIVER_DESCRIPTOR,
+        factory: (dependencies) => (driver = createMockDriver(dependencies)),
+      },
+    ],
     idFactory: (() => {
       let next = 0;
       return () => `test-${++next}`;
@@ -43,7 +47,9 @@ function createRuntime() {
 describe("application runtime composition", () => {
   it("composes profiles, transport, driver and measurement engine through one facade", async () => {
     const { runtime, getTransport, getDriver } = createRuntime();
-    expect(runtime.listProfiles()).toEqual([expect.objectContaining(mockProfile)]);
+    expect(runtime.listProfiles()).toEqual([
+      expect.objectContaining(mockProfile),
+    ]);
 
     const device = await runtime.connect("test.mock", { deviceId: "meter-1" });
     expect(device.state).toBe("connected");
@@ -102,18 +108,24 @@ describe("application runtime composition", () => {
       registerBuiltInInstruments: false,
       registerBuiltInTransports: false,
       profiles: [mockProfile],
-      transports: [{
-        descriptor: MOCK_TRANSPORT_DESCRIPTOR,
-        factory: () => (transport = new MockTransport()),
-      }],
-      drivers: [{
-        descriptor: MOCK_DRIVER_DESCRIPTOR,
-        factory: (dependencies) => {
-          const driver = createMockDriver(dependencies);
-          driver.onStart = async () => { throw new Error("startup failed"); };
-          return driver;
+      transports: [
+        {
+          descriptor: MOCK_TRANSPORT_DESCRIPTOR,
+          factory: () => (transport = new MockTransport()),
         },
-      }],
+      ],
+      drivers: [
+        {
+          descriptor: MOCK_DRIVER_DESCRIPTOR,
+          factory: (dependencies) => {
+            const driver = createMockDriver(dependencies);
+            driver.onStart = async () => {
+              throw new Error("startup failed");
+            };
+            return driver;
+          },
+        },
+      ],
     });
     await expect(runtime.connect("test.mock")).rejects.toMatchObject({
       code: "DEVICE_CONNECT_FAILED",
