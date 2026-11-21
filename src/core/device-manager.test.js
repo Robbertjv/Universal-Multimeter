@@ -85,6 +85,16 @@ describe("DeviceManager", () => {
     expect(manager.listConnectedDevices()).toHaveLength(1);
   });
 
+  it("creates independent sessions for concurrent connects without device IDs", async () => {
+    const { manager } = setup();
+    const [first, second] = await Promise.all([
+      manager.connect("mock.profile"),
+      manager.connect("mock.profile"),
+    ]);
+    expect(first.deviceId).not.toBe(second.deviceId);
+    expect(manager.listConnectedDevices()).toHaveLength(2);
+    await manager.disconnectAll();
+  });
   it("rolls back a failed transport connection", async () => {
     const { manager } = setup({ failConnect: true });
     await expect(
