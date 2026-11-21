@@ -109,6 +109,7 @@ export class DeviceManager {
       transportId: session.profile.transportId,
       state: session.state,
       capabilities: session.driver?.getCapabilities?.() ?? {},
+      controls: session.driver?.getControls?.() ?? {},
       connectedAt: session.connectedAt ?? null,
     };
   }

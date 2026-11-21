@@ -10,6 +10,15 @@ export const WEB_HID_TRANSPORT_DESCRIPTOR = Object.freeze({
   requiresUserGesture: true,
 });
 
+export const CP2110_HID_TRANSPORT_DESCRIPTOR = Object.freeze({
+  transportId: "cp2110.hid",
+  displayName: "Silicon Labs CP2110 HID-to-UART",
+  direction: "bidirectional",
+  payloadType: "Uint8Array",
+  framing: "uart-bytes-over-hid",
+  requiresUserGesture: true,
+});
+
 function validate(profile) {
   const config = profile?.hid;
   if (!config || typeof config !== "object") {
@@ -81,6 +90,25 @@ function validate(profile) {
       );
     }
   }
+  if (config.cp2110 !== undefined) {
+    const uart = config.cp2110;
+    if (
+      !uart ||
+      typeof uart !== "object" ||
+      !Number.isSafeInteger(uart.baudRate) ||
+      uart.baudRate < 1 ||
+      ![5, 6, 7, 8].includes(uart.dataBits) ||
+      !["none", "odd", "even", "mark", "space"].includes(uart.parity) ||
+      !["none", "hardware"].includes(uart.flowControl) ||
+      ![1, 2].includes(uart.stopBits)
+    ) {
+      throw new TransportError(
+        "TRANSPORT_INVALID_DESCRIPTOR",
+        "hid.cp2110 must define a valid UART configuration.",
+      );
+    }
+  }
+
   if (!config.filters?.length && config.vendorId === undefined) {
     throw new TransportError(
       "TRANSPORT_INVALID_DESCRIPTOR",
@@ -119,9 +147,15 @@ function mapError(error, operation) {
 }
 
 export class WebHIDTransport extends TransportAdapter {
-  constructor({ profile, hid = globalThis.navigator?.hid, ...options } = {}) {
-    super({ descriptor: WEB_HID_TRANSPORT_DESCRIPTOR, ...options });
+  constructor({
+    profile,
+    hid = globalThis.navigator?.hid,
+    descriptor = WEB_HID_TRANSPORT_DESCRIPTOR,
+    ...options
+  } = {}) {
+    super({ descriptor, ...options });
     this._config = validate(profile ?? {});
+    this._cp2110Config = this._config.cp2110 ?? null;
     this._hid = hid;
     this._device = null;
     this._input = null;
@@ -182,6 +216,12 @@ export class WebHIDTransport extends TransportAdapter {
         view.byteOffset,
         view.byteLength,
       );
+      if (this._cp2110Config) {
+        if (event.reportId < 1 || event.reportId > 63) return;
+        if (data.byteLength !== event.reportId) return;
+        this._emitData(data.slice());
+        return;
+      }
       // Prefix the exact HID report payload with its report ID to preserve
       // report boundaries.
       const chunk = new Uint8Array(data.length + 1);
@@ -206,6 +246,10 @@ export class WebHIDTransport extends TransportAdapter {
     try {
       await device.open();
       if (signal?.aborted) throw signal.reason;
+      if (this._cp2110Config) {
+        await this._configureCp2110(device);
+        if (signal?.aborted) throw signal.reason;
+      }
     } catch (error) {
       this._removeListeners();
       if (device.opened) {
@@ -235,6 +279,23 @@ export class WebHIDTransport extends TransportAdapter {
       );
     }
 
+    if (this._cp2110Config) {
+      if (bytes.length < 1 || bytes.length > 63) {
+        throw new TransportError(
+          "TRANSPORT_WRITE_FAILED",
+          "CP2110 UART writes must contain between 1 and 63 bytes.",
+        );
+      }
+      if (signal?.aborted) throw signal.reason;
+      try {
+        await device.sendReport(bytes.length, bytes);
+        if (signal?.aborted) throw signal.reason;
+      } catch (error) {
+        throw mapError(error, "send");
+      }
+      return;
+    }
+
     const reportId = bytes[0];
     if (
       this._config.outputReportId !== undefined &&
@@ -256,6 +317,57 @@ export class WebHIDTransport extends TransportAdapter {
       if (signal?.aborted) throw signal.reason;
     } catch (error) {
       throw mapError(error, "send");
+    }
+  }
+
+  async _configureCp2110(device) {
+    if (
+      typeof device.sendFeatureReport !== "function" ||
+      typeof device.receiveFeatureReport !== "function"
+    ) {
+      throw new TransportError(
+        "TRANSPORT_HID_FEATURE_REPORT_UNSUPPORTED",
+        "CP2110 requires HID feature-report support.",
+      );
+    }
+
+    const config = this._cp2110Config;
+    const parity = { none: 0, odd: 1, even: 2, mark: 3, space: 4 };
+    const flowControl = { none: 0, hardware: 1 };
+    const dataBits = { 5: 0, 6: 1, 7: 2, 8: 3 };
+    const stopBits = { 1: 0, 2: 1 };
+    const uartConfig = new Uint8Array(8);
+    new DataView(uartConfig.buffer).setUint32(0, config.baudRate, false);
+    uartConfig[4] = parity[config.parity];
+    uartConfig[5] = flowControl[config.flowControl];
+    uartConfig[6] = dataBits[config.dataBits];
+    uartConfig[7] = stopBits[config.stopBits];
+
+    try {
+      await device.sendFeatureReport(0x41, new Uint8Array([1]));
+      await device.sendFeatureReport(0x50, uartConfig);
+      await device.sendFeatureReport(0x43, new Uint8Array([2]));
+
+      const enabled = await device.receiveFeatureReport(0x41);
+      const actualConfig = await device.receiveFeatureReport(0x50);
+      const actualBytes = new Uint8Array(
+        actualConfig.buffer,
+        actualConfig.byteOffset,
+        actualConfig.byteLength,
+      );
+      if (
+        enabled.byteLength < 1 ||
+        enabled.getUint8(0) !== 1 ||
+        actualBytes.length !== uartConfig.length ||
+        actualBytes.some((value, index) => value !== uartConfig[index])
+      ) {
+        throw new TransportError(
+          "TRANSPORT_HID_UART_CONFIG_MISMATCH",
+          "CP2110 did not confirm the requested UART configuration.",
+        );
+      }
+    } catch (error) {
+      throw mapError(error, "configure");
     }
   }
 
@@ -285,6 +397,16 @@ export class WebHIDTransport extends TransportAdapter {
     const device = this._device;
     this._device = null;
     if (device?.opened) {
+      if (
+        this._cp2110Config &&
+        typeof device.sendFeatureReport === "function"
+      ) {
+        try {
+          await device.sendFeatureReport(0x41, new Uint8Array([0]));
+        } catch {
+          /* best-effort UART disable before closing the bridge */
+        }
+      }
       try {
         await device.close();
       } catch (error) {
@@ -304,6 +426,20 @@ export function registerWebHIDTransport(
 ) {
   registry.register(WEB_HID_TRANSPORT_DESCRIPTOR, ({ profile }) =>
     createWebHIDTransport({ profile, hid }),
+  );
+  return registry;
+}
+
+export function registerCp2110HidTransport(
+  registry,
+  { hid = globalThis.navigator?.hid } = {},
+) {
+  registry.register(CP2110_HID_TRANSPORT_DESCRIPTOR, ({ profile }) =>
+    createWebHIDTransport({
+      profile,
+      hid,
+      descriptor: CP2110_HID_TRANSPORT_DESCRIPTOR,
+    }),
   );
   return registry;
 }
