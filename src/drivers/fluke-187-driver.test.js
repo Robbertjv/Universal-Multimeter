@@ -76,6 +76,16 @@ describe("Fluke 187 response parser", () => {
     );
   });
 
+  it("accepts UTF-8 degree symbols in temperature readings", () => {
+    const parser = new Fluke187ResponseParser();
+    const result = parser.push(bytes("QM,23.5 °C\\r"));
+    expect(parseFluke187ResponseLine(result.lines[0]).measurement).toMatchObject({
+      quantity: "temperature",
+      unit: "degC",
+      value: 23.5,
+    });
+  });
+
   it("rejects unparseable values without inventing a measurement", () => {
     expect(parseFluke187ResponseLine("QM,--- V").ok).toBe(false);
     expect(parseFluke187ResponseLine("random").error.code).toBe(
