@@ -152,7 +152,8 @@ export class WebHIDTransport extends TransportAdapter {
     }
 
     try {
-      // requestDevice must remain the first platform call in this user-gesture path.
+      // requestDevice must remain the first platform call in this user-gesture
+      // path.
       devices = await this._hid.requestDevice({ filters });
     } catch (error) {
       throw mapError(error, "select");
@@ -184,7 +185,8 @@ export class WebHIDTransport extends TransportAdapter {
         view.byteOffset,
         view.byteLength,
       );
-      // Prefix the exact HID report payload with its report ID to preserve report boundaries.
+      // Prefix the exact HID report payload with its report ID to preserve
+      // report boundaries.
       const chunk = new Uint8Array(data.length + 1);
       chunk[0] = event.reportId;
       chunk.set(data, 1);
