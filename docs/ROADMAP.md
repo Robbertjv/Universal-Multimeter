@@ -42,8 +42,8 @@ Build the shared foundations once, then develop all requested device drivers inc
 - [x] Draft transport contract in TRANSPORT_CONTRACT.md.
 - [x] Draft Device Manager and Measurement Engine contracts in DEVICE_MANAGER_AND_ENGINE.md.
 - [x] Define protocol fixture/test conventions in TEST_STRATEGY.md.
-- [x] Implement Device Manager and Measurement Engine runtime against mock transport/driver (issue #7; PR #16 review pending).
-- [x] Implement transport-independent base adapter, mock transport, stable errors, timeout/AbortSignal behavior, serialized writes, bounded queues/chunks, and contract tests (issue #6; PR review pending).\n- [x] Implement the v1 universal measurement model, validation utilities, and unit metadata (issue #4; awaiting PR review).
+- [x] Implement Device Manager and Measurement Engine runtime against mock transport/driver (issue #7; PR #16 merged).
+- [x] Implement transport-independent base adapter, mock transport, stable errors, timeout/AbortSignal behavior, serialized writes, bounded queues/chunks, and contract tests (issue #6; PR #15 merged).\n- [x] Implement the v1 universal measurement model, validation utilities, and unit metadata (issue #4; awaiting PR review).
 - [x] Add CI for automated checks.
 
 The v1 contract documents are reviewed implementation baselines. Checked items indicate code or configuration has been added; runtime and CI validation are recorded separately.
@@ -54,7 +54,7 @@ The v1 contract documents are reviewed implementation baselines. Checked items i
 
 Implement adapters independently and document browser/OS support.
 
-1. [x] Initial Web Bluetooth LE adapter implementation — profile-driven GATT service/characteristic discovery, notifications, optional writes, disconnect/cleanup, diagnostics, and mock tests (issue #8; PR #17 review pending). Real Chrome/platform and 121GW validation remain outstanding.
+1. [x] Initial Web Bluetooth LE adapter — profile-driven GATT discovery, notifications, optional writes, disconnect/cleanup, diagnostics, and mock tests (issue #8; PR #17 review pending). Real browser/platform and 121GW validation remain outstanding.
 2. [ ] Web Serial transport — serial/USB-serial instruments and compatible cables.
 3. [ ] WebHID transport — USB HID bridges and instruments such as the UT612 CP2110 cable path.
 4. [ ] MQTT transport — broker connection, topic configuration, reconnect, and message validation.
