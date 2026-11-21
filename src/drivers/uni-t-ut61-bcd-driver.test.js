@@ -87,7 +87,7 @@ describe("FS9922 UNI-T UT61B/C/D protocol parser", () => {
   it("exposes battery, hold, relative and signed bargraph metadata", () => {
     const result = parseFs9922Frame(
       frame({
-        byte7: 0x32,
+        byte7: 0x33,
         byte8: 0x04,
         bargraph: 0x8a,
       }),
