@@ -97,6 +97,38 @@ export class MeasurementHistoryStore {
     });
   }
 
+  async listSessions({ deviceId } = {}) {
+    const records = await this.query({ deviceId });
+    const sessions = new Map();
+    for (const record of records) {
+      const session =
+        sessions.get(record.sessionId) ??
+        {
+          sessionId: record.sessionId,
+          deviceId: record.deviceId,
+          device: record.device,
+          startedAt: record.receivedAt,
+          lastMeasurementAt: record.receivedAt,
+          measurementCount: 0,
+        };
+      session.startedAt =
+        record.receivedAt < session.startedAt
+          ? record.receivedAt
+          : session.startedAt;
+      session.lastMeasurementAt =
+        record.receivedAt > session.lastMeasurementAt
+          ? record.receivedAt
+          : session.lastMeasurementAt;
+      session.measurementCount += 1;
+      sessions.set(record.sessionId, session);
+    }
+    return [...sessions.values()].sort(
+      (left, right) =>
+        new Date(right.lastMeasurementAt).valueOf() -
+        new Date(left.lastMeasurementAt).valueOf(),
+    );
+  }
+
   async clear({ sessionId } = {}) {
     const database = await this._database();
     return new Promise((resolve, reject) => {
