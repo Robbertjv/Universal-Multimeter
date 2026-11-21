@@ -84,7 +84,7 @@ export function parseUt71xFrame(input) {
   }
 
   const rangeIndex = frame[5] - 0x30;
-  const modeCode = frame[6] - 0x30;
+  const modeCode = Number.parseInt(String.fromCharCode(frame[6]), 16);
   if (
     rangeIndex < 0 ||
     rangeIndex > 7 ||
