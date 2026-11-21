@@ -171,6 +171,7 @@ export function createApplicationRuntime({
       }
       const existing = loggingSessions.get(deviceId);
       if (existing) return existing;
+      getHistoryStore();
       const session = Object.freeze({
         sessionId:
           globalThis.crypto?.randomUUID?.() ??
@@ -191,14 +192,14 @@ export function createApplicationRuntime({
       return [...loggingSessions.values()];
     },
     async getHistory(filters) {
-      return historyStore ? historyStore.query(filters) : [];
+      return getHistoryStore().query(filters);
     },
     async exportHistoryCsv(filters) {
       const records = await this.getHistory(filters);
       return measurementsToCsv(records);
     },
     async clearHistory(filters) {
-      return historyStore ? historyStore.clear(filters) : 0;
+      return getHistoryStore().clear(filters);
     },
     on(type, listener) {
       if (!RUNTIME_EVENTS.has(type) && type !== "*") {
