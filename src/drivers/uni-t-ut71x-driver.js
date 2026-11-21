@@ -78,7 +78,8 @@ function readDigits(frame) {
 }
 
 export function parseUt71xFrame(input) {
-  const frame = input instanceof Uint8Array ? input : Uint8Array.from(input ?? []);
+  const frame =
+    input instanceof Uint8Array ? input : Uint8Array.from(input ?? []);
   if (frame.length !== 11 || frame[9] !== 0x0d || frame[10] !== 0x0a) {
     return invalid("UNI_T_UT71X_FRAME_INVALID");
   }
@@ -165,7 +166,12 @@ export function parseUt71xFrame(input) {
         sign,
         fourDigitDisplay: digits.fourDigit ?? false,
         underRange: digits.special === "under-range",
-        sourceQuantity: modeCode === 14 ? "power" : modeCode === 15 ? "loop-current" : undefined,
+        sourceQuantity:
+          modeCode === 14
+            ? "power"
+            : modeCode === 15
+              ? "loop-current"
+              : undefined,
       },
     },
   };
@@ -182,7 +188,8 @@ export class UniTUt71xStreamParser {
   }
 
   push(chunk) {
-    const bytes = chunk instanceof Uint8Array ? chunk : Uint8Array.from(chunk ?? []);
+    const bytes =
+      chunk instanceof Uint8Array ? chunk : Uint8Array.from(chunk ?? []);
     let combined = new Uint8Array(this.buffer.length + bytes.length);
     combined.set(this.buffer);
     combined.set(bytes, this.buffer.length);
