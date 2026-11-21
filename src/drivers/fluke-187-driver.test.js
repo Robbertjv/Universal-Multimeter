@@ -59,9 +59,7 @@ describe("Fluke 187 response parser", () => {
   });
 
   it("maps common engineering units and keeps unknown units unknown", () => {
-    expect(
-      parseFluke187ResponseLine("QM,12.5 kOhm").measurement,
-    ).toMatchObject(
+    expect(parseFluke187ResponseLine("QM,12.5 kOhm").measurement).toMatchObject(
       {
         quantity: "resistance",
         unit: "kohm",
