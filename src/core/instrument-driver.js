@@ -307,7 +307,7 @@ export class InstrumentDriver {
             "error",
             new DriverError(
               "DRIVER_RECEIVE_QUEUE_FULL",
-              "Driver receive queue is full; incoming transport data was dropped.",
+              "Driver receive queue is full; incoming data was dropped.",
               {
                 pendingChunks: this._pendingTransportChunks,
                 pendingBytes: this._pendingTransportBytes,
