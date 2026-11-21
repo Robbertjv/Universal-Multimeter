@@ -16,12 +16,17 @@ export class Fluke187ResponseParser {
   }
 
   push(chunk) {
-    if (!(chunk instanceof Uint8Array)) {
-      throw new TypeError("Fluke 187 parser input must be a Uint8Array.");
+    if (!ArrayBuffer.isView(chunk)) {
+      throw new TypeError("Fluke 187 parser input must be a byte-array view.");
     }
+    const bytes = new Uint8Array(
+      chunk.buffer,
+      chunk.byteOffset,
+      chunk.byteLength,
+    );
     const lines = [];
     const warnings = [];
-    const text = this._decoder.decode(chunk, { stream: true });
+    const text = this._decoder.decode(bytes, { stream: true });
     for (const character of text) {
       const byte = character.charCodeAt(0);
       if (character === "\r" || character === "\n") {
