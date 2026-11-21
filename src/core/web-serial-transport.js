@@ -247,6 +247,7 @@ export class WebSerialTransport extends TransportAdapter {
       } catch {
         /* best-effort cleanup */
       }
+    }
     if (writer) {
       try {
         await writer.close();
