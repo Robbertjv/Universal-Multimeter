@@ -27,6 +27,7 @@ function createRuntime() {
     },
     connect: vi.fn(async () => ({ deviceId: "demo-1" })),
     disconnect: vi.fn(async () => true),
+    executeControl: vi.fn(async () => ({ sent: true })),
     shutdown: vi.fn(async () => {}),
     startLogging: vi.fn((deviceId) => ({
       sessionId: "session-1",
@@ -47,6 +48,46 @@ function createRuntime() {
 }
 
 describe("UniversalMultimeterApp", () => {
+  it("renders only supported controls and dispatches an authorized user action", async () => {
+    const runtime = createRuntime();
+    const app = document.createElement(tag);
+    app.setRuntime(runtime);
+    document.body.append(app);
+
+    runtime.emit("device-connected", {
+      device: {
+        deviceId: "ut61e-plus",
+        manufacturer: "UNI-T",
+        model: "UT61E+",
+        state: "connected",
+        controls: {
+          hold: { availability: "supported" },
+          relative: { availability: "supported" },
+          calibration: { availability: "unsupported" },
+        },
+      },
+    });
+
+    const panel = app.querySelector("[data-controls-panel]");
+    expect(panel.hidden).toBe(false);
+    expect(
+      [...app.querySelectorAll("[data-controls-list] button")].map(
+        (button) => button.textContent,
+      ),
+    ).toEqual(["Hold", "Relative"]);
+
+    app.querySelector("[data-controls-list] button").click();
+    await vi.waitFor(() => {
+      expect(runtime.executeControl).toHaveBeenCalledWith(
+        "ut61e-plus",
+        "hold",
+        {},
+        { authorized: true },
+      );
+    });
+    app.remove();
+  });
+
   it("renders the runtime-backed instrument and measurement interface", () => {
     const app = document.createElement(tag);
     document.body.append(app);
