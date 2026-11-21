@@ -79,6 +79,19 @@ describe("FS9922 UNI-T UT61B/C/D protocol parser", () => {
     });
   });
 
+  it("decodes VC850 diode mode through its ADP user-defined flag", () => {
+    const rawAdp = frame({ byte8: 0x01 });
+    expect(parseFs9922Frame(rawAdp).ok).toBe(false);
+    expect(parseFs9922Frame(rawAdp, { diodeUsesAdp: true })).toMatchObject({
+      ok: true,
+      measurement: {
+        quantity: "voltage",
+        function: "diode",
+        unit: "V",
+      },
+    });
+  });
+
   it("exposes battery, hold, relative and signed bargraph metadata", () => {
     const result = parseFs9922Frame(
       frame({
