@@ -16,7 +16,8 @@ export const UNI_T_UT61E_DEVICE_PROFILE = Object.freeze({
   evidence: {
     interface: "Cyrustek ES51922 unidirectional serial interface",
     serialSettings: "19200 baud nominal (chip timing approximately 19230), 7O1",
-    frame: "14 seven-bit packets: range, five digits, function, status, four option bytes, CRLF",
+    frame:
+      "14 seven-bit packets: range, five digits, function, status, four option bytes, CRLF",
     hardwareValidated: false,
     variantScope: "classic UT61E only; UT61E+ is a different protocol family",
   },
