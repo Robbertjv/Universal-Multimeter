@@ -7,10 +7,12 @@ export class Fluke187ResponseParser {
     }
     this.maxLineBytes = maxLineBytes;
     this._buffer = "";
+    this._decoder = new TextDecoder("utf-8");
   }
 
   reset() {
     this._buffer = "";
+    this._decoder = new TextDecoder("utf-8");
   }
 
   push(chunk) {
@@ -19,20 +21,22 @@ export class Fluke187ResponseParser {
     }
     const lines = [];
     const warnings = [];
-    for (const byte of chunk) {
-      if (byte === 13 || byte === 10) {
+    const text = this._decoder.decode(chunk, { stream: true });
+    for (const character of text) {
+      const byte = character.charCodeAt(0);
+      if (character === "\r" || character === "\n") {
         if (this._buffer.length) {
           lines.push(this._buffer);
           this._buffer = "";
         }
         continue;
       }
-      if (byte < 0x20 || byte > 0x7e) {
-        warnings.push({ code: "FLUKE_187_NON_ASCII_BYTE", byte });
+      if (byte < 0x20 || byte === 0x7f) {
+        warnings.push({ code: "FLUKE_187_CONTROL_CHARACTER", byte });
         this._buffer = "";
         continue;
       }
-      this._buffer += String.fromCharCode(byte);
+      this._buffer += character;
       if (this._buffer.length > this.maxLineBytes) {
         warnings.push({
           code: "FLUKE_187_LINE_TOO_LONG",
@@ -46,7 +50,11 @@ export class Fluke187ResponseParser {
 }
 
 function parseUnit(token) {
-  const normalized = token.replaceAll(" ", "").toLowerCase();
+  const normalized = token
+    .replaceAll(" ", "")
+    .replaceAll("µ", "u")
+    .replaceAll("μ", "u")
+    .toLowerCase();
   const units = {
     v: ["voltage", "V"],
     mv: ["voltage", "mV"],
