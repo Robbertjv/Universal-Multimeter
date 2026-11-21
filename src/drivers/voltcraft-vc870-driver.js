@@ -44,7 +44,7 @@ const MODE_DEFINITIONS = new Map([
       quantity: "voltage",
       function: "voltage.ac",
       unit: "V",
-      exponents: [-4, -3, -2, -1],
+      exponents: [-3, -2, -1, 0],
     },
   ],
   [
@@ -52,8 +52,8 @@ const MODE_DEFINITIONS = new Map([
     {
       quantity: "voltage",
       function: "voltage.dc",
-      unit: "mV",
-      exponents: [-2],
+      unit: "V",
+      exponents: [-5],
     },
   ],
   [
@@ -71,7 +71,7 @@ const MODE_DEFINITIONS = new Map([
       quantity: "resistance",
       function: "resistance",
       unit: "ohm",
-      exponents: [-2, -1, 0, 1, 2, 3],
+      exponents: [-2, -1, 1, 2, 3, 4],
     },
   ],
   [
@@ -102,7 +102,7 @@ const MODE_DEFINITIONS = new Map([
       quantity: "frequency",
       function: "frequency",
       unit: "Hz",
-      exponents: null,
+      exponents: [-3, -2, -1, 0, 1, 2, 3, 4],
     },
   ],
   [
@@ -110,8 +110,8 @@ const MODE_DEFINITIONS = new Map([
     {
       quantity: "unknown",
       function: "unknown",
-      unit: "1",
-      exponents: null,
+      unit: "%",
+      exponents: [-2],
       sourceFunction: "loop-current",
     },
   ],
@@ -130,7 +130,7 @@ const MODE_DEFINITIONS = new Map([
       quantity: "current",
       function: "current.ac",
       unit: "A",
-      exponents: [-8, -7],
+      exponents: [-7, -6],
     },
   ],
   [
@@ -148,7 +148,7 @@ const MODE_DEFINITIONS = new Map([
       quantity: "current",
       function: "current.ac",
       unit: "A",
-      exponents: [-6, -5],
+      exponents: [-5, -4],
     },
   ],
   [
@@ -225,10 +225,10 @@ export function parseVc870Frame(input) {
   const option2 = frame[17];
   const option3 = frame[18];
   const option4 = frame[19];
-  const overload = (status & 0x01) !== 0 || (option2 & 0x08) !== 0;
-  const openCircuit = (option2 & 0x04) !== 0 || (option4 & 0x01) !== 0;
-  const batteryLow = (status & 0x04) !== 0;
-  const sign = (status & 0x08) !== 0;
+  const overload = (status & 0x01) !== 0;
+  const openCircuit = (option2 & 0x04) !== 0;
+  const batteryLow = (status & 0x02) !== 0;
+  const sign = (status & 0x04) !== 0;
   const exponent =
     mode?.exponents && Number.isInteger(rangeIndex)
       ? mode.exponents[rangeIndex]
@@ -265,6 +265,8 @@ export function parseVc870Frame(input) {
         rawAuxiliaryDisplay: decodeDisplay(frame.subarray(8, 13)),
         sourceFunction: mode?.sourceFunction,
         batteryLow,
+        signAuxiliary: (status & 0x08) !== 0,
+        auxiliaryOverload: (option2 & 0x08) !== 0,
         hold: (option2 & 0x01) !== 0,
         manualRange: (option2 & 0x02) !== 0,
         relative: (option1 & 0x01) !== 0,
@@ -273,7 +275,8 @@ export function parseVc870Frame(input) {
         lightOn: (option3 & 0x08) !== 0,
         warning: (option3 & 0x02) !== 0,
         misplugWarning: (option4 & 0x08) !== 0,
-        dualDisplay: frame[20] === 0x31,
+        dualDisplay: (frame[20] & 0x01) !== 0,
+        auxiliaryOpen: (option4 & 0x01) !== 0,
         terminatorOrder: frame[21] === 0x0d ? "CRLF" : "LFCR",
       },
     },
