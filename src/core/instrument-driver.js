@@ -330,10 +330,12 @@ export class InstrumentDriver {
         this._transportDataQueue = processing.catch((error) =>
           this.publish("error", error),
         );
-        processing.finally(() => {
-          this._pendingTransportChunks -= 1;
-          this._pendingTransportBytes -= byteLength;
-        }).catch(() => {});
+        processing
+          .finally(() => {
+            this._pendingTransportChunks -= 1;
+            this._pendingTransportBytes -= byteLength;
+          })
+          .catch(() => {});
       }),
       this._transport.on("error", (error) => this.publish("error", error)),
       this._transport.on("state", (event) =>
