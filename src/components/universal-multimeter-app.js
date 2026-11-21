@@ -172,15 +172,21 @@ export class UniversalMultimeterApp extends HTMLElement {
       });
     });
 
-    this.querySelector("[data-active-device]").addEventListener("change", (event) => {
-      this._currentDeviceId = event.target.value || null;
-      this._renderMeasurement();
-      this._renderLogging();
-    });
+    this.querySelector("[data-active-device]").addEventListener(
+      "change",
+      (event) => {
+        this._currentDeviceId = event.target.value || null;
+        this._renderMeasurement();
+        this._renderLogging();
+      },
+    );
 
-    this.querySelector("[data-history-session]").addEventListener("change", () => {
-      this._renderLogging();
-    });
+    this.querySelector("[data-history-session]").addEventListener(
+      "change",
+      () => {
+        this._renderLogging();
+      },
+    );
 
     this.querySelector("[data-log-start]").addEventListener("click", () => {
       if (!this._currentDeviceId || !this._runtime) return;
@@ -211,9 +217,7 @@ export class UniversalMultimeterApp extends HTMLElement {
           "[data-history-session]",
         ).value;
         const session =
-          (selectedSessionId
-            ? { sessionId: selectedSessionId }
-            : null) ??
+          (selectedSessionId ? { sessionId: selectedSessionId } : null) ??
           this._lastLoggingSessions.get(this._currentDeviceId);
         if (!session || !this._runtime) return;
         try {
