@@ -89,6 +89,53 @@ describe("UNI-T UT61E+ polled protocol", () => {
     });
   });
 
+  it("gates temperature, LoZ and hFE modes by exact model variant", () => {
+    const temperature = frame({
+      mode: 0x0a,
+      range: 0x35,
+      display: " 25.000",
+    });
+    const loz = frame({
+      mode: 0x15,
+      range: 0x33,
+      display: "  2.200",
+    });
+    const hfe = frame({
+      mode: 0x12,
+      range: 0x33,
+      display: "  2.200",
+    });
+
+    expect(
+      parseUt61EPlusFrame(temperature, { model: "UT61E+" }).measurement.state,
+    ).toBe("unknown");
+    expect(
+      parseUt61EPlusFrame(temperature, { model: "UT61D+" }).measurement,
+    ).toMatchObject({
+      quantity: "temperature",
+      unit: "degC",
+      value: 25,
+    });
+    expect(
+      parseUt61EPlusFrame(loz, { model: "UT61D+" }).measurement,
+    ).toMatchObject({
+      quantity: "voltage",
+      function: "voltage.ac",
+      unit: "V",
+      value: 2200,
+      metadata: { lowImpedance: true },
+    });
+    expect(
+      parseUt61EPlusFrame(loz, { model: "UT61B+" }).measurement.state,
+    ).toBe("unknown");
+    expect(
+      parseUt61EPlusFrame(hfe, { model: "UT61B+" }).measurement.state,
+    ).toBe("unknown");
+    expect(
+      parseUt61EPlusFrame(hfe, { model: "UT61E+" }).measurement.state,
+    ).toBe("valid");
+  });
+
   it("reassembles partial and concatenated response frames and rejects bad checksums", () => {
     const parser = new UniTUt61EPlusStreamParser();
     const first = frame();
