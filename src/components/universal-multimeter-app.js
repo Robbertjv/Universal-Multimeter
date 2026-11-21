@@ -4,7 +4,6 @@ import { createFluke187Runtime } from "../app-runtime.js";
 const template = document.createElement("template");
 template.innerHTML = appTemplate;
 
-
 function formatValue(record) {
   if (record.state === "overload") return "OL";
   if (record.state !== "valid" || record.value === null) return "—";
