@@ -42,10 +42,9 @@ function validate(profile) {
             (!Number.isInteger(filter.usage) ||
               filter.usage < 0 ||
               filter.usage > 65535)) ||
-          (filter.vendorId === undefined &&
-            filter.productId === undefined &&
-            filter.usagePage === undefined &&
-            filter.usage === undefined),
+          (filter.productId !== undefined && filter.vendorId === undefined) ||
+          (filter.usage !== undefined && filter.usagePage === undefined) ||
+          (filter.vendorId === undefined && filter.usagePage === undefined),
       ))
   ) {
     throw new TransportError(
@@ -54,6 +53,12 @@ function validate(profile) {
     );
   }
 
+  if (config.productId !== undefined && config.vendorId === undefined) {
+    throw new TransportError(
+      "TRANSPORT_INVALID_DESCRIPTOR",
+      "hid.productId requires hid.vendorId.",
+    );
+  }
   for (const key of ["vendorId", "productId"]) {
     if (
       config[key] !== undefined &&
@@ -78,12 +83,11 @@ function validate(profile) {
   }
   if (
     !config.filters?.length &&
-    config.vendorId === undefined &&
-    config.productId === undefined
+    config.vendorId === undefined
   ) {
     throw new TransportError(
       "TRANSPORT_INVALID_DESCRIPTOR",
-      "Configure HID filters, vendorId, or productId to constrain device selection.",
+      "Configure a valid HID filter or vendorId to constrain device selection.",
     );
   }
   return config;
@@ -141,16 +145,10 @@ export class WebHIDTransport extends TransportAdapter {
       ? structuredClone(this._config.filters)
       : [];
     if (!filters.length) {
-      filters = [
-        {
-          ...(this._config.vendorId === undefined
-            ? {}
-            : { vendorId: this._config.vendorId }),
-          ...(this._config.productId === undefined
-            ? {}
-            : { productId: this._config.productId }),
-        },
-      ];
+      filters = [{ vendorId: this._config.vendorId }];
+      if (this._config.productId !== undefined) {
+        filters[0].productId = this._config.productId;
+      }
     }
 
     try {
