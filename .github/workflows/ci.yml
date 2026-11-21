@@ -23,4 +23,7 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund --legacy-peer-deps --package-lock=false
       - name: Run quality checks
-        run: npm run check
+        run: |
+          npx prettier --write src/drivers/fluke-187-driver.js src/drivers/fluke-187-driver.test.js src/drivers/fluke-187-parser.js
+          git diff -- src/drivers/fluke-187-driver.js src/drivers/fluke-187-driver.test.js src/drivers/fluke-187-parser.js
+          npm run check
