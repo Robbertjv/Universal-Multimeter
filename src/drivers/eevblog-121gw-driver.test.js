@@ -82,10 +82,10 @@ describe("EEVblog 121GW decoder", () => {
     expect(decoded.measurement).toMatchObject({
       quantity: "voltage",
       function: "voltage.dc",
-      value: -1.2345,
       unit: "V",
       state: "valid",
     });
+    expect(decoded.measurement.value).toBeCloseTo(-1.2345, 10);
   });
 
   it("decodes the extended 18-bit main count", () => {
@@ -119,11 +119,12 @@ describe("EEVblog 121GW decoder", () => {
     const temp = packet({ mode: 5, count: 234 });
     temp[6] |= 0x10;
     temp[18] = temp.slice(0, 18).reduce((sum, byte) => sum ^ byte, 0);
-    expect(decodeEevblog121gwFrame(temp).measurement).toMatchObject({
+    const decodedTemperature = decodeEevblog121gwFrame(temp).measurement;
+    expect(decodedTemperature).toMatchObject({
       quantity: "temperature",
-      value: 23.4,
       unit: "degF",
     });
+    expect(decodedTemperature.value).toBeCloseTo(23.4, 10);
   });
 
   it("preserves unsupported modes as unknown rather than guessing", () => {
