@@ -21,8 +21,13 @@ function concat(left, right) {
  */
 export class Eevblog121gwStreamParser {
   constructor({ maxBufferBytes = 4096 } = {}) {
-    if (!Number.isSafeInteger(maxBufferBytes) || maxBufferBytes < EEVBLOG_121GW_PACKET_LENGTH) {
-      throw new TypeError("maxBufferBytes must be a safe integer of at least 19.");
+    if (
+      !Number.isSafeInteger(maxBufferBytes) ||
+      maxBufferBytes < EEVBLOG_121GW_PACKET_LENGTH
+    ) {
+      throw new TypeError(
+        "maxBufferBytes must be a safe integer of at least 19.",
+      );
     }
     this.maxBufferBytes = maxBufferBytes;
     this._buffer = new Uint8Array();
@@ -61,7 +66,9 @@ export class Eevblog121gwStreamParser {
       if (this._buffer.length < EEVBLOG_121GW_PACKET_LENGTH) break;
 
       const candidate = this._buffer.slice(0, EEVBLOG_121GW_PACKET_LENGTH);
-      const expected = xor(candidate.subarray(0, EEVBLOG_121GW_PACKET_LENGTH - 1));
+      const expected = xor(
+        candidate.subarray(0, EEVBLOG_121GW_PACKET_LENGTH - 1),
+      );
       if (expected !== candidate[EEVBLOG_121GW_PACKET_LENGTH - 1]) {
         warnings.push({
           code: "EEVBLOG_121GW_CHECKSUM_INVALID",
@@ -77,8 +84,9 @@ export class Eevblog121gwStreamParser {
     }
 
     if (this._buffer.length > this.maxBufferBytes) {
-      const droppedBytes = this._buffer.length - (EEVBLOG_121GW_PACKET_LENGTH - 1);
-      this._buffer = this._buffer.slice(- (EEVBLOG_121GW_PACKET_LENGTH - 1));
+      const droppedBytes =
+        this._buffer.length - (EEVBLOG_121GW_PACKET_LENGTH - 1);
+      this._buffer = this._buffer.slice(-(EEVBLOG_121GW_PACKET_LENGTH - 1));
       warnings.push({
         code: "EEVBLOG_121GW_BUFFER_LIMIT",
         droppedBytes,
