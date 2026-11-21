@@ -104,7 +104,7 @@ function measurementMeaning(flags) {
   if (flags.percent) {
     return { quantity: "duty-cycle", function: "duty-cycle", unit: "%" };
   }
-  if (flags.diode || flags.adp) {
+  if (flags.diode) {
     return { quantity: "voltage", function: "diode", unit: "V" };
   }
   if (flags.voltage) {
