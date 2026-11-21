@@ -582,6 +582,7 @@ export class UniversalMultimeterApp extends HTMLElement {
     const stateLabels = {
       overload: "Buiten bereik",
       "open-circuit": "Open kring",
+      "short-circuit": "Kortsluiting",
       invalid: "Ongeldige meting",
       "warming-up": "Opwarmen",
       disconnected: "Niet verbonden",
