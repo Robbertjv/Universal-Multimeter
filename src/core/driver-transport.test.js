@@ -4,7 +4,7 @@ import { MockTransport } from "./mock-transport.js";
 
 describe("driver and injected transport boundary", () => {
   it(
-    "serializes receive processing and drops chunks when the bounded queue is full",
+    "bounds and serializes receive processing",
     async () => {
       const transport = new MockTransport();
       const driver = createMockDriver({
