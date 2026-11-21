@@ -241,6 +241,30 @@ describe("UniversalMultimeterApp", () => {
     expect(app.querySelector(".reading-value").textContent).toBe("230.1");
     expect(app.querySelector(".reading-unit").textContent).toBe("V");
 
+    runtime.emit("measurement", {
+      measurements: [
+        {
+          deviceId: "demo-1",
+          channelId: "primary",
+          value: null,
+          unit: "V",
+          quantity: "voltage",
+          function: "voltage.dc",
+          quality: "good",
+          state: "unknown",
+          metadata: { batteryLow: true },
+          receivedAt: new Date().toISOString(),
+        },
+      ],
+    });
+    expect(app.querySelector(".reading-value").textContent).toBe("—");
+    expect(app.querySelector("[data-quality]").textContent).toBe(
+      "Status onbekend",
+    );
+    expect(app.querySelector("[data-detail]").textContent).toContain(
+      "Batterij laag",
+    );
+
     app.remove();
   });
 });
