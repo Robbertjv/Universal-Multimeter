@@ -152,6 +152,18 @@ describe("WebSerialTransport", () => {
     expect(f.serial.requestPort).not.toHaveBeenCalled();
   });
 
+  it("rejects USB product filters without a vendor ID", () => {
+    const f = fixture();
+    expect(
+      () =>
+        new WebSerialTransport({
+          profile: { serial: { filters: [{ usbProductId: 0xea80 }] } },
+          serial: f.serial,
+        }),
+    ).toThrow();
+    expect(f.serial.requestPort).not.toHaveBeenCalled();
+  });
+
   it("detects unplug/read failure and cleans up idempotently", async () => {
     const f = fixture();
     const transport = new WebSerialTransport({ profile, serial: f.serial });
