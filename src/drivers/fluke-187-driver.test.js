@@ -91,14 +91,14 @@ describe("Fluke 187 response parser", () => {
       unit: "mV",
       state: "overload",
     });
-    expect(
-      parseFluke187ResponseLine("QM,1.25 V AC").measurement,
-    ).toMatchObject({
-      quantity: "voltage",
-      value: 1.25,
-      unit: "V",
-      metadata: { "vendor.fluke187": { mode: "ac" } },
-    });
+    expect(parseFluke187ResponseLine("QM,1.25 V AC").measurement).toMatchObject(
+      {
+        quantity: "voltage",
+        value: 1.25,
+        unit: "V",
+        metadata: { "vendor.fluke187": { mode: "ac" } },
+      },
+    );
   });
 
   it("maps common engineering units and keeps unknown units unknown", () => {
