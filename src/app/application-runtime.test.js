@@ -17,7 +17,7 @@ const mockProfile = {
   transportId: "mock.bytes",
 };
 
-function createRuntime({ historyStoreFactory } = {}) {
+function createRuntime({ historyStoreFactory, mqttClientFactory } = {}) {
   let transport;
   let driver;
   const runtime = createApplicationRuntime({
@@ -41,6 +41,7 @@ function createRuntime({ historyStoreFactory } = {}) {
       return () => `test-${++next}`;
     })(),
     ...(historyStoreFactory ? { historyStoreFactory } : {}),
+    ...(mqttClientFactory ? { mqttClientFactory } : {}),
   });
   return { runtime, getTransport: () => transport, getDriver: () => driver };
 }
@@ -125,6 +126,68 @@ describe("application runtime composition", () => {
     await runtime.disconnect("meter-log");
     await runtime.shutdown();
     expect(historyStore.close).toHaveBeenCalledOnce();
+  });
+
+  it("composes universal MQTT and read-only MCP integrations", async () => {
+    const mqttClients = [];
+    const { runtime } = createRuntime({
+      mqttClientFactory: async (config) => {
+        const client = {
+          connect: vi.fn(),
+          publish: vi.fn(),
+          subscribe: vi.fn(),
+          disconnect: vi.fn(),
+        };
+        mqttClients.push({ config, client });
+        return client;
+      },
+    });
+
+    expect(runtime.integrations).toEqual({ mqtt: "available", mcp: "available" });
+    await runtime.connectMqtt("meter-out", {
+      direction: "southbound",
+      url: "wss://broker.example/mqtt",
+    });
+    await runtime.connectMqtt("external-in", {
+      direction: "northbound",
+      url: "wss://other.example/mqtt",
+    });
+    await runtime.publishMqtt("meter-out", "meters/one/measurement", { value: 230 });
+    const onMessage = vi.fn();
+    await runtime.subscribeMqtt("external-in", "external/#", onMessage);
+
+    expect(mqttClients[0].client.publish).toHaveBeenCalledOnce();
+    expect(mqttClients[1].client.subscribe).toHaveBeenCalledOnce();
+    expect(runtime.listMqttConnections()).toHaveLength(2);
+
+    const tools = await runtime.handleMcpMessage({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "tools/list",
+    });
+    expect(tools.result.tools.map(({ name }) => name)).toEqual([
+      "get_status",
+      "list_devices",
+      "get_latest_measurements",
+    ]);
+
+    await runtime.disconnectMqtt("meter-out");
+    expect(runtime.listMqttConnections()).toHaveLength(1);
+    await runtime.shutdown();
+    expect(mqttClients[1].client.disconnect).toHaveBeenCalledOnce();
+  });
+
+  it("keeps MCP read-only and rejects unknown tools", async () => {
+    const { runtime } = createRuntime();
+    const response = await runtime.handleMcpMessage({
+      jsonrpc: "2.0",
+      id: 2,
+      method: "tools/call",
+      params: { name: "execute_control", arguments: {} },
+    });
+    expect(response.result.isError).toBe(true);
+    expect(response.result.content[0].text).toMatch(/Unknown MCP tool/);
+    await runtime.shutdown();
   });
 
   it("registers both production instrument profiles through the same registry", () => {
