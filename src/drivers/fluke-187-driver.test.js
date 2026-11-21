@@ -9,9 +9,7 @@ import {
   parseFluke187ResponseLine,
   registerFluke187Driver,
 } from "./fluke-187-driver.js";
-import {
-  Fluke187ResponseParser,
-} from "./fluke-187-parser.js";
+import { Fluke187ResponseParser } from "./fluke-187-parser.js";
 import { registerFluke187Profile } from "./fluke-187-profile.js";
 
 const bytes = (text) => new TextEncoder().encode(text);
@@ -88,8 +86,12 @@ describe("Fluke 187 response parser", () => {
 
 describe("Fluke 187 driver", () => {
   it("registers an experimental descriptor and serial profile", () => {
-    expect(validateDriverDescriptor(FLUKE_187_DRIVER_DESCRIPTOR).valid).toBe(true);
-    expect(registerFluke187Driver(new DriverRegistry()).has("fluke.187")).toBe(true);
+    expect(
+      validateDriverDescriptor(FLUKE_187_DRIVER_DESCRIPTOR).valid,
+    ).toBe(true);
+    expect(
+      registerFluke187Driver(new DriverRegistry()).has("fluke.187"),
+    ).toBe(true);
     const profiles = registerFluke187Profile(new DeviceProfileRegistry());
     expect(profiles.get("fluke.187.ir-serial")).toMatchObject({
       transportId: "web.serial",
@@ -108,7 +110,9 @@ describe("Fluke 187 driver", () => {
     const readings = [];
     driver.on("measurement", (reading) => readings.push(reading));
     await driver.start();
-    expect(transport.receivedWrites.map((item) => new TextDecoder().decode(item))).toEqual([
+    expect(
+      transport.receivedWrites.map((item) => new TextDecoder().decode(item)),
+    ).toEqual([
       "ID\r",
       "QM\r",
     ]);
