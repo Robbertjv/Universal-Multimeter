@@ -123,13 +123,15 @@ export function parseUt61eFrame(input) {
   } else {
     switch (modeCode) {
       case 0x3b:
-        functionName = ac && dc ? "voltage.acdc" : ac ? "voltage.ac" : "voltage.dc";
+        functionName =
+          ac && dc ? "voltage.acdc" : ac ? "voltage.ac" : "voltage.dc";
         break;
       case 0x3d:
       case 0x3f:
       case 0x30:
       case 0x39:
-        functionName = ac && dc ? "current.acdc" : ac ? "current.ac" : "current.dc";
+        functionName =
+          ac && dc ? "current.acdc" : ac ? "current.ac" : "current.dc";
         break;
       case 0x33:
         functionName = "resistance";
