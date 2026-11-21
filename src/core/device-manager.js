@@ -131,7 +131,11 @@ export class DeviceManager {
   }
 
   connect(profileId, options = {}) {
-    const connectionKey = `${profileId}\\u0000${options.deviceId ?? "default"}`;
+    // Coalesce retries for an explicitly named session only. Without a deviceId,
+    // each call represents a request for a new independently identified device.
+    if (options.deviceId == null) return this._connect(profileId, options);
+
+    const connectionKey = JSON.stringify([profileId, options.deviceId]);
     if (this._connecting.has(connectionKey)) {
       return this._connecting.get(connectionKey);
     }
@@ -141,7 +145,6 @@ export class DeviceManager {
     this._connecting.set(connectionKey, promise);
     return promise;
   }
-
   async _connect(profileId, options) {
     const profile = this._profiles.get(profileId);
     const deviceId = options.deviceId ?? this._idFactory();
