@@ -19,7 +19,9 @@ export function bootstrapApplication({
   const app = documentRef.querySelector("universal-multimeter-app");
 
   if (!app) {
-    throw new Error("The <universal-multimeter-app> root element was not found.");
+    throw new Error(
+      "The <universal-multimeter-app> root element was not found.",
+    );
   }
 
   const runtime = runtimeFactory();
