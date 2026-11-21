@@ -101,16 +101,14 @@ export class MeasurementHistoryStore {
     const records = await this.query({ deviceId });
     const sessions = new Map();
     for (const record of records) {
-      const session =
-        sessions.get(record.sessionId) ??
-        {
-          sessionId: record.sessionId,
-          deviceId: record.deviceId,
-          device: record.device,
-          startedAt: record.receivedAt,
-          lastMeasurementAt: record.receivedAt,
-          measurementCount: 0,
-        };
+      const session = sessions.get(record.sessionId) ?? {
+        sessionId: record.sessionId,
+        deviceId: record.deviceId,
+        device: record.device,
+        startedAt: record.receivedAt,
+        lastMeasurementAt: record.receivedAt,
+        measurementCount: 0,
+      };
       session.startedAt =
         record.receivedAt < session.startedAt
           ? record.receivedAt
