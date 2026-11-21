@@ -206,7 +206,8 @@ export class UniversalMultimeterApp extends HTMLElement {
         : record.quality === "stale"
           ? "Verouderd"
           : record.state;
-    this._measurementMeta.textContent = `Kanaal: ${record.channelId} · ontvangen: ${new Date(record.receivedAt).toLocaleTimeString()}`;
+    this._measurementMeta.textContent =
+      `Kanaal: ${record.channelId} · ontvangen: ${new Date(record.receivedAt).toLocaleTimeString()}`;
   }
 
   async _connect() {
