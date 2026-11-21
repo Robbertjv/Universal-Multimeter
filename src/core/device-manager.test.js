@@ -7,7 +7,7 @@ import { MeasurementEngine } from "./measurement-engine.js";
 import { MockTransport, MOCK_TRANSPORT_DESCRIPTOR } from "./mock-transport.js";
 import { TransportRegistry } from "./transport-registry.js";
 
-function setup({ failConnect = false, clock } = {}) {
+function setup({ failConnect = false, failInitialize = false, failStart = false, clock } = {}) {
   const profiles = new DeviceProfileRegistry().register({
     profileId: "mock.profile",
     manufacturer: "Test",
@@ -26,7 +26,13 @@ function setup({ failConnect = false, clock } = {}) {
   );
   const drivers = new DriverRegistry().register(
     MOCK_DRIVER_DESCRIPTOR,
-    (dependencies) => createMockDriver(dependencies),
+    (dependencies) => {
+      const driver = createMockDriver(dependencies);
+      if (failInitialize) driver.onInitialize = async () => { throw new Error('initialize failed'); };
+      if (failStart) driver.onStart = async () => { throw new Error('start failed'); };
+      setup.lastDriver = driver;
+      return driver;
+    },
   );
   const engine = new MeasurementEngine({ clock });
   const manager = new DeviceManager({
@@ -88,6 +94,19 @@ describe("DeviceManager", () => {
     expect(setup.lastTransport.state).toBe("disposed");
   });
 
+  it.each([
+    ["driver initialization", { failInitialize: true }],
+    ["driver start", { failStart: true }],
+  ])("rolls back a %s failure", async (_stage, options) => {
+    const { manager, engine } = setup(options);
+    await expect(
+      manager.connect("mock.profile", { deviceId: "driver-failed" }),
+    ).rejects.toMatchObject({ code: "DEVICE_CONNECT_FAILED" });
+    expect(manager.getDevice("driver-failed")).toBeNull();
+    expect(setup.lastTransport.state).toBe("disposed");
+    expect(setup.lastDriver.state).toBe("stopped");
+    expect(engine.getLatest("driver-failed")).toBeNull();
+  });
   it("isolates device sessions and disconnectAll is repeatable", async () => {
     const { manager } = setup();
     const first = await manager.connect("mock.profile", { deviceId: "one" });
