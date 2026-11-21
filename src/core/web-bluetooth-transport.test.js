@@ -165,17 +165,17 @@ describe("WebBluetoothTransport", () => {
       const transport = new WebBluetoothTransport({
         profile: configuredProfile,
         bluetooth: fixture.bluetooth,
+      });
+
+      await transport.connect();
+
+      expect(fixture.bluetooth.requestDevice).toHaveBeenCalledWith({
+        filters: [{ namePrefix: "Meter" }],
+        optionalServices: [profile.ble.serviceUuid, "battery_service"],
+      });
+      await transport.dispose();
     },
   );
-
-    await transport.connect();
-
-    expect(fixture.bluetooth.requestDevice).toHaveBeenCalledWith({
-      filters: [{ namePrefix: "Meter" }],
-      optionalServices: [profile.ble.serviceUuid, "battery_service"],
-    });
-    await transport.dispose();
-  });
 
   it(
     "cleans up listeners and the GATT link when notification setup fails",
@@ -183,36 +183,36 @@ describe("WebBluetoothTransport", () => {
       const fixture = createFixture();
       fixture.characteristic.startNotifications = vi.fn(async () => {
         throw new Error("notification setup failed");
+      });
+      const removeCharacteristicListener = vi.spyOn(
+        fixture.characteristic,
+        "removeEventListener",
+      );
+      const removeDeviceListener = vi.spyOn(
+        fixture.device,
+        "removeEventListener",
+      );
+      const transport = new WebBluetoothTransport({
+        profile,
+        bluetooth: fixture.bluetooth,
+      });
+
+      await expect(transport.connect()).rejects.toMatchObject({
+        code: "TRANSPORT_CONNECT_FAILED",
+      });
+      await transport.dispose();
+
+      expect(removeCharacteristicListener).toHaveBeenCalledWith(
+        "characteristicvaluechanged",
+        expect.any(Function),
+      );
+      expect(removeDeviceListener).toHaveBeenCalledWith(
+        "gattserverdisconnected",
+        expect.any(Function),
+      );
+      expect(fixture.device.gatt.connected).toBe(false);
     },
   );
-    const removeCharacteristicListener = vi.spyOn(
-      fixture.characteristic,
-      "removeEventListener",
-    );
-    const removeDeviceListener = vi.spyOn(
-      fixture.device,
-      "removeEventListener",
-    );
-    const transport = new WebBluetoothTransport({
-      profile,
-      bluetooth: fixture.bluetooth,
-    });
-
-    await expect(transport.connect()).rejects.toMatchObject({
-      code: "TRANSPORT_CONNECT_FAILED",
-    });
-    await transport.dispose();
-
-    expect(removeCharacteristicListener).toHaveBeenCalledWith(
-      "characteristicvaluechanged",
-      expect.any(Function),
-    );
-    expect(removeDeviceListener).toHaveBeenCalledWith(
-      "gattserverdisconnected",
-      expect.any(Function),
-    );
-    expect(fixture.device.gatt.connected).toBe(false);
-  });
 
   it("rejects invalid profiles and detects disconnects", async () => {
     const createInvalid = () =>
