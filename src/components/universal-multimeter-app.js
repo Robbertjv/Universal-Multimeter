@@ -127,6 +127,24 @@ template.innerHTML = `
   </main>
 `;
 
+const CONTROL_LABELS = Object.freeze({
+  hold: "Hold",
+  minMax: "Min / max",
+  exitMinMax: "Stop min / max",
+  autoRange: "Auto range",
+  relative: "Relative",
+  select2: "Second display",
+  light: "Backlight",
+  select: "Select",
+  peak: "Peak",
+  exitPeak: "Stop peak",
+  manualRange: "Handmatig bereik",
+  minMaxAverage: "Min / max / gemiddeld",
+  compare: "Vergelijken",
+  singleLog: "Eenmalig loggen",
+  continueLog: "Doorgaan met loggen",
+});
+
 const STATE_LABELS = {
   connecting: "Verbinding maken…",
   initializing: "Instrument initialiseren…",
