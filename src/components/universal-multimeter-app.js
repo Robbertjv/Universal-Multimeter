@@ -187,7 +187,7 @@ export class UniversalMultimeterApp extends HTMLElement {
         const csv = await this._runtime.exportHistoryCsv({
           sessionId: session.sessionId,
         });
-        if (!csv.split("\\r\\n").length || csv.split("\\r\\n").length < 2) {
+        if (csv.trim().split(/\r?\n/).length < 2) {
           this._setMessage("Geen meetgegevens om te exporteren.");
           return;
         }
