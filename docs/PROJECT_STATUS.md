@@ -57,7 +57,7 @@ No application drivers have been implemented or hardware-validated yet. The entr
 
 | Instrument | Work status | Driver maturity | Next useful action |
 |---|---|---|---|
-| EEVblog 121GW | In progress | Experimental target; scaffold next | Start the first BLE driver scaffold, define profile/descriptor identity, and establish version-aware frame fixtures. |
+| EEVblog 121GW | In progress | Experimental driver scaffold | Binary V2 stream parser, selected main-display decoding, BLE profile and synthetic tests implemented on the issue #10 branch; physical meter/browser validation outstanding. |
 | Fluke 187 | Ready | Scaffold planned | Implement serial parser and safe query/response state machine. |
 | Voltcraft VC850 | Ready | Research needed | Create driver skeleton; obtain raw captures and establish packet format. |
 | Voltcraft VC870 | Ready | Scaffold planned | Implement 23-byte parser; validate frame mapping. |
@@ -86,7 +86,7 @@ These v1 technical contracts are the reviewed implementation baseline. Runtime i
 
 ## Current priorities
 
-1. Implement the first driver wave incrementally, starting with the EEVblog 121GW BLE driver.
+1. Complete review and validation of the initial EEVblog 121GW BLE driver; capture real meter data before raising maturity.
 2. Add parser fixtures and tests for partial, concatenated, malformed, and unknown frames.
 3. Record protocol assumptions and evidence; obtain real captures and hardware validation without blocking known-field implementation.
 4. Keep driver maturity marked experimental/partial until actual hardware validation is complete.
