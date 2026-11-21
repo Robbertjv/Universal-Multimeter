@@ -4,6 +4,8 @@ import {
   parseFluke187ResponseLine,
 } from "./fluke-187-parser.js";
 
+export { parseFluke187ResponseLine };
+
 export const FLUKE_187_DRIVER_DESCRIPTOR = Object.freeze({
   driverId: "fluke.187",
   manufacturer: "Fluke",
