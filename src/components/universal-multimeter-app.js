@@ -315,11 +315,9 @@ export class UniversalMultimeterApp extends HTMLElement {
     badge.lastChild.textContent =
       STATE_LABELS[state] ?? "Geen instrument verbonden";
     badge.dataset.state = state;
-    connect.disabled = [
-      "connecting",
-      "initializing",
-      "disconnecting",
-    ].includes(state);
+    connect.disabled = ["connecting", "initializing", "disconnecting"].includes(
+      state,
+    );
     disconnect.disabled = state !== "connected";
   }
 
@@ -351,10 +349,12 @@ export class UniversalMultimeterApp extends HTMLElement {
   _renderMeasurement() {
     const reading = this.querySelector("[data-reading]");
     const measurement = this._currentDeviceId
-      ? this._latestMeasurements.get(`${this._currentDeviceId}\u0000primary`) ??
+      ? (this._latestMeasurements.get(
+          `${this._currentDeviceId}\u0000primary`,
+        ) ??
         [...this._latestMeasurements.entries()].find(([key]) =>
           key.startsWith(`${this._currentDeviceId}\u0000`),
-        )?.[1]
+        )?.[1])
       : null;
     const value = reading.querySelector(".reading-value");
     const unit = reading.querySelector(".reading-unit");
@@ -400,9 +400,7 @@ export class UniversalMultimeterApp extends HTMLElement {
       const item = document.createElement("li");
       item.textContent = `${measurement.channelId}: ${
         measurement.value ?? "OL"
-      } ${measurement.unit ?? ""} · ${
-        measurement.function ?? "onbekend"
-      }`;
+      } ${measurement.unit ?? ""} · ${measurement.function ?? "onbekend"}`;
       list.append(item);
     }
   }
@@ -424,14 +422,15 @@ export class UniversalMultimeterApp extends HTMLElement {
       detail.textContent = "Verbind een instrument om een trend op te bouwen.";
       return;
     }
-    const points = this._measurementHistory.filter((entry) =>
-      entry.deviceId === measurement.deviceId &&
-      entry.channelId === measurement.channelId &&
-      entry.unit === measurement.unit &&
-      entry.quantity === measurement.quantity &&
-      entry.state === "valid" &&
-      Number.isFinite(entry.value) &&
-      now - new Date(entry.receivedAt).valueOf() <= windowMs,
+    const points = this._measurementHistory.filter(
+      (entry) =>
+        entry.deviceId === measurement.deviceId &&
+        entry.channelId === measurement.channelId &&
+        entry.unit === measurement.unit &&
+        entry.quantity === measurement.quantity &&
+        entry.state === "valid" &&
+        Number.isFinite(entry.value) &&
+        now - new Date(entry.receivedAt).valueOf() <= windowMs,
     );
     if (points.length < 2) {
       const empty = document.createElementNS(
@@ -462,8 +461,7 @@ export class UniversalMultimeterApp extends HTMLElement {
     const duration = end - start || 1;
     const coordinates = points.map((entry) => {
       const x =
-        48 +
-        ((new Date(entry.receivedAt).valueOf() - start) / duration) * 704;
+        48 + ((new Date(entry.receivedAt).valueOf() - start) / duration) * 704;
       const y = 184 - ((entry.value - min) / span) * 148;
       return `${x.toFixed(1)},${y.toFixed(1)}`;
     });
