@@ -22,7 +22,8 @@ export const VOLTCRAFT_VC870_DEVICE_PROFILE = Object.freeze({
       "User must activate PC interface with the meter's REL/PC button.",
     hardwareValidated: false,
     knownLimitations: [
-      "Frequency, loop-current and power-family scaling remain unknown.",
+      "Power-family channels and auxiliary display scaling remain unknown.",
+      "Loop-current quantity is not normalized; its raw percentage is preserved.",
       "Auxiliary display semantics are retained as metadata until mode-specific decoding is verified.",
       "The vendor document and third-party protocol summary disagree on CR/LF order; both are accepted and recorded.",
     ],
