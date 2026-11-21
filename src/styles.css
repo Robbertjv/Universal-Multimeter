@@ -299,3 +299,65 @@ button:disabled {
     width: 100%;
   }
 }
+
+
+.graph-panel {
+  margin-top: 28px;
+  padding: 28px;
+  border: 1px solid #2c3945;
+  border-radius: 16px;
+  background: #17232d;
+}
+
+.graph-panel svg {
+  display: block;
+  width: 100%;
+  min-height: 160px;
+  overflow: visible;
+  color: #70c1b3;
+}
+
+.graph-empty {
+  fill: #aab7c2;
+  font-size: 16px;
+}
+
+.graph-actions {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.graph-actions label {
+  display: grid;
+  gap: 8px;
+  color: #c3ced7;
+  font-size: 0.88rem;
+}
+
+.channel-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  color: #aab7c2;
+  font-size: 0.88rem;
+}
+
+@media (max-width: 720px) {
+  .graph-panel {
+    padding: 20px;
+  }
+
+  .graph-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .graph-actions button {
+    width: 100%;
+  }
+}
