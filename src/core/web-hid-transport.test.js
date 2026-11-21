@@ -67,17 +67,15 @@ describe("WebHIDTransport", () => {
     await transport.dispose();
   });
 
-  it("applies product-only and usage-page chooser filters", async () => {
+  it("applies usage-page chooser filters and rejects invalid product-only filters", async () => {
     const f = fixture();
-    const productTransport = new WebHIDTransport({
-      profile: { hid: { productId: 0xea80 } },
-      hid: f.hid,
-    });
-    await productTransport.connect();
-    expect(f.hid.requestDevice).toHaveBeenCalledWith({
-      filters: [{ productId: 0xea80 }],
-    });
-    await productTransport.dispose();
+    expect(
+      () =>
+        new WebHIDTransport({
+          profile: { hid: { productId: 0xea80 } },
+          hid: f.hid,
+        }),
+    ).toThrow();
 
     const usageFixture = fixture();
     const usageTransport = new WebHIDTransport({
