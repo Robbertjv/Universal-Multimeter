@@ -4,7 +4,7 @@ A modular, browser-based interface for reading measurements from different multi
 
 ## Project status
 
-**Core foundation integrated; initial transport adapters under review.** The Vite/Web Components app shell, universal measurement model, transport base, Device Manager, and Measurement Engine are integrated. The initial profile-driven Web Bluetooth LE adapter is under review in PR #17. No browser/platform or hardware-validated meter support is claimed.
+**Core foundation and initial browser transport adapters integrated; validation remains experimental.** The Vite/Web Components app shell, universal measurement model, transport base, Device Manager, Measurement Engine, Web Bluetooth LE, Web Serial, and WebHID adapters are implemented. No browser/platform or hardware-validated meter support is claimed.
 
 ## Initial target
 
@@ -62,6 +62,7 @@ The repository also maintains the development process and current project state:
 - [Driver Contract](docs/DRIVER_CONTRACT.md) — driver lifecycle, parser boundary, and capability rules.
 - [Transport Contract](docs/TRANSPORT_CONTRACT.md) — common transport interface and adapter requirements.
 - [Web Bluetooth Runtime API](src/core/WEB_BLUETOOTH_API.md) — profile configuration, GATT lifecycle, permissions, and current validation limits.
+- [Web Serial and WebHID Runtime API](src/core/WEB_SERIAL_HID_API.md) — serial framing, HID report handling, lifecycle, and validation limits.
 - [Device Manager and Measurement Engine](docs/DEVICE_MANAGER_AND_ENGINE.md) — service responsibilities and lifecycle.
 - [Device Manager Runtime API](docs/DEVICE_MANAGER_API.md) — implemented registry, connection, measurement ingestion, and current limitations.
 - [Test Strategy](docs/TEST_STRATEGY.md) — unit, fixture, integration, browser, and hardware validation.
