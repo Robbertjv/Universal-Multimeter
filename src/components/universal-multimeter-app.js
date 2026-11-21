@@ -153,7 +153,7 @@ export class UniversalMultimeterApp extends HTMLElement {
       "Selecteer de seriële poort van de Fluke IR-adapter in de browser…",
     );
     try {
-      // This runs directly from the click gesture to request Web Serial permission.
+      // Request Web Serial permission directly from the click gesture.
       const device = await this._runtime.deviceManager.connect(
         "fluke.187.ir-serial",
       );
