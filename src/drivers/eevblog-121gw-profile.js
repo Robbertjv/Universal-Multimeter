@@ -7,10 +7,8 @@ export const EEVBLOG_121GW_DEVICE_PROFILE = Object.freeze({
   ble: {
     serviceUuid: "0bd51666-e7cb-469b-8e4d-2742f1ba77cc",
     notifyCharacteristicUuid: "e7add780-b042-4876-aae1-112855353cc1",
-    writeCharacteristicUuid: "e7add780-b042-4876-aae1-112855353cc1",
     filters: [{ namePrefix: "121GW" }, { namePrefix: "Bluegiga" }],
     optionalServices: ["0bd51666-e7cb-469b-8e4d-2742f1ba77cc"],
-    writeMode: "with-response",
   },
   supportLevel: "experimental",
   evidence: {
