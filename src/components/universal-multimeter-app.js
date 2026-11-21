@@ -394,7 +394,9 @@ export class UniversalMultimeterApp extends HTMLElement {
       if (
         this._currentDeviceId &&
         !key.startsWith(`${this._currentDeviceId}\u0000`)
-      ) continue;
+      ) {
+        continue;
+      }
       const item = document.createElement("li");
       item.textContent = `${measurement.channelId}: ${
         measurement.value ?? "OL"
