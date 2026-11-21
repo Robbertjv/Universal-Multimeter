@@ -57,6 +57,8 @@ describe("WebBluetoothTransport", () => {
     expect(registry.has("web.bluetooth.le")).toBe(true);
     const descriptor = registry.getDescriptor("web.bluetooth.le");
     expect(descriptor.transportId).toBe("web.bluetooth.le");
+    const transport = registry.create("web.bluetooth.le", { profile });
+    expect(transport).toBeInstanceOf(WebBluetoothTransport);
   });
 
   it("connects, emits notification chunks, and writes bytes", async () => {
@@ -114,6 +116,27 @@ describe("WebBluetoothTransport", () => {
     await expect(deniedTransport.connect()).rejects.toMatchObject({
       code: "TRANSPORT_PERMISSION_DENIED",
     });
+  });
+
+  it("supports receive-only profiles without a write characteristic", async () => {
+    const fixture = createFixture();
+    const receiveOnlyProfile = {
+      ...profile,
+      ble: {
+        serviceUuid: profile.ble.serviceUuid,
+        notifyCharacteristicUuid: profile.ble.notifyCharacteristicUuid,
+      },
+    };
+    const transport = new WebBluetoothTransport({
+      profile: receiveOnlyProfile,
+      bluetooth: fixture.bluetooth,
+    });
+
+    await transport.connect();
+    await expect(transport.write(new Uint8Array([1]))).rejects.toMatchObject({
+      code: "TRANSPORT_WRITE_FAILED",
+    });
+    await transport.dispose();
   });
 
   it("maps missing GATT services and characteristics", async () => {
