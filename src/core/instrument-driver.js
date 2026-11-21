@@ -88,7 +88,12 @@ export class InstrumentDriver {
     this._state = "new";
     this._initialized = false;
     this._lifecycleQueue = Promise.resolve();
-    if (!Number.isSafeInteger(maxPendingTransportChunks) || maxPendingTransportChunks < 1 || !Number.isSafeInteger(maxPendingTransportBytes) || maxPendingTransportBytes < 1) {
+    if (
+      !Number.isSafeInteger(maxPendingTransportChunks) ||
+      maxPendingTransportChunks < 1 ||
+      !Number.isSafeInteger(maxPendingTransportBytes) ||
+      maxPendingTransportBytes < 1
+    ) {
       throw new TypeError("Transport receive queue limits must be positive safe integers.");
     }
     this._maxPendingTransportChunks = maxPendingTransportChunks;
@@ -310,8 +315,12 @@ export class InstrumentDriver {
         }
         this._pendingTransportChunks += 1;
         this._pendingTransportBytes += byteLength;
-        const processing = this._transportDataQueue.then(() => this.onTransportData(bytes));
-        this._transportDataQueue = processing.catch((error) => this.publish("error", error));
+        const processing = this._transportDataQueue.then(() =>
+          this.onTransportData(bytes),
+        );
+        this._transportDataQueue = processing.catch((error) =>
+          this.publish("error", error),
+        );
         processing.finally(() => {
           this._pendingTransportChunks -= 1;
           this._pendingTransportBytes -= byteLength;
