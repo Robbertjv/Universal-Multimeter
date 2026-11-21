@@ -195,7 +195,7 @@ export function createApplicationRuntime({
       return getHistoryStore().query(filters);
     },
     async exportHistoryCsv(filters) {
-      const records = await this.getHistory(filters);
+      const records = await getHistoryStore().query(filters);
       return measurementsToCsv(records);
     },
     async clearHistory(filters) {
