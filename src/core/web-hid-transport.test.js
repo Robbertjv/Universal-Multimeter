@@ -1,12 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import { TransportRegistry } from "./transport-registry.js";
 import {
+  CP2110_HID_TRANSPORT_DESCRIPTOR,
   WebHIDTransport,
+  registerCp2110HidTransport,
   registerWebHIDTransport,
 } from "./web-hid-transport.js";
 
 function fixture() {
   const hid = new EventTarget();
+  const features = new Map();
   const device = {
     vendorId: 0x10c4,
     productId: 0xea80,
@@ -18,9 +21,16 @@ function fixture() {
       this.opened = false;
     }),
     sendReport: vi.fn(async () => {}),
+    sendFeatureReport: vi.fn(async (reportId, bytes) => {
+      features.set(reportId, new Uint8Array(bytes));
+    }),
+    receiveFeatureReport: vi.fn(async (reportId) => {
+      const bytes = features.get(reportId) ?? new Uint8Array([0]);
+      return new DataView(bytes.slice().buffer);
+    }),
   };
   hid.requestDevice = vi.fn(async () => [device]);
-  return { hid, device };
+  return { hid, device, features };
 }
 
 const profile = {
@@ -64,6 +74,98 @@ describe("WebHIDTransport", () => {
     );
     await transport.disconnect();
     expect(f.device.close).toHaveBeenCalledTimes(1);
+    await transport.dispose();
+  });
+
+  it("configures CP2110 UART, strips input report IDs and frames output dynamically", async () => {
+    const f = fixture();
+    const profile = {
+      hid: {
+        filters: [{ vendorId: 0x10c4, productId: 0xea80 }],
+        cp2110: {
+          baudRate: 9600,
+          dataBits: 8,
+          parity: "none",
+          flowControl: "none",
+          stopBits: 1,
+        },
+      },
+    };
+    const registry = new TransportRegistry();
+    registerCp2110HidTransport(registry, { hid: f.hid });
+    const transport = registry.create("cp2110.hid", { profile });
+    const chunks = [];
+    transport.on("data", (bytes) => chunks.push([...bytes]));
+
+    await transport.connect();
+    expect(f.device.sendFeatureReport).toHaveBeenNthCalledWith(
+      1,
+      0x41,
+      new Uint8Array([1]),
+    );
+    expect(f.device.sendFeatureReport).toHaveBeenNthCalledWith(
+      2,
+      0x50,
+      new Uint8Array([0, 0, 0x25, 0x80, 0, 0, 3, 0]),
+    );
+    expect(f.device.sendFeatureReport).toHaveBeenNthCalledWith(
+      3,
+      0x43,
+      new Uint8Array([2]),
+    );
+
+    report(f.hid, f.device, 3, [0xab, 0xcd, 0x03]);
+    report(f.hid, f.device, 2, [0xff]);
+    expect(chunks).toEqual([[0xab, 0xcd, 0x03]]);
+
+    await transport.write(new Uint8Array([0xab, 0xcd, 0x03, 0x5e, 0x01, 0xd9]));
+    expect(f.device.sendReport).toHaveBeenCalledWith(
+      6,
+      new Uint8Array([0xab, 0xcd, 0x03, 0x5e, 0x01, 0xd9]),
+    );
+    await transport.dispose();
+    expect(f.device.sendFeatureReport).toHaveBeenLastCalledWith(
+      0x41,
+      new Uint8Array([0]),
+    );
+  });
+
+  it("rejects invalid CP2110 UART configuration and feature-report failures", async () => {
+    const f = fixture();
+    expect(
+      () =>
+        new WebHIDTransport({
+          profile: {
+            hid: {
+              vendorId: 0x10c4,
+              cp2110: { baudRate: 9600, dataBits: 9, parity: "none", flowControl: "none", stopBits: 1 },
+            },
+          },
+          hid: f.hid,
+        }),
+    ).toThrow();
+
+    const unsupported = fixture();
+    delete unsupported.device.sendFeatureReport;
+    const transport = new WebHIDTransport({
+      profile: {
+        hid: {
+          vendorId: 0x10c4,
+          cp2110: {
+            baudRate: 9600,
+            dataBits: 8,
+            parity: "none",
+            flowControl: "none",
+            stopBits: 1,
+          },
+        },
+      },
+      hid: unsupported.hid,
+      descriptor: CP2110_HID_TRANSPORT_DESCRIPTOR,
+    });
+    await expect(transport.connect()).rejects.toMatchObject({
+      code: "TRANSPORT_HID_FEATURE_REPORT_UNSUPPORTED",
+    });
     await transport.dispose();
   });
 
