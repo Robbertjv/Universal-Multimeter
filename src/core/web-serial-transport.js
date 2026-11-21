@@ -36,7 +36,9 @@ function validate(profile) {
               filter.usbProductId < 0 ||
               filter.usbProductId > 65535)) ||
           (filter.usbVendorId === undefined &&
-            filter.usbProductId === undefined),
+            filter.usbProductId === undefined) ||
+          (filter.usbProductId !== undefined &&
+            filter.usbVendorId === undefined),
       ))
   ) {
     throw new TransportError(
