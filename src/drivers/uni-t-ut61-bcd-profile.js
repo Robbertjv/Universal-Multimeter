@@ -15,6 +15,7 @@ export const UNI_T_UT61_BCD_DEVICE_PROFILES = Object.freeze(
         stopBits: 1,
         flowControl: "none",
         bufferSize: 4096,
+        signals: { dataTerminalReady: true },
       },
       supportLevel: "experimental",
       evidence: {
