@@ -119,6 +119,39 @@ describe("WebSerialTransport", () => {
     }
   });
 
+  it("passes validated USB filters to the chooser", async () => {
+    const f = fixture();
+    const filteredProfile = {
+      serial: {
+        ...profile.serial,
+        filters: [{ usbVendorId: 0x10c4, usbProductId: 0xea80 }],
+      },
+    };
+    const transport = new WebSerialTransport({
+      profile: filteredProfile,
+      serial: f.serial,
+    });
+
+    await transport.connect();
+
+    expect(f.serial.requestPort).toHaveBeenCalledWith({
+      filters: [{ usbVendorId: 0x10c4, usbProductId: 0xea80 }],
+    });
+    await transport.dispose();
+  });
+
+  it("rejects malformed USB filters before requesting a port", async () => {
+    const f = fixture();
+    expect(
+      () =>
+        new WebSerialTransport({
+          profile: { serial: { filters: [{ usbVendorId: "invalid" }] } },
+          serial: f.serial,
+        }),
+    ).toThrow();
+    expect(f.serial.requestPort).not.toHaveBeenCalled();
+  });
+
   it("detects unplug/read failure and cleans up idempotently", async () => {
     const f = fixture();
     const transport = new WebSerialTransport({ profile, serial: f.serial });
@@ -133,5 +166,7 @@ describe("WebSerialTransport", () => {
     );
     await transport.dispose();
     expect(transport.state).toBe("disposed");
+    expect(f.reader.releaseLock).toHaveBeenCalledTimes(1);
+    expect(f.port.close).toHaveBeenCalledTimes(1);
   });
 });
