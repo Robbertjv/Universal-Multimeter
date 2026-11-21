@@ -3,7 +3,9 @@ import { createMockDriver } from "./mock-driver.js";
 import { MockTransport } from "./mock-transport.js";
 
 describe("driver and injected transport boundary", () => {
-  it("serializes receive processing and drops chunks when the bounded queue is full", async () => {
+  it(
+    "serializes receive processing and drops chunks when the bounded queue is full",
+    async () => {
     const transport = new MockTransport();
     const driver = createMockDriver({
       transport,
@@ -31,7 +33,9 @@ describe("driver and injected transport boundary", () => {
     await driver.stop();
   });
 
-  it("subscribes to transport chunks without taking connection ownership", async () => {
+  it(
+    "subscribes to transport chunks without taking connection ownership",
+    async () => {
     const transport = new MockTransport();
     const driver = createMockDriver({ transport });
     const chunks = [];
