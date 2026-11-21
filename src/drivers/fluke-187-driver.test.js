@@ -58,6 +58,49 @@ describe("Fluke 187 response parser", () => {
     });
   });
 
+  it("parses documented Fluke 187 response examples (synthetic fixtures)", () => {
+    // Values and wire-format examples are transcribed from the interface note;
+    // these are protocol fixtures, not captures from a physical meter.
+    expect(
+      parseFluke187ResponseLine("FLUKE 187, V0.39,123456789"),
+    ).toMatchObject({
+      ok: true,
+      type: "identification",
+      value: "FLUKE 187, V0.39,123456789",
+    });
+    expect(
+      parseFluke187ResponseLine("QM,+47.66 KOhms").measurement,
+    ).toMatchObject({
+      quantity: "resistance",
+      value: 47.66,
+      unit: "kohm",
+    });
+    expect(
+      parseFluke187ResponseLine("QM,-121.43 VDC").measurement,
+    ).toMatchObject({
+      quantity: "voltage",
+      value: -121.43,
+      unit: "V",
+      metadata: { "vendor.fluke187": { mode: "dc" } },
+    });
+    expect(
+      parseFluke187ResponseLine("QM,Out of Range mVDC").measurement,
+    ).toMatchObject({
+      quantity: "voltage",
+      value: null,
+      unit: "mV",
+      state: "overload",
+    });
+    expect(
+      parseFluke187ResponseLine("QM,1.25 V AC").measurement,
+    ).toMatchObject({
+      quantity: "voltage",
+      value: 1.25,
+      unit: "V",
+      metadata: { "vendor.fluke187": { mode: "ac" } },
+    });
+  });
+
   it("maps common engineering units and keeps unknown units unknown", () => {
     expect(parseFluke187ResponseLine("QM,12.5 kOhm").measurement).toMatchObject(
       {
