@@ -142,6 +142,8 @@ describe("application runtime composition", () => {
       "uni-t.ut61b.serial",
       "uni-t.ut61c.serial",
       "uni-t.ut61d.serial",
+      "voltcraft.vc850.serial",
+      "voltcraft.gdm704.serial",
     ]);
   });
 
