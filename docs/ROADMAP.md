@@ -2,6 +2,45 @@
 
 This roadmap is an ordered, dependency-aware plan rather than a promise of calendar dates. Work can proceed in parallel when dependencies allow. Incomplete device protocols do not prevent implementation of driver scaffolding, parsers for known fields, test fixtures, or research tasks.
 
+## Current execution order — reviewed 2026-11-21
+
+The detailed specification-to-implementation comparison is maintained in [DELTA_REGISTER_2026-11-21.md](DELTA_REGISTER_2026-11-21.md). If older phase descriptions below conflict with this current execution order, this section and the delta register take precedence.
+
+### Stage A — review existing branches
+- [ ] Review PR #26 (Fluke parser correction; latest recorded CI succeeded).
+- [ ] Review PR #27 (Fluke UI integration; latest recorded CI failed at Prettier; not merged).
+- [ ] Reconcile legacy PR #1 with the modular architecture through issue #37; do not merge wholesale.
+- [ ] Keep baseline PR #28 and the delta-register PR reviewed before implementation resumes.
+
+### Stage B — first coherent software application (P0)
+1. [ ] [#29 — Compose modular runtime and first device workflow](https://github.com/Robbertjv/Universal-Multimeter/issues/29).
+2. [ ] [#30 — Universal live dashboard, graph and bargraph](https://github.com/Robbertjv/Universal-Multimeter/issues/30).
+3. [ ] [#31 — Capability-driven controls and device status](https://github.com/Robbertjv/Universal-Multimeter/issues/31).
+4. [ ] [#32 — IndexedDB history and CSV export](https://github.com/Robbertjv/Universal-Multimeter/issues/32).
+
+**Software MVP exit condition:** a user can connect the initial target instrument through the modular runtime, see normalized live readings and honest state/quality indicators, and record/export measurements locally without optional network services.
+
+### Stage C — broader application and integrations
+- [ ] [#33 — Multi-instance dashboard, graph and logging](https://github.com/Robbertjv/Universal-Multimeter/issues/33).
+- [ ] [#34 — MQTT, generic WebSocket and REST](https://github.com/Robbertjv/Universal-Multimeter/issues/34).
+- [ ] [#35 — Secure, instance-scoped MCP](https://github.com/Robbertjv/Universal-Multimeter/issues/35).
+- [ ] [#36 — Browser/OS validation matrix](https://github.com/Robbertjv/Universal-Multimeter/issues/36).
+- [ ] [#38 — Bluetooth Classic feasibility/native bridge](https://github.com/Robbertjv/Universal-Multimeter/issues/38).
+- [ ] [#39 — PWA and offline shell](https://github.com/Robbertjv/Universal-Multimeter/issues/39).
+
+### Stage D — instrument expansion and deferred hardware evidence
+- [ ] [#22 — UNI-T UT61E driver](https://github.com/Robbertjv/Universal-Multimeter/issues/22).
+- [ ] [#23 — UNI-T UT71 variant drivers](https://github.com/Robbertjv/Universal-Multimeter/issues/23).
+- [ ] [#11 — Remaining Voltcraft/UNI-T driver research](https://github.com/Robbertjv/Universal-Multimeter/issues/11).
+- [ ] [#20 — EEVblog 121GW hardware validation](https://github.com/Robbertjv/Universal-Multimeter/issues/20) — **deferred until after the software MVP**.
+- [ ] [#25 — Fluke 187 hardware validation](https://github.com/Robbertjv/Universal-Multimeter/issues/25) — **deferred until after the software MVP**.
+
+### Priority rules
+- P0 is the software MVP (#29–#32); no physical meter/cable test is a prerequisite.
+- P1 is multi-instance capability and browser/platform validation (#33, #36).
+- P2 is optional transports and integrations (#34, #35, #38, #39).
+- Physical validation issues #20 and #25 remain open but deferred until the software MVP exit condition is met.
+
 ## Delivery strategy
 
 Build the shared foundations once, then develop all requested device drivers incrementally. Keep transport adapters independent from protocol decoders and make the universal measurement model the boundary between drivers and the rest of the application.
@@ -48,7 +87,7 @@ Build the shared foundations once, then develop all requested device drivers inc
 
 The v1 contract documents are reviewed implementation baselines. Checked items indicate code or configuration has been added; runtime and CI validation are recorded separately.
 
-**Exit criteria:** a minimal application can load, instantiate a mock device/transport, normalize a reading, and test it without real hardware.
+**Exit criteria:** a minimal application can load, instantiate a mock device/transport, normalize a reading, and test it without real hardware. The merged main branch currently has this foundation, but the production app shell does not yet compose that runtime; see issue #29.
 
 ## Phase 2 — Transport adapters
 
@@ -60,7 +99,7 @@ Implement adapters independently and document browser/OS support.
 4. [ ] MQTT transport — broker connection, topic configuration, reconnect, and message validation.
 5. [ ] WebSocket transport — generic streaming endpoint.
 6. [ ] REST integration — polling and/or command interface where a target device/server supports it.
-7. [ ] Native/helper bridge evaluation for browser/platform gaps, including Bluetooth Classic and direct MQTT TCP where browser APIs cannot provide the required access.
+7. [ ] Native/helper bridge evaluation for browser/platform gaps, including Bluetooth Classic (issue #38) and direct MQTT TCP (issue #34).
 
 **Exit criteria:** each adapter has documented capability limits, connection lifecycle handling, and automated tests with mocks or fixtures.
 
@@ -71,7 +110,7 @@ Drivers are developed in increments. The order below is a suggested sequence, no
 ### First implementation wave
 
 - [x] EEVblog 121GW — initial experimental BLE V2 parser/primary-display decoder merged in [PR #19](https://github.com/Robbertjv/Universal-Multimeter/pull/19); hardware validation tracked in [#20](https://github.com/Robbertjv/Universal-Multimeter/issues/20).
-- [ ] Fluke 187 — experimental read-only ID/QM serial driver in development for [#21](https://github.com/Robbertjv/Universal-Multimeter/issues/21); physical validation remains outstanding.
+- [x] Fluke 187 — initial experimental read-only ID/QM serial driver merged via PR #24; parser correction remains open in PR #26, and app integration is proposed in PR #27. Hardware validation remains deferred in issue #25.
 - [ ] UNI-T UT61E — ES51922-family serial frame decoder and cable/transport variants ([#22](https://github.com/Robbertjv/Universal-Multimeter/issues/22)).
 - [ ] UNI-T UT71 series — 11-byte frame decoder; verify serial framing discrepancy on hardware ([#23](https://github.com/Robbertjv/Universal-Multimeter/issues/23)).
 
