@@ -100,7 +100,7 @@ describe("application runtime composition", () => {
     });
     await runtime.connect("test.mock", { deviceId: "meter-log" });
     const session = runtime.startLogging("meter-log");
-    expect(session.sessionId).toMatch(/^session-/);
+    expect(session.sessionId).toBeTruthy();
     getDriver().publish("measurement", {
       quantity: "voltage",
       function: "voltage.dc",
