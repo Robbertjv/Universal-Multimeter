@@ -29,25 +29,166 @@ export const VOLTCRAFT_VC870_DRIVER_DESCRIPTOR = Object.freeze({
 });
 
 const MODE_DEFINITIONS = new Map([
-  ["00", { quantity: "voltage", function: "voltage.dc", unit: "V", exponents: [-4, -3, -2, -1] }],
-  ["01", { quantity: "voltage", function: "voltage.ac", unit: "V", exponents: [-4, -3, -2, -1] }],
-  ["10", { quantity: "voltage", function: "voltage.dc", unit: "mV", exponents: [-2] }],
-  ["11", { quantity: "temperature", function: "temperature", unit: "degC", exponents: [-1] }],
-  ["20", { quantity: "resistance", function: "resistance", unit: "ohm", exponents: [-2, -1, 0, 1, 2, 3] }],
-  ["21", { quantity: "continuity", function: "continuity", unit: "ohm", exponents: [-2] }],
-  ["30", { quantity: "capacitance", function: "capacitance", unit: "F", exponents: [-12, -11, -10, -9, -8, -7, -6] }],
-  ["40", { quantity: "voltage", function: "diode", unit: "V", exponents: [-4] }],
-  ["50", { quantity: "frequency", function: "frequency", unit: "Hz", exponents: null }],
-  ["51", { quantity: "unknown", function: "unknown", unit: "1", exponents: null, sourceFunction: "loop-current" }],
-  ["60", { quantity: "current", function: "current.dc", unit: "A", exponents: [-8, -7] }],
-  ["61", { quantity: "current", function: "current.ac", unit: "A", exponents: [-8, -7] }],
-  ["70", { quantity: "current", function: "current.dc", unit: "A", exponents: [-6, -5] }],
-  ["71", { quantity: "current", function: "current.ac", unit: "A", exponents: [-6, -5] }],
-  ["80", { quantity: "current", function: "current.dc", unit: "A", exponents: [-3] }],
-  ["81", { quantity: "current", function: "current.ac", unit: "A", exponents: [-3] }],
-  ["90", { quantity: "unknown", function: "unknown", unit: "1", exponents: null, sourceFunction: "power-and-apparent-power" }],
-  ["91", { quantity: "unknown", function: "unknown", unit: "1", exponents: null, sourceFunction: "power-factor-and-frequency" }],
-  ["92", { quantity: "unknown", function: "unknown", unit: "1", exponents: null, sourceFunction: "voltage-and-current-rms" }],
+  [
+    "00",
+    {
+      quantity: "voltage",
+      function: "voltage.dc",
+      unit: "V",
+      exponents: [-4, -3, -2, -1],
+    },
+  ],
+  [
+    "01",
+    {
+      quantity: "voltage",
+      function: "voltage.ac",
+      unit: "V",
+      exponents: [-4, -3, -2, -1],
+    },
+  ],
+  [
+    "10",
+    {
+      quantity: "voltage",
+      function: "voltage.dc",
+      unit: "mV",
+      exponents: [-2],
+    },
+  ],
+  [
+    "11",
+    {
+      quantity: "temperature",
+      function: "temperature",
+      unit: "degC",
+      exponents: [-1],
+    },
+  ],
+  [
+    "20",
+    {
+      quantity: "resistance",
+      function: "resistance",
+      unit: "ohm",
+      exponents: [-2, -1, 0, 1, 2, 3],
+    },
+  ],
+  [
+    "21",
+    {
+      quantity: "continuity",
+      function: "continuity",
+      unit: "ohm",
+      exponents: [-2],
+    },
+  ],
+  [
+    "30",
+    {
+      quantity: "capacitance",
+      function: "capacitance",
+      unit: "F",
+      exponents: [-12, -11, -10, -9, -8, -7, -6],
+    },
+  ],
+  [
+    "40",
+    { quantity: "voltage", function: "diode", unit: "V", exponents: [-4] },
+  ],
+  [
+    "50",
+    {
+      quantity: "frequency",
+      function: "frequency",
+      unit: "Hz",
+      exponents: null,
+    },
+  ],
+  [
+    "51",
+    {
+      quantity: "unknown",
+      function: "unknown",
+      unit: "1",
+      exponents: null,
+      sourceFunction: "loop-current",
+    },
+  ],
+  [
+    "60",
+    {
+      quantity: "current",
+      function: "current.dc",
+      unit: "A",
+      exponents: [-8, -7],
+    },
+  ],
+  [
+    "61",
+    {
+      quantity: "current",
+      function: "current.ac",
+      unit: "A",
+      exponents: [-8, -7],
+    },
+  ],
+  [
+    "70",
+    {
+      quantity: "current",
+      function: "current.dc",
+      unit: "A",
+      exponents: [-6, -5],
+    },
+  ],
+  [
+    "71",
+    {
+      quantity: "current",
+      function: "current.ac",
+      unit: "A",
+      exponents: [-6, -5],
+    },
+  ],
+  [
+    "80",
+    { quantity: "current", function: "current.dc", unit: "A", exponents: [-3] },
+  ],
+  [
+    "81",
+    { quantity: "current", function: "current.ac", unit: "A", exponents: [-3] },
+  ],
+  [
+    "90",
+    {
+      quantity: "unknown",
+      function: "unknown",
+      unit: "1",
+      exponents: null,
+      sourceFunction: "power-and-apparent-power",
+    },
+  ],
+  [
+    "91",
+    {
+      quantity: "unknown",
+      function: "unknown",
+      unit: "1",
+      exponents: null,
+      sourceFunction: "power-factor-and-frequency",
+    },
+  ],
+  [
+    "92",
+    {
+      quantity: "unknown",
+      function: "unknown",
+      unit: "1",
+      exponents: null,
+      sourceFunction: "voltage-and-current-rms",
+    },
+  ],
 ]);
 
 function invalid(code, details = {}) {
@@ -101,9 +242,7 @@ export function parseVc870Frame(input) {
         ? "valid"
         : "unknown";
   const value =
-    state === "valid"
-      ? (sign ? -1 : 1) * rawValue * 10 ** exponent
-      : null;
+    state === "valid" ? (sign ? -1 : 1) * rawValue * 10 ** exponent : null;
 
   return {
     ok: true,
@@ -135,8 +274,7 @@ export function parseVc870Frame(input) {
         warning: (option3 & 0x02) !== 0,
         misplugWarning: (option4 & 0x08) !== 0,
         dualDisplay: frame[20] === 0x31,
-        terminatorOrder:
-          frame[21] === 0x0d ? "CRLF" : "LFCR",
+        terminatorOrder: frame[21] === 0x0d ? "CRLF" : "LFCR",
       },
     },
   };
