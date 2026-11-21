@@ -38,7 +38,7 @@ function frame({
 describe("Voltcraft VC870 protocol parser", () => {
   it("decodes a signed DC voltage and records battery/status flags", () => {
     const result = parseVc870Frame(
-      frame({ digits: "01234", status: 0x0c, option1: 0x01 }),
+      frame({ digits: "01234", status: 0x06, option1: 0x01 }),
     );
 
     expect(result.ok).toBe(true);
@@ -69,6 +69,27 @@ describe("Voltcraft VC870 protocol parser", () => {
       quantity: "capacitance",
       value: 4e-8,
       unit: "F",
+    });
+  });
+
+  it("decodes frequency and retains loop-current quantity as unknown", () => {
+    const frequency = parseVc870Frame(
+      frame({ functionCode: "5", selectCode: "0", digits: "01234" }),
+    );
+    const loopCurrent = parseVc870Frame(
+      frame({ functionCode: "5", selectCode: "1", digits: "01234" }),
+    );
+
+    expect(frequency.measurement).toMatchObject({
+      quantity: "frequency",
+      function: "frequency",
+      value: 1.234,
+      unit: "Hz",
+    });
+    expect(loopCurrent.measurement).toMatchObject({
+      quantity: "unknown",
+      value: 12.34,
+      unit: "%",
     });
   });
 
