@@ -70,7 +70,7 @@ function readDigits(frame) {
   if (text === ":<0::") return { special: "under-range" };
   const fourDigit = text[4] === ":";
   const digits = text.slice(0, fourDigit ? 4 : 5);
-  if (!/^\\d+$/.test(digits)) return null;
+  if (!/^\d+$/.test(digits)) return null;
   return {
     value: Number(digits) * (fourDigit ? 10 : 1),
     fourDigit,
@@ -88,6 +88,7 @@ export function parseUt71xFrame(input) {
   if (
     rangeIndex < 0 ||
     rangeIndex > 7 ||
+    !Number.isInteger(modeCode) ||
     modeCode < 0 ||
     modeCode > 15
   ) {
