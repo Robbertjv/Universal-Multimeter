@@ -251,7 +251,8 @@ export class WebBluetoothTransport extends TransportAdapter {
         );
       }
       this._onValueChanged = (event) => {
-        const value = event.target?.value ?? this._notifyCharacteristic?.value;
+        const value =
+          event.target?.value ?? this._notifyCharacteristic?.value;
         if (!value) return;
         const chunk = new Uint8Array(
           value.buffer,
@@ -319,7 +320,9 @@ export class WebBluetoothTransport extends TransportAdapter {
           );
         }
         await characteristic.writeValueWithoutResponse(bytes);
-      } else if (typeof characteristic.writeValueWithResponse === "function") {
+      } else if (
+        typeof characteristic.writeValueWithResponse === "function"
+      ) {
         await characteristic.writeValueWithResponse(bytes);
       } else if (typeof characteristic.writeValue === "function") {
         await characteristic.writeValue(bytes);
