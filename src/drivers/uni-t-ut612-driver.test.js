@@ -68,7 +68,7 @@ describe("UNI-T UT612 ES51919 protocol parser", () => {
     const capacitance = parseUt612Frame(
       frame({
         primaryCode: 2,
-        primaryRaw: 20000,
+        primaryRaw: 19999,
         primaryInfo: measurementInfo(2, 11),
         secondaryCode: 0,
       }),
@@ -82,7 +82,7 @@ describe("UNI-T UT612 ES51919 protocol parser", () => {
       }),
     );
 
-    expect(capacitance.measurements[0].value).toBeCloseTo(0.0002, 12);
+    expect(capacitance.measurements[0].value).toBeCloseTo(0.00019999, 12);
     expect(capacitance.measurements[0].unit).toBe("F");
     expect(resistance.measurements[0]).toMatchObject({
       quantity: "resistance",
