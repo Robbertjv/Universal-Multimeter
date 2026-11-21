@@ -41,8 +41,7 @@ function validateBleProfile(profile) {
     config.optionalServices !== undefined &&
     (!Array.isArray(config.optionalServices) ||
       config.optionalServices.some(
-        (service) =>
-          typeof service !== "string" && typeof service !== "number",
+        (service) => typeof service !== "string" && typeof service !== "number",
       ))
   ) {
     throw new TransportError(
