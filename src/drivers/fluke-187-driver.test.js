@@ -12,7 +12,7 @@ import {
 import { Fluke187ResponseParser } from "./fluke-187-parser.js";
 import { registerFluke187Profile } from "./fluke-187-profile.js";
 
-const bytes = (text) => new TextEncoder().encode(text);
+const bytes = (text) => Uint8Array.from(new TextEncoder().encode(text));
 const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 describe("Fluke 187 response parser", () => {
