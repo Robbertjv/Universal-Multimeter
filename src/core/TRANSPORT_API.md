@@ -38,7 +38,7 @@ The driver boundary also applies bounded asynchronous processing: by default
 it accepts at most 128 pending chunks and 256 KiB of pending bytes, processes
 accepted chunks serially, and emits `DRIVER_RECEIVE_QUEUE_FULL` while dropping
 new chunks that would exceed either limit. Drivers can tune these limits with
-`maxPendingTransportChunks` and `maxPendingTransportBytes`. This is an
+`maxPendingTransportChunks` and `maxPendingTransportBytes`; both must be positive safe integers. This is an
 explicit bounded drop policy, not lossless flow control; concrete adapters
 should additionally pause/resume their source when the platform supports it,
 or use their own bounded queue and report overflow.
