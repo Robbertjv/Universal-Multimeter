@@ -8,7 +8,7 @@ Both adapters implement the shared `TransportAdapter` contract and are registere
 
 Module: `src/core/web-serial-transport.js`; transport ID: `web.serial`.
 
-A profile uses `serial` options: `baudRate` (default 9600), `dataBits` (8), `stopBits` (1), `parity` (none/even/odd), `flowControl` (none/hardware), `bufferSize` (4096), and optional browser `filters` containing `usbVendorId` and/or `usbProductId`.
+A profile uses `serial` options: `baudRate` (default 9600), `dataBits` (8), `stopBits` (1), `parity` (none/even/odd), `flowControl` (none/hardware), `bufferSize` (4096), and optional browser `filters` containing `usbVendorId` and optional `usbProductId` (the product ID requires a vendor ID).
 
 ```js
 {
