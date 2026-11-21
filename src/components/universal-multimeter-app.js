@@ -153,7 +153,9 @@ export class UniversalMultimeterApp extends HTMLElement {
       "measurement-error",
     ];
     for (const type of eventTypes) {
-      this._unsubscribers.push(this._runtime.on(type, (event) => this._handleRuntimeEvent(event)));
+      this._unsubscribers.push(
+        this._runtime.on(type, (event) => this._handleRuntimeEvent(event)),
+      );
     }
     for (const device of this._runtime.listConnectedDevices()) {
       this._deviceStates.set(device.deviceId, device);
@@ -195,13 +197,16 @@ export class UniversalMultimeterApp extends HTMLElement {
       case "device-connected":
         this._deviceStates.set(event.device.deviceId, event.device);
         this._currentDeviceId = event.device.deviceId;
-        this._setMessage(`${event.device.manufacturer} ${event.device.model} is verbonden.`);
+        this._setMessage(
+          `${event.device.manufacturer} ${event.device.model} is verbonden.`,
+        );
         break;
       case "device-disconnected":
         this._deviceStates.delete(event.deviceId);
         this._latestMeasurements.delete(event.deviceId);
         if (this._currentDeviceId === event.deviceId) {
-          this._currentDeviceId = this._deviceStates.keys().next().value ?? null;
+          this._currentDeviceId =
+            this._deviceStates.keys().next().value ?? null;
         }
         this._setMessage("Instrumentverbinding verbroken.");
         break;
@@ -210,7 +215,11 @@ export class UniversalMultimeterApp extends HTMLElement {
         this._setMessage(this._friendlyError(event.error));
         break;
       case "device-warning":
-        this._setMessage(event.warning?.message ?? event.warning?.code ?? "Waarschuwing van instrument.");
+        this._setMessage(
+          event.warning?.message ??
+            event.warning?.code ??
+            "Waarschuwing van instrument.",
+        );
         break;
       case "measurement":
         for (const measurement of event.measurements ?? []) {
@@ -226,9 +235,12 @@ export class UniversalMultimeterApp extends HTMLElement {
 
   _friendlyError(error) {
     if (!error) return "Er is een onbekende fout opgetreden.";
-    if (error.code === "TRANSPORT_DEVICE_SELECTION_CANCELLED") return "Apparaatselectie geannuleerd.";
-    if (error.code === "TRANSPORT_PERMISSION_DENIED") return "Geen toestemming voor apparaattoegang.";
-    if (error.code?.includes("UNAVAILABLE")) return "Deze browser ondersteunt de gevraagde verbinding niet.";
+    if (error.code === "TRANSPORT_DEVICE_SELECTION_CANCELLED")
+      return "Apparaatselectie geannuleerd.";
+    if (error.code === "TRANSPORT_PERMISSION_DENIED")
+      return "Geen toestemming voor apparaattoegang.";
+    if (error.code?.includes("UNAVAILABLE"))
+      return "Deze browser ondersteunt de gevraagde verbinding niet.";
     return error.message ?? error.code ?? "Verbinding mislukt.";
   }
 
@@ -245,9 +257,15 @@ export class UniversalMultimeterApp extends HTMLElement {
       ? this._deviceStates.get(this._currentDeviceId)
       : null;
     const state = current?.state ?? "disconnected";
-    badge.lastChild.textContent = STATE_LABELS[state] ?? "Geen instrument verbonden";
+    badge.lastChild.textContent =
+      STATE_LABELS[state] ?? "Geen instrument verbonden";
     badge.dataset.state = state;
-    connect.disabled = ["connecting", "initializing", "connected", "disconnecting"].includes(state);
+    connect.disabled = [
+      "connecting",
+      "initializing",
+      "connected",
+      "disconnecting",
+    ].includes(state);
     disconnect.disabled = state !== "connected";
   }
 
@@ -264,9 +282,13 @@ export class UniversalMultimeterApp extends HTMLElement {
     for (const device of this._deviceStates.values()) {
       const item = document.createElement("li");
       const name = document.createElement("strong");
-      name.textContent = [device.manufacturer, device.model].filter(Boolean).join(" ") || device.profileId || device.deviceId;
+      name.textContent =
+        [device.manufacturer, device.model].filter(Boolean).join(" ") ||
+        device.profileId ||
+        device.deviceId;
       const state = document.createElement("span");
-      state.textContent = STATE_LABELS[device.state] ?? device.state ?? "Status onbekend";
+      state.textContent =
+        STATE_LABELS[device.state] ?? device.state ?? "Status onbekend";
       item.append(name, state);
       list.append(item);
     }
@@ -288,15 +310,22 @@ export class UniversalMultimeterApp extends HTMLElement {
       detail.textContent = "Verbind een instrument om metingen te ontvangen.";
       return;
     }
-    value.textContent = measurement.value === null ? "OL" : String(measurement.value);
+    value.textContent =
+      measurement.value === null ? "OL" : String(measurement.value);
     unit.textContent = measurement.unit ?? "";
-    quality.textContent = measurement.quality === "stale"
-      ? "Verouderde meting"
-      : measurement.state === "overload"
-        ? "Buiten bereik"
-        : measurement.quality ?? "Status onbekend";
-    detail.textContent = [measurement.function, measurement.quantity, measurement.receivedAt]
-      .filter(Boolean).join(" · ");
+    quality.textContent =
+      measurement.quality === "stale"
+        ? "Verouderde meting"
+        : measurement.state === "overload"
+          ? "Buiten bereik"
+          : (measurement.quality ?? "Status onbekend");
+    detail.textContent = [
+      measurement.function,
+      measurement.quantity,
+      measurement.receivedAt,
+    ]
+      .filter(Boolean)
+      .join(" · ");
   }
 
   _renderAll() {
