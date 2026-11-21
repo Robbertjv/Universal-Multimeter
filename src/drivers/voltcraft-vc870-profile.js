@@ -11,6 +11,7 @@ export const VOLTCRAFT_VC870_DEVICE_PROFILE = Object.freeze({
     stopBits: 1,
     flowControl: "none",
     bufferSize: 4096,
+    signals: { dataTerminalReady: true },
   },
   supportLevel: "experimental",
   evidence: {
