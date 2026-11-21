@@ -1,72 +1,9 @@
+import appTemplate from "./app-template.html?raw";
 import { createFluke187Runtime } from "../app-runtime.js";
 
 const template = document.createElement("template");
-template.innerHTML = `
-  <main class="app-shell">
-    <header class="app-header">
-      <div>
-        <p class="eyebrow">MEETINSTRUMENTEN · UNIVERSELE INTERFACE</p>
-        <h1>Universal Multimeter</h1>
-        <p class="intro">
-          Eén werkplek voor multimeters en andere meetinstrumenten.
-        </p>
-      </div>
-      <span class="connection-badge" role="status" aria-live="polite">
-        <span class="status-dot" aria-hidden="true"></span>
-        <span data-role="connection-label">Geen instrument verbonden</span>
-      </span>
-    </header>
-    <section class="instrument-card" aria-labelledby="instrument-title">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">INSTRUMENT</p>
-          <h2 id="instrument-title">Fluke 187</h2>
-          <p class="muted">
-            Optische IR-verbinding via Web Serial · experimenteel
-          </p>
-        </div>
-        <div class="actions">
-          <button type="button" data-action="connect">
-            Verbind Fluke 187
-          </button>
-          <button
-            type="button"
-            data-action="disconnect"
-            class="secondary"
-            disabled
-          >
-            Verbreek
-          </button>
-        </div>
-      </div>
-      <p class="notice" data-role="message" role="status" aria-live="polite">
-        Kies Verbind om in de browser een seriële poort te selecteren.
-      </p>
-      <p class="muted" data-role="identity"></p>
-    </section>
-    <section class="measurement-card" aria-labelledby="measurement-title">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">LIVE METING</p>
-          <h2 id="measurement-title">Primaire uitlezing</h2>
-        </div>
-        <span class="measurement-state" data-role="measurement-state">
-          Nog geen meting
-        </span>
-      </div>
-      <output class="measurement-value" data-role="measurement-value">
-        —
-      </output>
-      <p class="muted" data-role="measurement-meta">
-        Wacht op een meetwaarde van het instrument.
-      </p>
-    </section>
-    <footer class="app-footer">
-      <span>Universal Multimeter Web Interface</span>
-      <span>Fluke 187 · experimentele ondersteuning</span>
-    </footer>
-  </main>
-`;
+template.innerHTML = appTemplate;
+
 
 function formatValue(record) {
   if (record.state === "overload") return "OL";
@@ -206,8 +143,10 @@ export class UniversalMultimeterApp extends HTMLElement {
         : record.quality === "stale"
           ? "Verouderd"
           : record.state;
-    this._measurementMeta.textContent =
-      `Kanaal: ${record.channelId} · ontvangen: ${new Date(record.receivedAt).toLocaleTimeString()}`;
+    this._measurementMeta.textContent = [
+      `Kanaal: ${record.channelId}`,
+      `ontvangen: ${new Date(record.receivedAt).toLocaleTimeString()}`,
+    ].join(" · ");
   }
 
   async _connect() {
