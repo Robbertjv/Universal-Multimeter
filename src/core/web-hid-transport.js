@@ -18,10 +18,28 @@ function validate(profile) {
       "A HID profile is required.",
     );
   }
-  if (config.filters !== undefined && !Array.isArray(config.filters)) {
+  if (
+    config.filters !== undefined &&
+    (!Array.isArray(config.filters) ||
+      config.filters.some(
+        (filter) =>
+          !filter ||
+          typeof filter !== "object" ||
+          Array.isArray(filter) ||
+          (filter.vendorId !== undefined &&
+            (!Number.isInteger(filter.vendorId) ||
+              filter.vendorId < 0 ||
+              filter.vendorId > 65535)) ||
+          (filter.productId !== undefined &&
+            (!Number.isInteger(filter.productId) ||
+              filter.productId < 0 ||
+              filter.productId > 65535)) ||
+          (filter.vendorId === undefined && filter.productId === undefined),
+      ))
+  ) {
     throw new TransportError(
       "TRANSPORT_INVALID_DESCRIPTOR",
-      "hid.filters must be an array.",
+      "hid.filters must contain valid vendorId or productId filters.",
     );
   }
 
@@ -50,12 +68,11 @@ function validate(profile) {
   if (
     !config.filters?.length &&
     config.vendorId === undefined &&
-    config.inputReportId === undefined &&
-    config.outputReportId === undefined
+    config.productId === undefined
   ) {
     throw new TransportError(
       "TRANSPORT_INVALID_DESCRIPTOR",
-      "Configure HID filters, vendorId, or report IDs.",
+      "Configure HID filters, vendorId, or productId to constrain device selection.",
     );
   }
   return config;
@@ -112,10 +129,12 @@ export class WebHIDTransport extends TransportAdapter {
     let filters = this._config.filters
       ? structuredClone(this._config.filters)
       : [];
-    if (!filters.length && this._config.vendorId !== undefined) {
+    if (!filters.length) {
       filters = [
         {
-          vendorId: this._config.vendorId,
+          ...(this._config.vendorId === undefined
+            ? {}
+            : { vendorId: this._config.vendorId }),
           ...(this._config.productId === undefined
             ? {}
             : { productId: this._config.productId }),
